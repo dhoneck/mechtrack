@@ -6,18 +6,24 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Business(models.Model):
     name = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = 'Businesses'
+
     def __str__(self):
         return self.name
 
 
 class Branch(models.Model):
-    business_id = models.ForeignKey(Business, on_delete=models.CASCADE)
-    address = models.CharField(max_length= 100)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    address = models.CharField(max_length=100)
     phone = PhoneNumberField()
-    email = models.EmailField(max_length=254)
+    email = models.EmailField(null=True, blank=True, max_length=254)
+
+    class Meta:
+        verbose_name_plural = 'Branches'
 
     def __str__(self):
-        business_name = Branch.objects.get(id=self.business_id)
+        business_name = Business.objects.get(id=self.business.id).name
         return f'{business_name} - {self.address}'
 
 
@@ -25,8 +31,8 @@ class Car(models.Model):
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField()
-    vin = models.CharField(max_length=17)
-    license = models.CharField(max_length=8)
+    vin = models.CharField(null=True, blank=True, unique=True, max_length=17)
+    license = models.CharField(null=True, blank=True, unique=True, max_length=8)
 
     def __str__(self):
         return f'{self.year} {self.make} {self.model}'
@@ -35,35 +41,35 @@ class Car(models.Model):
 class Customer(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = PhoneNumberField()
-    email = models.EmailField(max_length=254)
-    notes = models.TextField()
+    phone = PhoneNumberField(null=True, blank=True, unique=True)
+    email = models.EmailField(null=True, blank=True, max_length=254)
+    notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
 
 class Owner(models.Model):
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    car_id = models.ForeignKey(Car, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('customer_id', 'car_id')
+        unique_together = ('customer', 'car')
 
     def __str__(self):
-        customer = Owner.objects.get(id=self.customer_id)
-        car = Owner.objects.get(id=self.car_id)
-        return f'{customer} - {car}'
+        customer = Customer.objects.get(id=self.customer.id)
+        car = Car.objects.get(id=self.car.id)
+        return f'{customer.first_name} - {car.make} {car.model}'
 
 
 class Invoice(models.Model):
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     date = models.DateField()
     description = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        customer = Invoice.objects.get(id=self.customer_id)
+        customer = Customer.objects.get(id=self.customer.id)
         return f'''
             Invoice for {customer}
             Date: {self.date}
