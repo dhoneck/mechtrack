@@ -17,7 +17,7 @@ class Branch(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     address = models.CharField(max_length=100)
     phone = PhoneNumberField()
-    email = models.EmailField(null=True, blank=True, max_length=254)
+    email = models.EmailField(blank=True, default='', max_length=254)
 
     class Meta:
         verbose_name_plural = 'Branches'
@@ -31,8 +31,8 @@ class Car(models.Model):
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField()
-    vin = models.CharField(null=True, blank=True, unique=True, max_length=17)
-    license = models.CharField(null=True, blank=True, unique=True, max_length=8)
+    vin = models.CharField(blank=True, default='', unique=True, max_length=17)
+    license = models.CharField(blank=True, default='', unique=True, max_length=8)
 
     def __str__(self):
         return f'{self.year} {self.make} {self.model}'
@@ -41,9 +41,9 @@ class Car(models.Model):
 class Customer(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = PhoneNumberField(null=True, blank=True, unique=True)
-    email = models.EmailField(null=True, blank=True, max_length=254)
-    notes = models.TextField(null=True, blank=True)
+    phone = PhoneNumberField(blank=True, default='', unique=True)
+    email = models.EmailField(blank=True, default='', max_length=254)
+    notes = models.TextField(blank=True, default='',)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
