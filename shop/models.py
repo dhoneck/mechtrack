@@ -14,7 +14,7 @@ class Business(models.Model):
 
 
 class Branch(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='branches')
     address = models.CharField(max_length=100)
     phone = PhoneNumberField()
     email = models.EmailField(blank=True, default='', max_length=254)
@@ -28,6 +28,7 @@ class Branch(models.Model):
 
 
 class Car(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='cars')
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField()
@@ -39,6 +40,7 @@ class Car(models.Model):
 
 
 class Customer(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='customers')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)
@@ -63,7 +65,7 @@ class Owner(models.Model):
 
 
 class Invoice(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='invoices')
     date = models.DateField()
     description = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
