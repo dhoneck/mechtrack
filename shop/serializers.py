@@ -11,28 +11,28 @@ class BusinessSerializer(serializers.ModelSerializer):
 class BranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
-        fields = ['id', 'business_id', 'address', 'phone', 'email']
+        fields = ['id', 'business', 'address', 'phone', 'email']
 
 
 class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
-        fields = ['id', 'make', 'model', 'year', 'vin', 'license']
+        fields = ['id', 'make', 'model', 'year', 'color', 'vin', 'license']
 
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'phone', 'email', 'notes']
+        fields = ['id', 'branch', 'first_name', 'last_name', 'phone', 'email', 'notes']
 
 
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Owner
-        fields = ['id', 'customer_id', 'car_id']
+        fields = ['id', 'customer', 'car']
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
-        fields = ['id', 'customer_id', 'date', 'description', 'amount']
+        fields = ['id', 'customer', 'date', 'description', 'amount']

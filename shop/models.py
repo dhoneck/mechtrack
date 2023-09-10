@@ -28,15 +28,28 @@ class Branch(models.Model):
 
 
 class Car(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='cars')
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
-    year = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(blank=True, null=True)
+    color = models.CharField(blank=True, default='', max_length=50)
     vin = models.CharField(blank=True, default='', unique=True, max_length=17)
     license = models.CharField(blank=True, default='', unique=True, max_length=8)
 
     def __str__(self):
-        return f'{self.year} {self.make} {self.model}'
+        description = ''
+        if self.color:
+            description += f'{self.color}'
+        if self.year:
+            description += f' {self.year}'
+
+        description += f' {self.make} {self.model}'
+
+        if self.license:
+            description += f' | LICENSE: {self.license.upper()}'
+        if self.vin:
+            description += f' | VIN: {self.vin.upper()}'
+
+        return description
 
 
 class Customer(models.Model):

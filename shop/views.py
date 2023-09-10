@@ -26,3 +26,35 @@ class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+
+class CarList(generics.ListCreateAPIView):
+    """
+    List all cars, or create a new car.
+    """
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+
+
+class CarDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a car instance.
+    """
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+
+
+class OwnerList(generics.ListCreateAPIView):
+    """
+    List all owners, or create a new owner.
+    """
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
+
+
+class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete an owner instance.
+    """
+    queryset = Owner.objects.all()
+    serializer_class = OwnerSerializer
