@@ -1,29 +1,17 @@
 from rest_framework import serializers
-from shop.models import Business, Branch, Car, Customer, Owner, Invoice
+from shop.models import Vehicle, Customer, Owner, Invoice
 
 
-class BusinessSerializer(serializers.ModelSerializer):
+class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Business
-        fields = ['id', 'name']
-
-
-class BranchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Business
-        fields = ['id', 'business', 'address', 'phone', 'email']
-
-
-class CarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Car
-        fields = ['id', 'make', 'model', 'year', 'color', 'vin', 'license']
+        model = Vehicle
+        fields = ['id', 'make', 'model', 'year', 'color', 'license', 'vin', 'notes']
 
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id', 'branch', 'first_name', 'last_name', 'phone', 'email', 'notes']
+        fields = ['id', 'first_name', 'last_name', 'phone', 'email', 'accepts_texts', 'accepts_emails', 'flagged', 'notes']
 
 
 class OwnerSerializer(serializers.ModelSerializer):

@@ -3,37 +3,14 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
-class Business(models.Model):
-    name = models.CharField(max_length=50)
-
-    class Meta:
-        verbose_name_plural = 'Businesses'
-
-    def __str__(self):
-        return self.name
-
-
-class Branch(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='branches')
-    address = models.CharField(max_length=100)
-    phone = PhoneNumberField()
-    email = models.EmailField(blank=True, default='', max_length=254)
-
-    class Meta:
-        verbose_name_plural = 'Branches'
-
-    def __str__(self):
-        business_name = Business.objects.get(id=self.business.id).name
-        return f'{business_name} - {self.address}'
-
-
-class Car(models.Model):
+class Vehicle(models.Model):
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField(blank=True, null=True)
     color = models.CharField(blank=True, default='', max_length=50)
-    vin = models.CharField(blank=True, default='', unique=True, max_length=17)
     license = models.CharField(blank=True, default='', unique=True, max_length=8)
+    vin = models.CharField(blank=True, default='', unique=True, max_length=17)
+    notes = models.TextField(blank=True, default='')
 
     def __str__(self):
         description = ''
@@ -53,12 +30,14 @@ class Car(models.Model):
 
 
 class Customer(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='customers')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)
     email = models.EmailField(blank=True, default='', max_length=254)
-    notes = models.TextField(blank=True, default='',)
+    accepts_texts = models.BooleanField(default=False)
+    accepts_emails = models.BooleanField(default=False)
+    flagged = models.BooleanField(default=False)
+    notes = models.TextField(blank=True, default='')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -66,15 +45,15 @@ class Customer(models.Model):
 
 class Owner(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('customer', 'car')
+        unique_together = ('customer', 'vehicle')
 
     def __str__(self):
         customer = Customer.objects.get(id=self.customer.id)
-        car = Car.objects.get(id=self.car.id)
-        return f'{customer.first_name} - {car.make} {car.model}'
+        vehicle = Vehicle.objects.get(id=self.vehicle.id)
+        return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
 
 
 class Invoice(models.Model):

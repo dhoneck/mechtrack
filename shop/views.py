@@ -1,14 +1,6 @@
-from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework import generics
-from rest_framework.response import Response
-from shop.models import Business, Branch, Car, Customer, Owner, Invoice
-from shop.serializers import (BusinessSerializer,
-                              BranchSerializer,
-                              CarSerializer,
-                              CustomerSerializer,
-                              OwnerSerializer,
-                              InvoiceSerializer)
+from shop.models import Vehicle, Customer, Owner
+from shop.serializers import VehicleSerializer, CustomerSerializer, OwnerSerializer
 
 
 # Create your views here.
@@ -28,20 +20,20 @@ class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CustomerSerializer
 
 
-class CarList(generics.ListCreateAPIView):
+class VehicleList(generics.ListCreateAPIView):
     """
-    List all cars, or create a new car.
+    List all vehicles, or create a new vehicles.
     """
-    queryset = Car.objects.all()
-    serializer_class = CarSerializer
+    queryset = Vehicle.objects.all()
+    serializer_class = VehicleSerializer
 
 
-class CarDetail(generics.RetrieveUpdateDestroyAPIView):
+class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, update or delete a car instance.
+    Retrieve, update or delete a vehicle instance.
     """
-    queryset = Car.objects.all()
-    serializer_class = CarSerializer
+    queryset = Vehicle.objects.all()
+    serializer_class = VehicleSerializer
 
 
 class OwnerList(generics.ListCreateAPIView):
