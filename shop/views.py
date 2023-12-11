@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import filters, generics
 from shop.models import Vehicle, Customer, Owner
 from shop.serializers import VehicleSerializer, CustomerSerializer, OwnerSerializer
 
@@ -10,6 +10,8 @@ class CustomerList(generics.ListCreateAPIView):
     """
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['first_name', 'last_name', 'phone']
 
 
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
