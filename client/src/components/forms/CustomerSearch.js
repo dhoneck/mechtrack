@@ -3,6 +3,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'
 
 export default function CustomerSearch() {
   const [query, setQuery] = useState('');
@@ -46,7 +47,7 @@ export default function CustomerSearch() {
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
-      <Button variant='contained' sx={{ my: 1}}>Add Customer</Button>
+      <Button as={ Link } to='/add-customer' variant='contained' sx={{ my: 1}} >Add Customer</Button>
       <Box id={'results'}>
         <h2 style={{margin: 0, marginTop: 10, marginBottom: 5}}>Results</h2>
         <p style={{margin: 0, marginBottom: 15}}>Searching for "{query}"</p>
