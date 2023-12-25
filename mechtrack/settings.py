@@ -37,7 +37,7 @@ elif IN_PRODUCTION == 'false':
     print('In development!')
     DEBUG = True
 
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 # ALLOWED_HOSTS = ['127.0.0.1', 'http://localhost:3000']
