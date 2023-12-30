@@ -6,11 +6,11 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  TextField
+  TextField,
+  Typography,
 } from '@mui/material'
 
 import axios from 'axios';
-import {redirect} from "react-router-dom";
 
 const style = {
   my: 5
@@ -62,69 +62,69 @@ export default function AddCustomer() {
 
   return (
     <Box
-      component="form"
+      component='form'
       noValidate
-      autoComplete="off"
+      autoComplete='off'
     >
-      <h1>Add Customer</h1>
+      <Typography variant='h2' align='center'>Add Customer</Typography>
       <FormGroup>
         <TextField
           style={style}
-          required id="first-name"
-          label="First Name"
-          variant="outlined"
+          required id='first-name'
+          label='First Name'
+          variant='outlined'
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
         <TextField
-          required id="last-name"
-          label="Last Name"
-          variant="outlined"
+          required id='last-name'
+          label='Last Name'
+          variant='outlined'
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
         <TextField
-          required id="phone-number"
-          label="Phone Number"
-          variant="outlined"
+          required id='phone-number'
+          label='Phone Number'
+          variant='outlined'
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
         />
         <TextField
-          id="email"
-          label="Email"
-          variant="outlined"
+          id='email'
+          label='Email'
+          variant='outlined'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <FormControlLabel
           control={<Checkbox />}
-          label="Accepts Texts"
+          label='Accepts Texts'
           checked={acceptsTexts}
           onChange={(e) => setAcceptsTexts(!acceptsTexts)}
         />
         <FormControlLabel
           control={<Checkbox />}
-          label="Accepts Emails"
+          label='Accepts Emails'
           checked={acceptsEmails}
           onChange={(e) => setAcceptsEmails(!acceptsEmails)}
         />
         <FormControlLabel
           control={<Checkbox />}
-          label="Flagged"
+          label='Flagged'
           checked={isFlagged}
           onChange={(e) => setsIsFlagged(!isFlagged)}
         />
         <TextField
-          id="customer-notes"
-          label="Customer Notes"
-          variant="outlined"
+          id='customer-notes'
+          label='Customer Notes'
+          variant='outlined'
           multiline
           rows={4}
           value={customerNotes}
           onChange={(e) => setsCustomerNotes(e.target.value)}
         />
-        <Button variant="contained" onClick={handleSubmit}>Submit</Button>
+        <Button variant='contained' onClick={handleSubmit}>Submit</Button>
       </FormGroup>
     </Box>
   );

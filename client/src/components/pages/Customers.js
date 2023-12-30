@@ -1,12 +1,13 @@
+import { Box, Typography } from '@mui/material';
+import NavBar from '../partials/NavBar';
 import CustomerSearch from '../forms/CustomerSearch';
-
-import Box from '@mui/material/Box';
 
 export default function Customers() {
   return (
     <Box>
-      <h1>Customers</h1>
+      <Typography variant='h2' align='center'>Customers</Typography>
+      <NavBar></NavBar>
       <CustomerSearch />
     </Box>
-  )
-};
+  );
+}

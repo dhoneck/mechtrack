@@ -1,6 +1,19 @@
-import { Box, Button, IconButton } from '@mui/material';
+import {
+  Box,
+  Button,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography
+} from '@mui/material';
+
 import SearchIcon from '@mui/icons-material/Search';
-import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom'
@@ -29,10 +42,7 @@ export default function CustomerSearch() {
       const response = await axios.get(url);
       console.log('Response:');
       console.log(response.data);
-      // console.log(response.json());
       setResult(response.data)
-      // setResult(response.data[0]['first_name']);
-      // console.log(result);
     } catch (error) {
       setResult('Error');
       console.error(error);
@@ -40,29 +50,46 @@ export default function CustomerSearch() {
   }
 
   return (
-    <Box>
-      <form className={'search-form'}>
-        <TextField label="Customer Search" id="customer-query" />
-        <IconButton type={'submit'} onClick={searchCustomers} sx={{ ml: .5, borderRadius: 1}}>
+    <Box sx={{
+      textAlign: 'center',
+      minWidth: '519px',
+      maxWidth: '75%',
+      margin: 'auto' }}
+    >
+      <form className='search-form'>
+        <TextField label='Customer Search' id='customer-query' fullWidth />
+        <IconButton type='submit' onClick={searchCustomers} sx={{ ml: .5, borderRadius: 1}}>
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
-      <Link to="/add-customer" style={{ textDecoration: 'none' }}>
+
+      <Link to='/add-customer' style={{ textDecoration: 'none' }}>
         <Button variant='contained' sx={{ my: 1}} >Add Customer</Button>
       </Link>
-      <Box id={'results'}>
-        <h2 style={{margin: 0, marginTop: 10, marginBottom: 5}}>Results</h2>
-        <p style={{margin: 0, marginBottom: 15}}>Searching for "{query}"</p>
-        <ul>
-          {
-            result
-              .map(customer =>
-                <Link to={"/customers/" + customer.id}>
-                  <li key={customer.id}>{customer.first_name} {customer.last_name} - {customer.phone}</li>
-                </Link>
-              )
-          }
-        </ul>
+
+      <Box id='results'>
+        <Typography variant='h4'>Results</Typography>
+        <Typography>Searching for "{query}"</Typography>
+        <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>First</TableCell>
+                <TableCell>Last</TableCell>
+                <TableCell>Phone</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {result.map(customer => (
+                <TableRow key={customer.id}>
+                  <TableCell>{customer.first_name}</TableCell>
+                  <TableCell>{customer.last_name}</TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </Box>
   );

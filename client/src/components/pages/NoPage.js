@@ -1,5 +1,13 @@
-const NoPage = () => {
-  return <h1>404 - Page Not Found</h1>;
-};
+import { Box, Typography } from '@mui/material';
+import NavBar from '../partials/NavBar';
 
-export default NoPage;
+export default function NoPage() {
+  return (
+    <Box sx={{textAlign: 'center'}}>
+      <Typography variant='h2' align='center'>Page Not Found</Typography>
+      <Typography>Please try one of the buttons below.</Typography>
+      <NavBar></NavBar>
+    </Box>
+
+  );
+}

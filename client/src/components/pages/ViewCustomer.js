@@ -1,7 +1,7 @@
-import { Box, Button } from "@mui/material";
-import { useParams } from "react-router-dom"
-import axios from "axios";
-import { useEffect, useState} from "react";
+import { Box, Button, Typography } from '@mui/material';
+import { useParams } from 'react-router-dom'
+import axios from 'axios';
+import { useEffect, useState} from 'react';
 
 export default function ViewCustomer() {
   let { id } = useParams();
@@ -29,24 +29,34 @@ export default function ViewCustomer() {
 
 
   return (
-    <Box>
-      <h2>Customer Detail</h2>
-      <p>{result.first_name} {result.last_name}</p>
-      <Button variant="outlined">Edit</Button>
-      <p>{result.phone}</p>
-      <p>Accepts Texts: {String(result.accepts_texts)}</p>
-      <p>{result.email}</p>
-      <p>Accepts Emails: {String(result.accepts_emails)}</p>
-      <p>Flagged: {String(result.flagged)}</p>
-      <p>Notes: {result.notes}</p>
-
-      <h2>Vehicles</h2>
-      <Button variant="outlined">Add Vehicle</Button>
-      <p>No vehicles for this customer</p>
-
-      <h2>Service Record</h2>
-      <Button variant="outlined">Add Service</Button>
-      <p>No service records for this customer</p>
+    <Box sx={{textAlign: 'center'}}>
+      <Typography variant='h2'>Customer Detail</Typography>
+      <br/>
+      <Typography><strong>{result.first_name} {result.last_name}</strong></Typography>
+      <br/>
+      <Button variant='outlined'>Edit</Button>
+      <br/>
+      <br/>
+      <Typography>{result.phone}</Typography>
+      <Typography>Accepts Texts: {String(result.accepts_texts)}</Typography>
+      <Typography>{result.email}</Typography>
+      <Typography>Accepts Emails: {String(result.accepts_emails)}</Typography>
+      <Typography>Flagged: {String(result.flagged)}</Typography>
+      <Typography>Notes: {result.notes}</Typography>
+      <br/>
+      <Typography variant='h4'>Vehicles</Typography>
+      <br/>
+      <Button variant='outlined'>Add Vehicle</Button>
+      <br/>
+      <br/>
+      <Typography>No vehicles for this customer</Typography>
+      <br/>
+      <Typography variant='h4'>Service Record</Typography>
+      <br/>
+      <Button variant='outlined'>Add Service</Button>
+      <br/>
+      <br/>
+      <Typography>No service records for this customer</Typography>
     </Box>
   );
 }
