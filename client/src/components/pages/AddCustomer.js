@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 
 import axios from 'axios';
+import {redirect} from "react-router-dom";
 
 const style = {
   my: 5
@@ -47,7 +48,11 @@ export default function AddCustomer() {
 
     axios.post(url, values)
     .then(function (response) {
-      console.log(response);
+      console.log(response)
+      if (response.status === 201) {
+        let newCustID = response.data.id;
+        window.location.replace(`/customers/${newCustID}`)
+      }
     })
     .catch(function (error) {
       console.log(error);

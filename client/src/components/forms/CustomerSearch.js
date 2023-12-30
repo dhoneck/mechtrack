@@ -47,7 +47,9 @@ export default function CustomerSearch() {
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
-      <Button as={ Link } to='/add-customer' variant='contained' sx={{ my: 1}} >Add Customer</Button>
+      <Link to="/add-customer" style={{ textDecoration: 'none' }}>
+        <Button variant='contained' sx={{ my: 1}} >Add Customer</Button>
+      </Link>
       <Box id={'results'}>
         <h2 style={{margin: 0, marginTop: 10, marginBottom: 5}}>Results</h2>
         <p style={{margin: 0, marginBottom: 15}}>Searching for "{query}"</p>
@@ -55,7 +57,9 @@ export default function CustomerSearch() {
           {
             result
               .map(customer =>
-                <li key={customer.id}>{customer.first_name} {customer.last_name} - {customer.phone}</li>
+                <Link to={"/customers/" + customer.id}>
+                  <li key={customer.id}>{customer.first_name} {customer.last_name} - {customer.phone}</li>
+                </Link>
               )
           }
         </ul>
