@@ -82,9 +82,9 @@ export default function CustomerSearch() {
             <TableBody>
               {result.map(customer => (
                 <TableRow key={customer.id}>
-                  <TableCell>{customer.first_name}</TableCell>
-                  <TableCell>{customer.last_name}</TableCell>
-                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell><Link to={'/customers/' + customer.id}>{customer.first_name}</Link></TableCell>
+                  <TableCell><Link to={'/customers/' + customer.id}>{customer.last_name}</Link></TableCell>
+                  <TableCell><Link to={'/customers/' + customer.id}>{customer.phone}</Link></TableCell>
                 </TableRow>
               ))}
             </TableBody>

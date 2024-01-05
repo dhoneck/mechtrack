@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Box,
@@ -24,8 +25,8 @@ export default function AddCustomer() {
   const [email, setEmail] = useState('');
   const [acceptsTexts, setAcceptsTexts] = useState(false);
   const [acceptsEmails, setAcceptsEmails] = useState(false);
-  const [isFlagged, setsIsFlagged] = useState(false);
-  const [customerNotes, setsCustomerNotes] = useState('');
+  const [isFlagged, setIsFlagged] = useState(false);
+  const [customerNotes, setCustomerNotes] = useState('');
 
 
   async function handleSubmit(event) {
@@ -59,14 +60,22 @@ export default function AddCustomer() {
     });
   }
 
+  let navigate = useNavigate();
 
   return (
     <Box
       component='form'
       noValidate
       autoComplete='off'
+      sx={{
+        textAlign: 'center',
+        margin: 'auto',
+        minWidth: '519px',
+        maxWidth: '75%',
+      }}
     >
       <Typography variant='h2' align='center'>Add Customer</Typography>
+      <Button variant='contained' sx={{my: 1}} onClick={() => navigate(-1)}>Back</Button>
       <FormGroup>
         <TextField
           style={style}
@@ -75,6 +84,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
+          sx={{mb: 1}}
         />
         <TextField
           required id='last-name'
@@ -82,6 +92,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+          sx={{mb: 1}}
         />
         <TextField
           required id='phone-number'
@@ -89,6 +100,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
+          sx={{mb: 1}}
         />
         <TextField
           id='email'
@@ -96,6 +108,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          sx={{mb: 1}}
         />
         <FormControlLabel
           control={<Checkbox />}
@@ -113,7 +126,7 @@ export default function AddCustomer() {
           control={<Checkbox />}
           label='Flagged'
           checked={isFlagged}
-          onChange={(e) => setsIsFlagged(!isFlagged)}
+          onChange={(e) => setIsFlagged(!isFlagged)}
         />
         <TextField
           id='customer-notes'
@@ -122,7 +135,8 @@ export default function AddCustomer() {
           multiline
           rows={4}
           value={customerNotes}
-          onChange={(e) => setsCustomerNotes(e.target.value)}
+          onChange={(e) => setCustomerNotes(e.target.value)}
+          sx={{mb: 1}}
         />
         <Button variant='contained' onClick={handleSubmit}>Submit</Button>
       </FormGroup>
