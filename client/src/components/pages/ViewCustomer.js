@@ -14,7 +14,7 @@ export default function ViewCustomer() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // Hold form values
+  // Hold customer form values
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -24,6 +24,9 @@ export default function ViewCustomer() {
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
 
+  // Hold customer form values
+
+
   const fetchData = async () => {
     // Make a GET request to the API
     try {
@@ -31,7 +34,6 @@ export default function ViewCustomer() {
       console.log(`API URL: ${url}`)
       const response = await axios.get(url)
         .then(function (response) {
-          console.log('In then statement!')
           console.log(response.data);
           setResult(response.data);
           // Set values
@@ -49,13 +51,40 @@ export default function ViewCustomer() {
       console.error(error);
     }
   }
+
+  const updateUser = async () => {
+    // Make a PUT request to the API
+    let values = {
+      'first_name': firstName,
+      'last_name': lastName,
+      'phone': phoneNumber,
+      'email': email,
+      'accepts_emails': acceptsEmails,
+      'accepts_texts': acceptsTexts,
+      'flagged': isFlagged,
+      'notes': customerNotes
+    };
+    console.log(values);
+    try {
+      let url = `http://127.0.0.1:8000/api/customers/${id}/`
+      const response = await axios.put(url, values)
+        .then(function (response) {
+          console.log(response.data);
+          setOpen(false);
+          fetchData();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     fetchData();
   }, [])
 
   const style2 = {
-  my: 5
-}
+    my: 5
+  }
 
   const style = {
     position: 'absolute',
@@ -79,7 +108,7 @@ export default function ViewCustomer() {
       <br/>
       <Button variant='outlined' onClick={handleOpen}>Edit</Button>
 
-      {/* Modal Start */}
+      {/* Modal start for editing customer */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -152,12 +181,12 @@ export default function ViewCustomer() {
               onChange={(e) => setCustomerNotes(e.target.value)}
               sx={{mb: 1}}
             />
-            <Button variant='contained'>Submit</Button>
-            {/*<Button variant='contained' onClick={handleSubmit}>Submit</Button>*/}
+            {/*<Button variant='contained'>Submit</Button>*/}
+            <Button variant='contained' onClick={updateUser}>Submit</Button>
           </FormGroup>
         </Box>
       </Modal>
-      {/* Modal End */}
+      {/* Modal end for editing customer */}
 
       <br/>
       <br/>
