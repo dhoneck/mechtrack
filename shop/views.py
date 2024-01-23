@@ -28,6 +28,8 @@ class VehicleList(generics.ListCreateAPIView):
     """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['make', 'model', 'year', 'color', 'license', 'vin', 'notes']
 
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):

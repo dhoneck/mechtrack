@@ -17,7 +17,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Owner
-        fields = ['id', 'customer', 'car']
+        fields = ['id', 'customer', 'vehicle']
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
