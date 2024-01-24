@@ -86,7 +86,7 @@ export default function CustomerSearch() {
                   <TableCell><Link to={'/customers/' + customer.id}>{customer.first_name}</Link></TableCell>
                   <TableCell><Link to={'/customers/' + customer.id}>{customer.last_name}</Link></TableCell>
                   <TableCell><Link to={'/customers/' + customer.id}>{customer.phone}</Link></TableCell>
-                  <TableCell><Link to={'/customers/' + customer.id}>n/a</Link></TableCell>
+                  <TableCell><Link to={'/customers/' + customer.id}>{customer.vehicle_count}</Link></TableCell>
                 </TableRow>
               ))}
             </TableBody>

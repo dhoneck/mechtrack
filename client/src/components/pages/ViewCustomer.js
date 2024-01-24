@@ -1,20 +1,35 @@
-import {Box, Button, Checkbox, FormControlLabel, FormGroup, Modal, TextField, Typography} from '@mui/material';
-import { useParams } from 'react-router-dom'
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Modal,
+  TextField,
+  Typography
+} from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useEffect, useState} from 'react';
+
 import NavBar from '../partials/NavBar';
-import * as React from 'react';
 
 export default function ViewCustomer() {
+  // Get ID of customer from URL
   let { id } = useParams();
 
-  const [result, setResult] = useState([]);
+  // Customer information from fetch call
+  const [customerInfo, setCustomerInfo] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
+  // Track modal state for the edit user modal
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // Hold customer form values
+  // Set empty customer form values
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -24,19 +39,17 @@ export default function ViewCustomer() {
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
 
-  // Hold customer form values
-
-
-  const fetchData = async () => {
-    // Make a GET request to the API
+  /** Make GET request using ID from URL param to grab customer data  */
+  const getCustomerInfo = async () => {
     try {
-      let url = `http://127.0.0.1:8000/api/customers/${id}/`
-      console.log(`API URL: ${url}`)
-      const response = await axios.get(url)
+      let url = `http://127.0.0.1:8000/api/customers/${id}/`;
+
+      await axios.get(url)
         .then(function (response) {
-          console.log(response.data);
-          setResult(response.data);
-          // Set values
+          // Store customer data from response
+          setCustomerInfo(response.data);
+
+          // Set initial values for 'Edit User' form
           setFirstName(response.data.first_name);
           setLastName(response.data.last_name);
           setPhoneNumber(response.data.phone);
@@ -45,15 +58,16 @@ export default function ViewCustomer() {
           setAcceptsEmails(response.data.accepts_emails);
           setIsFlagged(response.data.flagged);
           setCustomerNotes(response.data.notes);
-
         });
+
     } catch (error) {
       console.error(error);
     }
   }
 
-  const updateUser = async () => {
-    // Make a PUT request to the API
+  /** Make PUT request to update customer data */
+  const updateCustomer = async () => {
+    // Combine 'Edit User' form values to use in PUT request
     let values = {
       'first_name': firstName,
       'last_name': lastName,
@@ -64,22 +78,26 @@ export default function ViewCustomer() {
       'flagged': isFlagged,
       'notes': customerNotes
     };
-    console.log(values);
+
     try {
-      let url = `http://127.0.0.1:8000/api/customers/${id}/`
-      const response = await axios.put(url, values)
-        .then(function (response) {
-          console.log(response.data);
-          setOpen(false);
-          fetchData();
+      let url = `http://127.0.0.1:8000/api/customers/${id}/`;
+
+      await axios.put(url, values)
+        .then(function () {
+          // Close modal
+          handleClose();
+
+          // Refresh customer info
+          getCustomerInfo();
         });
     } catch (error) {
       console.error(error);
     }
   }
 
+  // Get customer info
   useEffect(() => {
-    fetchData();
+    getCustomerInfo();
   }, [])
 
   const style2 = {
@@ -104,7 +122,7 @@ export default function ViewCustomer() {
       <Typography variant='h2'>Customer Detail</Typography>
       <NavBar></NavBar>
       <br/>
-      <Typography><strong>{result.first_name} {result.last_name}</strong></Typography>
+      <Typography><strong>{customerInfo.first_name} {customerInfo.last_name}</strong></Typography>
       <br/>
       <Button variant='outlined' onClick={handleOpen}>Edit</Button>
 
@@ -182,7 +200,7 @@ export default function ViewCustomer() {
               sx={{mb: 1}}
             />
             {/*<Button variant='contained'>Submit</Button>*/}
-            <Button variant='contained' onClick={updateUser}>Submit</Button>
+            <Button variant='contained' onClick={updateCustomer}>Submit</Button>
           </FormGroup>
         </Box>
       </Modal>
@@ -190,21 +208,38 @@ export default function ViewCustomer() {
 
       <br/>
       <br/>
-      <Typography>{result.phone}</Typography>
-      <Typography>Accepts Texts: {String(result.accepts_texts)}</Typography>
+      <Typography>{customerInfo.phone}</Typography>
+      <Typography>Accepts Texts: {String(customerInfo.accepts_texts)}</Typography>
       <br/>
-      <Typography>{result.email}</Typography>
-      <Typography>Accepts Emails: {String(result.accepts_emails)}</Typography>
+      <Typography>{customerInfo.email}</Typography>
+      <Typography>Accepts Emails: {String(customerInfo.accepts_emails)}</Typography>
       <br/>
-      <Typography>Flagged: {String(result.flagged)}</Typography>
-      <Typography>Notes: {result.notes}</Typography>
+      <Typography>Flagged: {String(customerInfo.flagged)}</Typography>
+      <Typography>Notes: {customerInfo.notes}</Typography>
       <br/>
       <Typography variant='h4'>Vehicles</Typography>
       <br/>
       <Button variant='outlined'>Add Vehicle</Button>
       <br/>
       <br/>
-      <Typography>No vehicles for this customer</Typography>
+      {/*<Typography>No vehicles for this customer</Typography>*/}
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-around'}}>
+        <Card sx={{ maxWidth: 275 }} style={{backgroundColor: 'lightgray'}}>
+          <CardContent>
+            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+              Ford F150 (Hardcoded Placeholder)
+            </Typography>
+
+          </CardContent>
+          <CardActions>
+            <Button size="small">Add Service</Button>
+            <Button size="small">View Service</Button>
+          </CardActions>
+        </Card>
+      </Box>
+
+
       <br/>
       <Typography variant='h4'>Service Record</Typography>
       <br/>

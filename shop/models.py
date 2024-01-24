@@ -12,6 +12,10 @@ class Vehicle(models.Model):
     vin = models.CharField(blank=True, default='', unique=True, max_length=17)
     notes = models.TextField(blank=True, default='')
 
+    def get_owners(self):
+        print('Getting owners for ' + self.make)
+        print(Owner.objects.all().filter(vehicle_id=self.id))
+
     def __str__(self):
         description = ''
         if self.color:
@@ -38,6 +42,9 @@ class Customer(models.Model):
     accepts_emails = models.BooleanField(default=False)
     flagged = models.BooleanField(default=False)
     notes = models.TextField(blank=True, default='')
+
+    def vehicle_count(self):
+        return Owner.objects.all().filter(customer_id=self.id).count()
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
