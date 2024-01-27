@@ -1,6 +1,8 @@
 from rest_framework import filters, generics
-from shop.models import Vehicle, Customer, Owner
-from shop.serializers import VehicleSerializer, CustomerSerializer, OwnerSerializer
+# from shop.models import Vehicle, Customer, Owner
+from shop.models import Vehicle, Customer
+# from shop.serializers import VehicleSerializer, CustomerSerializer, OwnerSerializer
+from shop.serializers import VehicleSerializer, CustomerSerializer
 
 
 # Create your views here.
@@ -40,17 +42,17 @@ class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = VehicleSerializer
 
 
-class OwnerList(generics.ListCreateAPIView):
-    """
-    List all owners, or create a new owner.
-    """
-    queryset = Owner.objects.all()
-    serializer_class = OwnerSerializer
-
-
-class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Retrieve, update or delete an owner instance.
-    """
-    queryset = Owner.objects.all()
-    serializer_class = OwnerSerializer
+# class OwnerList(generics.ListCreateAPIView):
+#     """
+#     List all owners, or create a new owner.
+#     """
+#     queryset = Owner.objects.all()
+#     serializer_class = OwnerSerializer
+#
+#
+# class OwnerDetail(generics.RetrieveUpdateDestroyAPIView):
+#     """
+#     Retrieve, update or delete an owner instance.
+#     """
+#     queryset = Owner.objects.all()
+#     serializer_class = OwnerSerializer
