@@ -1,6 +1,5 @@
 from rest_framework import serializers
-# from shop.models import Vehicle, Customer, Owner, Invoice
-from shop.models import Vehicle, Customer, Invoice
+from shop.models import Vehicle, Customer, CustomerVehicle, Invoice
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -17,10 +16,10 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class OwnerSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Owner
-#         fields = '__all__'
+class CustomerVehicleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerVehicle
+        fields = '__all__'
 
 
 class InvoiceSerializer(serializers.ModelSerializer):

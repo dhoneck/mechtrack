@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-# from .models import Vehicle, Customer, Owner, Invoice
-from .models import Vehicle, Customer, Invoice
+from .models import Vehicle, Customer, Invoice, CustomerVehicle
 
 
 # Register your models here.
@@ -17,9 +16,8 @@ class CustomerAdmin(admin.ModelAdmin):
     search_fields = all_fields
 
 
-# class OwnerAdmin(admin.ModelAdmin):
-#     list_display = ('customer', 'vehicle',)
-#     search_fields = ('customer__first_name', 'customer__last_name', 'vehicle__make', 'vehicle__model',)
+class CustomerVehicleAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'vehicle',)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
@@ -29,5 +27,5 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(Customer, CustomerAdmin)
-# admin.site.register(Owner, OwnerAdmin)
+admin.site.register(CustomerVehicle, CustomerVehicleAdmin)
 admin.site.register(Invoice, InvoiceAdmin)

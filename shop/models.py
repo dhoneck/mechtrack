@@ -42,7 +42,7 @@ class Customer(models.Model):
     accepts_emails = models.BooleanField(default=False)
     flagged = models.BooleanField(default=False)
     notes = models.TextField(blank=True, default='')
-    vehicles = models.ManyToManyField(Vehicle, blank=True)
+    vehicles = models.ManyToManyField(Vehicle, blank=True, through='CustomerVehicle')
 
     # def vehicle_count(self):
     #     return Owner.objects.all().filter(customer_id=self.id).count()
@@ -56,17 +56,17 @@ class Customer(models.Model):
         return f'{self.first_name} {self.last_name}'
 
 
-# class Owner(models.Model):
-#     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-#     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-#
-#     class Meta:
-#         unique_together = ('customer', 'vehicle')
-#
-#     def __str__(self):
-#         customer = Customer.objects.get(id=self.customer.id)
-#         vehicle = Vehicle.objects.get(id=self.vehicle.id)
-#         return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
+class CustomerVehicle(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('customer', 'vehicle')
+
+    def __str__(self):
+        customer = Customer.objects.get(id=self.customer.id)
+        vehicle = Vehicle.objects.get(id=self.vehicle.id)
+        return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
 
 
 class Invoice(models.Model):
