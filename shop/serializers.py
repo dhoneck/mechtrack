@@ -3,13 +3,16 @@ from shop.models import Vehicle, Customer, CustomerVehicle, Invoice
 
 
 class VehicleSerializer(serializers.ModelSerializer):
+    # customer_set = CustomerSerializer(many=True, read_only=True)
+    owner_count = serializers.ReadOnlyField()
+
     class Meta:
         model = Vehicle
         fields = '__all__'
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    vehicle_count = serializers.ReadOnlyField()
+    vehicles = VehicleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Customer
@@ -17,6 +20,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
 class CustomerVehicleSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CustomerVehicle
         fields = '__all__'

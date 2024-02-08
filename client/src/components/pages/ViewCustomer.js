@@ -38,6 +38,7 @@ export default function ViewCustomer() {
   const [acceptsEmails, setAcceptsEmails] = useState(false);
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
+  const [customerVehicles, setCustomerVehicles] = useState('');
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
@@ -46,6 +47,8 @@ export default function ViewCustomer() {
 
       await axios.get(url)
         .then(function (response) {
+          console.log('response:')
+          console.log(response.data)
           // Store customer data from response
           setCustomerInfo(response.data);
 
@@ -58,6 +61,10 @@ export default function ViewCustomer() {
           setAcceptsEmails(response.data.accepts_emails);
           setIsFlagged(response.data.flagged);
           setCustomerNotes(response.data.notes);
+          setCustomerVehicles(response.data.vehicles);
+          console.log()
+          console.log('Vehicles')
+          console.log(customerVehicles)
         });
 
     } catch (error) {
@@ -67,7 +74,7 @@ export default function ViewCustomer() {
 
   /** Make PUT request to update customer data */
   const updateCustomer = async () => {
-    // Combine 'Edit User' form values to use in PUT request
+    // Combine 'Edit User' form values to use in PUT request (don't include vehicles)
     let values = {
       'first_name': firstName,
       'last_name': lastName,
@@ -76,7 +83,7 @@ export default function ViewCustomer() {
       'accepts_emails': acceptsEmails,
       'accepts_texts': acceptsTexts,
       'flagged': isFlagged,
-      'notes': customerNotes
+      'notes': customerNotes,
     };
 
     try {
@@ -228,7 +235,8 @@ export default function ViewCustomer() {
         <Card sx={{ maxWidth: 275 }} style={{backgroundColor: 'lightgray'}}>
           <CardContent>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              Ford F150 (Hardcoded Placeholder)
+              {/*Ford F150 (Hardcoded Placeholder)*/}
+              {customerInfo.vehicle}
             </Typography>
 
           </CardContent>

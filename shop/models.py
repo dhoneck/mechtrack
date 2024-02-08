@@ -1,4 +1,7 @@
 from django.db import models
+from django.core import serializers
+from django.http import HttpResponse
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -12,9 +15,8 @@ class Vehicle(models.Model):
     vin = models.CharField(blank=True, null=True, unique=True, max_length=17)
     notes = models.TextField(blank=True, default='')
 
-    # def get_owners(self):
-    #     print('Getting owners for ' + self.make)
-    #     print(Owner.objects.all().filter(vehicle_id=self.id))
+    def owner_count(self):
+        return self.customer_set.count()
 
     def __str__(self):
         description = ''
@@ -43,14 +45,6 @@ class Customer(models.Model):
     flagged = models.BooleanField(default=False)
     notes = models.TextField(blank=True, default='')
     vehicles = models.ManyToManyField(Vehicle, blank=True, through='CustomerVehicle')
-
-    # def vehicle_count(self):
-    #     return Owner.objects.all().filter(customer_id=self.id).count()
-    #
-    # def list_vehicles(self):
-    #     result = Owner.objects.filter(customer_id=self.id).values()
-    #     vehicle_list = [vehicle for vehicle in result]
-    #     return vehicle_list
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'

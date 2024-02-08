@@ -80,7 +80,7 @@ export default function VehicleSearch() {
                 <TableCell>Color</TableCell>
                 <TableCell>License</TableCell>
                 <TableCell>Vin</TableCell>
-                <TableCell>Owner(s)</TableCell>
+                <TableCell>Owners</TableCell>
                 <TableCell>Services</TableCell>
               </TableRow>
             </TableHead>
@@ -93,7 +93,7 @@ export default function VehicleSearch() {
                   <TableCell>{vehicle.color}</TableCell>
                   <TableCell>{vehicle.license}</TableCell>
                   <TableCell>{vehicle.vin}</TableCell>
-                  <TableCell>n/a</TableCell>
+                  <TableCell>{vehicle.owner_count}</TableCell>
                   <TableCell>n/a</TableCell>
                 </TableRow>
               ))}
