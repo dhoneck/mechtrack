@@ -38,7 +38,6 @@ export default function ViewCustomer() {
   const [acceptsEmails, setAcceptsEmails] = useState(false);
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
-  const [customerVehicles, setCustomerVehicles] = useState('');
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
@@ -61,10 +60,6 @@ export default function ViewCustomer() {
           setAcceptsEmails(response.data.accepts_emails);
           setIsFlagged(response.data.flagged);
           setCustomerNotes(response.data.notes);
-          setCustomerVehicles(response.data.vehicles);
-          console.log()
-          console.log('Vehicles')
-          console.log(customerVehicles)
         });
 
     } catch (error) {
@@ -117,7 +112,6 @@ export default function ViewCustomer() {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 500,
-    // height: 750,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -229,22 +223,21 @@ export default function ViewCustomer() {
       <Button variant='outlined'>Add Vehicle</Button>
       <br/>
       <br/>
-      {/*<Typography>No vehicles for this customer</Typography>*/}
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-around'}}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>
+       {customerInfo.vehicles && customerInfo.vehicles.map(vehicle => (
         <Card sx={{ maxWidth: 275 }} style={{backgroundColor: 'lightgray'}}>
           <CardContent>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              {/*Ford F150 (Hardcoded Placeholder)*/}
-              {customerInfo.vehicle}
+              {vehicle.year} {vehicle.make} {vehicle.model}
             </Typography>
 
           </CardContent>
           <CardActions>
             <Button size="small">Add Service</Button>
-            <Button size="small">View Service</Button>
+            <Button size="small">View Record</Button>
           </CardActions>
         </Card>
+       ))}
       </Box>
 
 
