@@ -1,6 +1,6 @@
 from rest_framework import filters, generics
-from shop.models import Vehicle, Customer
-from shop.serializers import VehicleSerializer, CustomerSerializer
+from shop.models import Vehicle, Customer, CustomerVehicle
+from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer
 
 
 # Create your views here.
@@ -38,3 +38,19 @@ class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
+
+
+class CustomerVehicleList(generics.ListCreateAPIView):
+    """
+    List all customer/vehicle pairs, or create a new pairs.
+    """
+    queryset = CustomerVehicle.objects.all()
+    serializer_class = CustomerVehicleSerializer
+
+
+class CustomerVehicleDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a customer/vehicle pair instance.
+    """
+    queryset = CustomerVehicle.objects.all()
+    serializer_class = CustomerVehicleSerializer

@@ -123,14 +123,28 @@ export default function ViewCustomer() {
       'vin': vin,
       'notes': notes,
     };
-    console.log('Going to submit these values as new vehicle');
-    console.log(values);
 
+    // Try to create a new vehicle
     try {
       let url = `http://127.0.0.1:8000/api/vehicles/`;
 
       await axios.post(url, values)
-        .then(function () {
+        .then(function (response) {
+          console.log('New vehicle response');
+          console.log(response);
+          console.log(response.data);
+          let user_id = customerInfo.id;
+          let new_vehicle_id = response.data.id;
+
+          let customer_vehicle_values = {
+            'customer': user_id,
+            'vehicle': new_vehicle_id
+          }
+          let url2 = `http://127.0.0.1:8000/api/customer-vehicle/`;
+
+          // Associate vehicle with customer
+          axios.post(url2, customer_vehicle_values);
+
           // Close modal
           handleCloseVehicle();
 
