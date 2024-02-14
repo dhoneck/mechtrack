@@ -25,9 +25,14 @@ export default function ViewCustomer() {
   const [customerInfo, setCustomerInfo] = useState([]);
 
   // Track modal state for the edit user modal
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [openUser, setOpenUser] = useState(false);
+  const handleOpenUser = () => setOpenUser(true);
+  const handleCloseUser = () => setOpenUser(false);
+
+  // Track modal state for the new vehicle modal
+  const [openVehicle, setOpenVehicle] = useState(false);
+  const handleOpenVehicle = () => setOpenVehicle(true);
+  const handleCloseVehicle = () => setOpenVehicle(false);
 
   // Set empty customer form values
   const [firstName, setFirstName] = useState('');
@@ -38,6 +43,15 @@ export default function ViewCustomer() {
   const [acceptsEmails, setAcceptsEmails] = useState(false);
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
+
+  // Set empty vehicle form values
+  const [make, setMake] = useState('');
+  const [model, setModel] = useState('');
+  const [year, setYear] = useState('');
+  const [color, setColor] = useState('');
+  const [license, setLicense] = useState(null);
+  const [vin, setVin] = useState(null);
+  const [notes, setNotes] = useState(false);
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
@@ -87,7 +101,7 @@ export default function ViewCustomer() {
       await axios.put(url, values)
         .then(function () {
           // Close modal
-          handleClose();
+          handleCloseUser();
 
           // Refresh customer info
           getCustomerInfo();
@@ -125,12 +139,12 @@ export default function ViewCustomer() {
       <br/>
       <Typography><strong>{customerInfo.first_name} {customerInfo.last_name}</strong></Typography>
       <br/>
-      <Button variant='outlined' onClick={handleOpen}>Edit</Button>
+      <Button variant='outlined' onClick={handleOpenUser}>Edit</Button>
 
       {/* Modal start for editing customer */}
       <Modal
-        open={open}
-        onClose={handleClose}
+        open={openUser}
+        onClose={handleCloseUser}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >

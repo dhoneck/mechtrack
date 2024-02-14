@@ -20,13 +20,13 @@ class Vehicle(models.Model):
 
     def __str__(self):
         description = ''
-        if self.color:
-            description += f'{self.color}'
         if self.year:
             description += f' {self.year}'
 
         description += f' {self.make} {self.model}'
 
+        if self.color:
+            description += f' | Color: {self.color.upper()}'
         if self.license:
             description += f' | LICENSE: {self.license.upper()}'
         if self.vin:
