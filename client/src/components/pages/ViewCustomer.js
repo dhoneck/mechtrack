@@ -51,7 +51,7 @@ export default function ViewCustomer() {
   const [color, setColor] = useState('');
   const [license, setLicense] = useState(null);
   const [vin, setVin] = useState(null);
-  const [notes, setNotes] = useState(false);
+  const [notes, setNotes] = useState('');
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
@@ -102,6 +102,37 @@ export default function ViewCustomer() {
         .then(function () {
           // Close modal
           handleCloseUser();
+
+          // Refresh customer info
+          getCustomerInfo();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /** Make POST request to update customer data */
+  const addVehicle = async () => {
+    // Combine 'Add Vehicle' form values to use in POST request
+    let values = {
+      'make': make,
+      'model': model,
+      'year': year,
+      'color': color,
+      'license': license,
+      'vin': vin,
+      'notes': notes,
+    };
+    console.log('Going to submit these values as new vehicle');
+    console.log(values);
+
+    try {
+      let url = `http://127.0.0.1:8000/api/vehicles/`;
+
+      await axios.post(url, values)
+        .then(function () {
+          // Close modal
+          handleCloseVehicle();
 
           // Refresh customer info
           getCustomerInfo();
@@ -214,12 +245,88 @@ export default function ViewCustomer() {
               onChange={(e) => setCustomerNotes(e.target.value)}
               sx={{mb: 1}}
             />
-            {/*<Button variant='contained'>Submit</Button>*/}
             <Button variant='contained' onClick={updateCustomer}>Submit</Button>
           </FormGroup>
         </Box>
       </Modal>
       {/* Modal end for editing customer */}
+
+      {/* Modal start for adding vehicle */}
+      <Modal
+        open={openVehicle}
+        onClose={handleCloseVehicle}
+        aria-labelledby="vehicle-modal-title"
+        aria-describedby="vehicle-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="vehicle-modal-title" variant="h6" component="h2">
+            Add Vehicle
+          </Typography>
+          <FormGroup>
+            <TextField
+              style={style2}
+              required id='make'
+              label='Make'
+              variant='outlined'
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              required id='model'
+              label='Model'
+              variant='outlined'
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              required id='year'
+              label='Year'
+              variant='outlined'
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              id='color'
+              label='Color'
+              variant='outlined'
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              id='license'
+              label='License'
+              variant='outlined'
+              value={license}
+              onChange={(e) => setLicense(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              id='vin'
+              label='VIN'
+              variant='outlined'
+              value={vin}
+              onChange={(e) => setVin(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <TextField
+              id='notes'
+              label='Vehicle Notes'
+              variant='outlined'
+              multiline
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <Button variant='contained' onClick={addVehicle}>Submit</Button>
+          </FormGroup>
+        </Box>
+      </Modal>
+      {/* Modal end for adding vehicle */}
 
       <br/>
       <br/>
@@ -234,7 +341,7 @@ export default function ViewCustomer() {
       <br/>
       <Typography variant='h4'>Vehicles</Typography>
       <br/>
-      <Button variant='outlined'>Add Vehicle</Button>
+      <Button variant='outlined' onClick={handleOpenVehicle}>Add Vehicle</Button>
       <br/>
       <br/>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>
