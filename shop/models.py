@@ -18,6 +18,10 @@ class Vehicle(models.Model):
     def owner_count(self):
         return self.customer_set.count()
 
+    def list_owners(self):
+        # Join customer_set into a string
+        return ', '.join([str(customer) for customer in self.customer_set.all()])
+
     def __str__(self):
         description = ''
         if self.year:

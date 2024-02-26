@@ -9,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   TextField,
   Typography
 } from '@mui/material';
@@ -63,10 +64,6 @@ export default function VehicleSearch() {
         </IconButton>
       </form>
 
-      <Link to='/add-vehicle' style={{ textDecoration: 'none' }}>
-        <Button variant='contained' sx={{ my: 1}} >Add Vehicle</Button>
-      </Link>
-
       <Box id='results'>
         <Typography variant='h4'>Results</Typography>
         <Typography>Searching for "{query}"</Typography>
@@ -93,7 +90,7 @@ export default function VehicleSearch() {
                   <TableCell>{vehicle.color}</TableCell>
                   <TableCell>{vehicle.license}</TableCell>
                   <TableCell>{vehicle.vin}</TableCell>
-                  <TableCell>{vehicle.owner_count}</TableCell>
+                  <TableCell><Tooltip title={vehicle.list_owners}>{vehicle.owner_count}</Tooltip></TableCell>
                   <TableCell>n/a</TableCell>
                 </TableRow>
               ))}

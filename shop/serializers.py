@@ -3,7 +3,7 @@ from shop.models import Vehicle, Customer, CustomerVehicle, Invoice
 
 
 class VehicleSerializer(serializers.ModelSerializer):
-    # customer_set = CustomerSerializer(many=True, read_only=True)
+    list_owners = serializers.ReadOnlyField()
     owner_count = serializers.ReadOnlyField()
 
     class Meta:
