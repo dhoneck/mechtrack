@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vehicle, Customer, Invoice, CustomerVehicle
+from .models import Vehicle, Customer, CustomerVehicle, Service
 
 
 # Register your models here.
@@ -20,12 +20,11 @@ class CustomerVehicleAdmin(admin.ModelAdmin):
     list_display = ('customer', 'vehicle',)
 
 
-class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'date', 'description', 'amount',)
-    search_fields = ('customer__first_name', 'customer__last_name', 'date', 'description', 'amount',)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('vehicle', 'date', 'estimated_time', 'services', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
 
 
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(CustomerVehicle, CustomerVehicleAdmin)
-admin.site.register(Invoice, InvoiceAdmin)
+admin.site.register(Service, ServiceAdmin)

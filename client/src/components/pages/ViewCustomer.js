@@ -374,15 +374,6 @@ export default function ViewCustomer() {
         </Card>
        ))}
       </Box>
-
-
-      <br/>
-      <Typography variant='h4'>Service Record</Typography>
-      <br/>
-      <Button variant='outlined'>Add Service</Button>
-      <br/>
-      <br/>
-      <Typography>No service records for this customer</Typography>
     </Box>
   );
 }

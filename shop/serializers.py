@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import Vehicle, Customer, CustomerVehicle, Invoice
+from shop.models import Vehicle, Customer, CustomerVehicle, Service
 
 
 class VehicleSerializer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class CustomerVehicleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class InvoiceSerializer(serializers.ModelSerializer):
+class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Invoice
+        model = Service
         fields = '__all__'
