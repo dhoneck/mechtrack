@@ -11,8 +11,8 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import {Link, useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import NavBar from '../partials/NavBar';
@@ -369,7 +369,7 @@ export default function ViewCustomer() {
           </CardContent>
           <CardActions>
             <Button size="small">Add Service</Button>
-            <Button size="small">View Record</Button>
+            <Button as={Link} to={'/vehicles/' + vehicle.id} size="small">View Record</Button>
           </CardActions>
         </Card>
        ))}

@@ -19,6 +19,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom'
 
+
 export default function VehicleSearch() {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState([]);
@@ -84,14 +85,14 @@ export default function VehicleSearch() {
             <TableBody>
               {result.map(vehicle => (
                 <TableRow key={vehicle.id}>
-                  <TableCell>{vehicle.make}</TableCell>
-                  <TableCell>{vehicle.model}</TableCell>
-                  <TableCell>{vehicle.year}</TableCell>
-                  <TableCell>{vehicle.color}</TableCell>
-                  <TableCell>{vehicle.license}</TableCell>
-                  <TableCell>{vehicle.vin}</TableCell>
-                  <TableCell><Tooltip title={vehicle.list_owners}>{vehicle.owner_count}</Tooltip></TableCell>
-                  <TableCell>n/a</TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.make}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.model}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.year}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.color}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.license}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.vin}</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}><Tooltip title={vehicle.list_owners}>{vehicle.owner_count}</Tooltip></Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>n/a</Link></TableCell>
                 </TableRow>
               ))}
             </TableBody>

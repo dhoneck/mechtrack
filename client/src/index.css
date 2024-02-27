@@ -12,6 +12,10 @@ a {
   text-decoration: none;
 }
 
+a, a:visited, a:hover, a:active {
+  color: inherit;
+}
+
 /***** Navigation *****/
 nav ul {
   display: flex;
