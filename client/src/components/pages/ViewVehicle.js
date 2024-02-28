@@ -7,12 +7,12 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  Modal,
+  Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TextField,
   Typography
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import {Link, useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import NavBar from '../partials/NavBar';
@@ -219,6 +219,30 @@ export default function ViewVehicle() {
       <br/>
       <br/>
       <Typography>No service records for this vehicle</Typography>
+      <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Mileage</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {vehicle.services ? vehicle.services.map(service => (
+                <TableRow key={service.id}>
+                  <TableCell>{service.date}</TableCell>
+                  <TableCell>{service.services.join(', ')}</TableCell>
+                  <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
+                  <TableCell>n/a</TableCell>
+                  <TableCell>{service.completed ? service.completed : 'Not completed'}</TableCell>
+                </TableRow>
+              )) : 'No services found'}
+            </TableBody>
+          </Table>
+        </TableContainer>
     </Box>
   );
 }

@@ -24,6 +24,14 @@ class Vehicle(models.Model):
         # Join customer_set into a string
         return ', '.join([str(customer) for customer in self.customer_set.all()])
 
+    def service_count(self):
+        return self.services.count()
+
+    # def list_services(self):
+    #     # Return service_set as a JSON string
+    #     return serializers.serialize('json', self.service_set.all())
+    #     # return self.service_set.count()
+
     def __str__(self):
         description = ''
         if self.year:
@@ -90,7 +98,7 @@ SERVICE_CHOICES = (('Oil, lube, and filter', 'Oil, lube, and filter'),
 
 
 class Service(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
     date = models.DateField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
     # MultiSelectField has bug that requires max_length to be specified
