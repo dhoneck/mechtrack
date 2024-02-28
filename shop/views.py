@@ -1,6 +1,6 @@
 from rest_framework import filters, generics
-from shop.models import Vehicle, Customer, CustomerVehicle
-from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer
+from shop.models import Vehicle, Customer, CustomerVehicle, Service
+from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer
 
 
 # Create your views here.
@@ -54,3 +54,21 @@ class CustomerVehicleDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = CustomerVehicle.objects.all()
     serializer_class = CustomerVehicleSerializer
+
+
+class ServiceList(generics.ListCreateAPIView):
+    """
+    List all services, or create a new vehicles.
+    """
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['make', 'model', 'year', 'color', 'license', 'vin', 'notes']
+
+
+class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a service instance.
+    """
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
