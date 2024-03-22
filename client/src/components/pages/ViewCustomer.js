@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -34,6 +35,11 @@ export default function ViewCustomer() {
   const handleOpenVehicle = () => setOpenVehicle(true);
   const handleCloseVehicle = () => setOpenVehicle(false);
 
+  // Track modal state for vehicle linking modal
+  const [openVehicleLink, setOpenVehicleLink] = useState(false);
+  const handleOpenVehicleLink = () => setOpenVehicleLink(true);
+  const handleCloseVehicleLink = () => setOpenVehicleLink(false);
+
   // Set empty customer form values
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -52,6 +58,9 @@ export default function ViewCustomer() {
   const [license, setLicense] = useState(null);
   const [vin, setVin] = useState(null);
   const [notes, setNotes] = useState('');
+
+  // Hold all vehicles for linking purposes
+  const [vehicles, setVehicles] = useState([]);
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
@@ -156,9 +165,45 @@ export default function ViewCustomer() {
     }
   }
 
+   /** Make GET request to get all vehicle data */
+  const getVehicles = async () => {
+    // Try to get all vehicles
+    try {
+      let url = `http://127.0.0.1:8000/api/vehicles/`;
+
+      await axios.get(url)
+        .then(function (response) {
+          console.log('All vehicles');
+          console.log(response.data);
+          let rawVehicleList = response.data;
+          console.log(rawVehicleList);
+          let cleanVehicleList = [];
+          for (let index in rawVehicleList) {
+            console.log('VEHICLE');
+            let vehicle = rawVehicleList[index];
+            let id = vehicle.id;
+            let color = vehicle.color;
+            let year = vehicle.year;
+            let make = vehicle.make;
+            let model = vehicle.model;
+            let license = vehicle.license;
+            let otherOwners = vehicle.list_owners;
+            let vehicleDescription = `(ID: ${id}) ${color} ${year} ${make} ${model} ${license} ${otherOwners}`
+            console.log('Vehicle Description:');
+            console.log(vehicleDescription);
+            cleanVehicleList.push(vehicleDescription);
+          }
+          setVehicles(cleanVehicleList);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // Get customer info
   useEffect(() => {
     getCustomerInfo();
+    getVehicles();
   }, [])
 
   const style2 = {
@@ -342,6 +387,30 @@ export default function ViewCustomer() {
       </Modal>
       {/* Modal end for adding vehicle */}
 
+      {/* Modal start for linking vehicle */}
+      <Modal
+        open={openVehicleLink}
+        onClose={handleCloseVehicleLink}
+        aria-labelledby="vehicle-link-modal-title"
+        aria-describedby="vehicle-link-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="vehicle-link-modal-title" variant="h6" component="h2">
+            Link Vehicle
+          </Typography>
+          <FormGroup>
+            <Autocomplete
+              sx={{ my: 2 }}
+              id="free-solo-demo"
+              options={vehicles.map((option) => option)}
+              renderInput={(params) => <TextField {...params} label="Existing Vehicles" />}
+            />
+            <Button variant='contained'>Submit</Button>
+          </FormGroup>
+        </Box>
+      </Modal>
+      {/* Modal end for linking vehicle */}
+
       <br/>
       <br/>
       <Typography>{customerInfo.phone}</Typography>
@@ -355,7 +424,9 @@ export default function ViewCustomer() {
       <br/>
       <Typography variant='h4'>Vehicles</Typography>
       <br/>
-      <Button variant='outlined' onClick={handleOpenVehicle}>Add Vehicle</Button>
+      <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicle}>Add New Vehicle</Button>
+      <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleLink}>Link Existing Vehicle</Button>
+      <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleLink}>Unlink Vehicle</Button>
       <br/>
       <br/>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>

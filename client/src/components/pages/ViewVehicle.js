@@ -123,6 +123,8 @@ export default function ViewVehicle() {
       <NavBar></NavBar>
       <br/>
       <Typography><strong>{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.color ? `(${vehicle.color})` : ''}</strong></Typography>
+      <Typography><strong>Owners: {vehicle.list_owners}</strong></Typography>
+      <Typography></Typography>
       <br/>
       <Button variant='outlined' onClick={handleOpenVehicle}>Edit</Button>
       <br/>
