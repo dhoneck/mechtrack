@@ -62,6 +62,9 @@ export default function ViewCustomer() {
   // Hold all vehicles for linking purposes
   const [vehicles, setVehicles] = useState([]);
 
+  // Holds the vehicle that is attempting to be linked to a user
+  const [vehicleLink, setVehicleLink] = useState('');
+
   /** Make GET request using ID from URL param to grab customer data  */
   const getCustomerInfo = async () => {
     try {
@@ -156,6 +159,36 @@ export default function ViewCustomer() {
 
           // Close modal
           handleCloseVehicle();
+
+          // Refresh customer info
+          getCustomerInfo();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /** Make POST request to link existing vehicle to existing customer */
+  const linkVehicle = async () => {
+    console.log('Attempting to link vehicle to customer');
+    let vehicleID = parseInt(vehicleLink.split(' ')[1].slice(0, -1));
+    let customerID = parseInt(customerInfo.id);
+    let values = {
+      'customer': customerID,
+      'vehicle': vehicleID
+    };
+
+    console.log('Values:');
+    console.log(values);
+
+
+    try {
+      let url = `http://127.0.0.1:8000/api/customer-vehicle/`;
+
+      await axios.post(url, values)
+        .then(function () {
+          // Close modal
+          handleCloseVehicleLink();
 
           // Refresh customer info
           getCustomerInfo();
@@ -404,8 +437,9 @@ export default function ViewCustomer() {
               id="free-solo-demo"
               options={vehicles.map((option) => option)}
               renderInput={(params) => <TextField {...params} label="Existing Vehicles" />}
+              onChange={(e, v) => {setVehicleLink(v)}}
             />
-            <Button variant='contained'>Submit</Button>
+            <Button variant='contained' onClick={linkVehicle}>Submit</Button>
           </FormGroup>
         </Box>
       </Modal>
