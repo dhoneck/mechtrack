@@ -1,4 +1,7 @@
-from rest_framework import filters, generics
+from rest_framework.response import Response
+from rest_framework import filters, generics, status
+from rest_framework.decorators import api_view
+
 from shop.models import Vehicle, Customer, CustomerVehicle, Service
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer
 
@@ -72,3 +75,17 @@ class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+
+@api_view(['DELETE'])
+def delete_by_filter(request):
+    # Assuming you want to filter by a specific field value
+    customer = request.GET.get('customer')  # Get the value from the query parameters
+    vehicle = request.GET.get('vehicle')  # Get the value from the query parameters
+
+    try:
+        instance = CustomerVehicle.objects.get(customer_id=customer, vehicle_id=vehicle)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except CustomerVehicle.DoesNotExist:
+        return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)

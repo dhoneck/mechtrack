@@ -40,7 +40,12 @@ export default function ViewCustomer() {
   const handleOpenVehicleLink = () => setOpenVehicleLink(true);
   const handleCloseVehicleLink = () => setOpenVehicleLink(false);
 
-  // Set empty customer form values
+  // Track modal state for vehicle unlinking modal
+  const [openVehicleUnlink, setOpenVehicleUnlink] = useState(false);
+  const handleOpenVehicleUnlink = () => setOpenVehicleUnlink(true);
+  const handleCloseVehicleUnlink = () => setOpenVehicleUnlink(false);
+
+  // Set empty customer form values which will be populated by the fetched customer data for editing customer
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -50,7 +55,7 @@ export default function ViewCustomer() {
   const [isFlagged, setIsFlagged] = useState(false);
   const [customerNotes, setCustomerNotes] = useState('');
 
-  // Set empty vehicle form values
+  // Set empty vehicle form values for adding a new vehicle
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
@@ -62,18 +67,33 @@ export default function ViewCustomer() {
   // Hold all vehicles for linking purposes
   const [vehicles, setVehicles] = useState([]);
 
-  // Holds the vehicle that is attempting to be linked to a user
+  // Hold customer's vehicles for unlinking purposes
+  const [customerVehicles, setCustomerVehicles] = useState([]);
+
+  // Holds the vehicle that is attempting to be linked to a customer
   const [vehicleLink, setVehicleLink] = useState('');
 
-  /** Make GET request using ID from URL param to grab customer data  */
+  function makeVehicleDescription(vehicle) {
+    let id = vehicle.id;
+    let color = vehicle.color ? vehicle.color : '';
+    let year = vehicle.year ? vehicle.year : ''
+    let make = vehicle.make ? vehicle.make : '';
+    let model = vehicle.model ? vehicle.model : '';
+    let license = vehicle.license ? vehicle.license : '';
+    let otherOwners = vehicle.list_owners ? '| ' + vehicle.list_owners : '| No customers associated';
+    return `(ID: ${id}) ${color} ${year} ${make} ${model} ${license} ${otherOwners}`
+  }
+
+  /** Make GET request using ID from URL param to grab customer data */
   const getCustomerInfo = async () => {
     try {
       let url = `http://127.0.0.1:8000/api/customers/${id}/`;
 
       await axios.get(url)
         .then(function (response) {
-          console.log('response:')
+          console.log('Fetched Customer Data:')
           console.log(response.data)
+
           // Store customer data from response
           setCustomerInfo(response.data);
 
@@ -86,6 +106,8 @@ export default function ViewCustomer() {
           setAcceptsEmails(response.data.accepts_emails);
           setIsFlagged(response.data.flagged);
           setCustomerNotes(response.data.notes);
+
+          response.data.vehicles && setCustomerVehicles(response.data.vehicles.map(vehicle => makeVehicleDescription(vehicle)));
         });
 
     } catch (error) {
@@ -123,7 +145,7 @@ export default function ViewCustomer() {
     }
   }
 
-  /** Make POST request to update customer data */
+  /** Make POST request to add new vehicle for a customer */
   const addVehicle = async () => {
     // Combine 'Add Vehicle' form values to use in POST request
     let values = {
@@ -142,9 +164,10 @@ export default function ViewCustomer() {
 
       await axios.post(url, values)
         .then(function (response) {
-          console.log('New vehicle response');
-          console.log(response);
+          console.log('New vehicle created:');
           console.log(response.data);
+
+          console.log('Associating vehicle with customer...');
           let user_id = customerInfo.id;
           let new_vehicle_id = response.data.id;
 
@@ -178,10 +201,6 @@ export default function ViewCustomer() {
       'vehicle': vehicleID
     };
 
-    console.log('Values:');
-    console.log(values);
-
-
     try {
       let url = `http://127.0.0.1:8000/api/customer-vehicle/`;
 
@@ -198,9 +217,68 @@ export default function ViewCustomer() {
     }
   }
 
+  /** Make DELETE request to unlink vehicle to customer */
+  const unlinkVehicle = async () => {
+    console.log('Attempting to unlink vehicle from customer');
+
+    let customerID = parseInt(customerInfo.id);
+    let vehicleID = parseInt(vehicleLink.split(' ')[1].slice(0, -1));
+
+    try {
+      let url = `http://127.0.0.1:8000/api/customer-vehicle/delete-by-filter/?customer=${customerID}&vehicle=${vehicleID}`;
+
+      await axios.delete(url)
+        .then(function () {
+          // Close modal
+          handleCloseVehicleUnlink();
+
+          // Refresh customer info
+          getCustomerInfo();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
    /** Make GET request to get all vehicle data */
   const getVehicles = async () => {
     // Try to get all vehicles
+    try {
+      let url = `http://127.0.0.1:8000/api/vehicles/`;
+
+      await axios.get(url)
+        .then(function (response) {
+          console.log('All vehicles');
+          console.log(response.data);
+          let rawVehicleList = response.data;
+          console.log(rawVehicleList);
+          let cleanVehicleList = [];
+          // for (let index in rawVehicleList) {
+          //   console.log('VEHICLE');
+          //   let vehicle = rawVehicleList[index];
+          //   let id = vehicle.id;
+          //   let color = vehicle.color;
+          //   let year = vehicle.year;
+          //   let make = vehicle.make;
+          //   let model = vehicle.model;
+          //   let license = vehicle.license;
+          //   let otherOwners = vehicle.list_owners;
+          //   let vehicleDescription = `(ID: ${id}) ${color} ${year} ${make} ${model} ${license} ${otherOwners}`
+          //   console.log('Vehicle Description:');
+          //   console.log(vehicleDescription);
+          //   cleanVehicleList.push(vehicleDescription);
+          // }
+          setVehicles(rawVehicleList.map(vehicle => makeVehicleDescription(vehicle)));
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /** Make GET request to get all customer vehicle */
+  // TODO: Do I need this if I'm already getting the customer's vehicles in getCustomerInfo?
+  const getCustomerVehicles = async () => {
+    // Try to get all customer vehicles
     try {
       let url = `http://127.0.0.1:8000/api/vehicles/`;
 
@@ -239,21 +317,22 @@ export default function ViewCustomer() {
     getVehicles();
   }, [])
 
-  const style2 = {
-    my: 5
-  }
-
-  const style = {
+  // Custom styles
+    const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: 600,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
   };
+
+  const style2 = {
+    my: 5
+  }
 
   return (
     <Box sx={{textAlign: 'center'}}>
@@ -445,6 +524,31 @@ export default function ViewCustomer() {
       </Modal>
       {/* Modal end for linking vehicle */}
 
+      {/*Modal start for unlinking vehicle*/}
+      <Modal
+        open={openVehicleUnlink}
+        onClose={handleCloseVehicleUnlink}
+        aria-labelledby="vehicle-unlink-modal-title"
+        aria-describedby="vehicle-unlink-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="vehicle-unlink-modal-title" variant="h6" component="h2">
+            Unlink Vehicle
+          </Typography>
+          <FormGroup>
+            <Autocomplete
+              sx={{ my: 2 }}
+              id="free-solo-demo"
+              options={customerVehicles && customerVehicles.map((option) => option)}
+              renderInput={(params) => <TextField {...params} label="Existing Vehicles" />}
+              onChange={(e, v) => {setVehicleLink(v)}}
+            />
+            <Button variant='contained' onClick={unlinkVehicle}>Submit</Button>
+          </FormGroup>
+        </Box>
+      </Modal>
+      {/*Modal end for unlinking vehicle*/}
+
       <br/>
       <br/>
       <Typography>{customerInfo.phone}</Typography>
@@ -460,7 +564,7 @@ export default function ViewCustomer() {
       <br/>
       <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicle}>Add New Vehicle</Button>
       <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleLink}>Link Existing Vehicle</Button>
-      <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleLink}>Unlink Vehicle</Button>
+      <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleUnlink}>Unlink Vehicle</Button>
       <br/>
       <br/>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>
