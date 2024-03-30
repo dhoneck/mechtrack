@@ -31,13 +31,21 @@ export default function AddCustomer() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    // Add +1 to phone number if it is not there
+    let verifiedPhoneNumber = phoneNumber;
+    if (phoneNumber.substring(0, 2) !== '+1' && phoneNumber.length === 10) {
+      verifiedPhoneNumber = '+1' + phoneNumber;
+      setPhoneNumber(phoneNumber);
+    } else {
+      console.log('Phone number is not correct!');
+    }
 
     // Post the value of the form
     let url = 'http://127.0.0.1:8000/api/customers/'
     let values = {
       'first_name': firstName,
       'last_name': lastName,
-      'phone': phoneNumber,
+      'phone': verifiedPhoneNumber,
       'email': email,
       'accepts_emails': acceptsEmails,
       'accepts_texts': acceptsTexts,

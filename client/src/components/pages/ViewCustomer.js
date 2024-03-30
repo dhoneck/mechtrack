@@ -117,11 +117,20 @@ export default function ViewCustomer() {
 
   /** Make PUT request to update customer data */
   const updateCustomer = async () => {
+    // Add +1 to phone number if it is not there
+    let verifiedPhoneNumber = phoneNumber;
+    if (phoneNumber.substring(0, 2) !== '+1' && phoneNumber.length === 10) {
+      verifiedPhoneNumber = '+1' + phoneNumber;
+      setPhoneNumber(phoneNumber);
+    } else {
+      console.log('Phone number is not correct!');
+    }
+
     // Combine 'Edit User' form values to use in PUT request (don't include vehicles)
     let values = {
       'first_name': firstName,
       'last_name': lastName,
-      'phone': phoneNumber,
+      'phone': verifiedPhoneNumber,
       'email': email,
       'accepts_emails': acceptsEmails,
       'accepts_texts': acceptsTexts,
