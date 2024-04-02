@@ -87,7 +87,7 @@ TIME_CHOICES = (('1 hr', '1 hr'),
                 ('8 hrs', '8 hrs'),
                 ('1+ day', '1+ day'))
 
-SERVICE_CHOICES = (('Oil, lube, and filter', 'Oil, lube, and filter'),
+SERVICE_CHOICES = (('Oil lube and filter', 'Oil lube and filter'),
                    ('Diagnostic', 'Diagnostic'),
                    ('Tire rotation', 'Tire rotation'),
                    ('Brake replacement', 'Brake replacement'),
@@ -99,7 +99,7 @@ SERVICE_CHOICES = (('Oil, lube, and filter', 'Oil, lube, and filter'),
 
 class Service(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
-    date = models.DateField()
+    datetime = models.DateTimeField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
     # MultiSelectField has bug that requires max_length to be specified
     # More info: https://github.com/goinnn/django-multiselectfield/issues/131
@@ -113,7 +113,7 @@ class Service(models.Model):
         vehicle = Vehicle.objects.get(id=self.vehicle.id)
         return f'''
             Service for {vehicle}
-            Date: {self.date}
+            Datetime: {self.datetime}
             Services: {self.services}
         '''
 

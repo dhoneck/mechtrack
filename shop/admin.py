@@ -21,7 +21,7 @@ class CustomerVehicleAdmin(admin.ModelAdmin):
 
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'date', 'estimated_time', 'services', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
+    list_display = ('vehicle', 'datetime', 'estimated_time', 'services', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
 
 
 admin.site.register(Vehicle, VehicleAdmin)

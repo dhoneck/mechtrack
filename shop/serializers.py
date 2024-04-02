@@ -3,6 +3,7 @@ from shop.models import Vehicle, Customer, CustomerVehicle, Service
 
 
 class ServiceSerializer(serializers.ModelSerializer):
+    services = serializers.ListField(child=serializers.CharField())
 
     class Meta:
         model = Service

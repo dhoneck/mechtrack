@@ -5,12 +5,33 @@ import {
   CardActions,
   CardContent,
   Checkbox,
+  FormControl,
   FormControlLabel,
   FormGroup,
-  Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  InputLabel,
+  Grid,
+  MenuItem,
+  Modal,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography
 } from '@mui/material';
+
+import {
+  LocalizationProvider ,
+  DateTimePicker
+} from '@mui/x-date-pickers';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+import dayjs from 'dayjs';
 import {Link, useParams} from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -24,10 +45,15 @@ export default function ViewVehicle() {
   // Vehicle information from fetch call
   const [vehicle, setVehicleInfo] = useState([]);
 
-  // // Track modal state for the edit vehicle modal
+  // Track modal state for the edit vehicle modal
   const [openVehicle, setOpenVehicle] = useState(false);
   const handleOpenVehicle = () => setOpenVehicle(true);
   const handleCloseVehicle = () => setOpenVehicle(false);
+
+  // Track modal state for the add service modal
+  const [openService, setOpenService] = useState(false);
+  const handleOpenService = () => setOpenService(true);
+  const handleCloseService = () => setOpenService(false);
 
   // Set empty vehicle form values
   const [make, setMake] = useState('');
@@ -37,6 +63,31 @@ export default function ViewVehicle() {
   const [license, setLicense] = useState(null);
   const [vin, setVin] = useState(null);
   const [notes, setNotes] = useState('');
+
+  // Set service form values
+  const [dateTime, setDateTime] = useState(dayjs());
+  const [estimatedTime, setEstimatedTime] = useState('1 hr');
+  const [services, setServices] = useState([]);
+  const [customerNotes, setCustomerNotes] = useState('');
+
+  const serviceOptions = [
+    'Oil lube and filter',
+    'Diagnostic',
+    'Tire rotation',
+    'Brake replacement',
+    'Alignment',
+    'Transmission',
+    'Electrical systems',
+    'Other',
+  ];
+
+  const handleCheckboxChange = (service) => (event) => {
+    if (event.target.checked) {
+      setServices([...services, service]);
+    } else {
+      setServices(services.filter((item) => item !== service));
+    }
+  };
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getVehicleInfo = async () => {
@@ -49,6 +100,8 @@ export default function ViewVehicle() {
           console.log(response.data)
           // Store vehicle data from response
           setVehicleInfo(response.data);
+          console.log('vehicle:');
+          console.log(response.data);
 
           // Set initial values for 'Edit Vehicle' form
           setMake(response.data.make);
@@ -96,6 +149,42 @@ export default function ViewVehicle() {
     }
   }
 
+  /** Make POST request to add new service for a vehicle */
+  const scheduleServices = async () => {
+    console.log('Attempting to schedule service');
+
+    // Combine 'Schedule Service' form values to use in POST request
+    let values = {
+      'vehicle': vehicle.id,
+      'datetime': dateTime,
+      'estimated_time': estimatedTime,
+      'services': services,
+      'customer_notes': customerNotes,
+    };
+
+    console.log(values);
+
+    // Try to create a new vehicle
+    try {
+      let url = `http://127.0.0.1:8000/api/services/`;
+
+      await axios.post(url, values)
+        .then(function (response) {
+          console.log('Service Scheduled:');
+          console.log(response.data);
+
+          // Close modal
+          handleCloseService();
+
+          // Refresh vehicle info
+          getVehicleInfo();
+        });
+    } catch (error) {
+      console.error(error);
+      console.error(values)
+    }
+  }
+
   // Get customer info
   useEffect(() => {
     getVehicleInfo();
@@ -110,7 +199,7 @@ export default function ViewVehicle() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 500,
+    width: 550,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -214,10 +303,85 @@ export default function ViewVehicle() {
       </Modal>
       {/* Modal end for editing vehicle */}
 
+      {/* Modal start for adding service */}
+      <Modal
+        open={openService}
+        onClose={handleCloseService}
+        aria-labelledby="service-modal-title"
+        aria-describedby="service-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="service-modal-title" variant="h6" component="h2">
+            Schedule Service
+          </Typography>
+          <FormGroup>
+            <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
+                <DateTimePicker
+                  timeSteps={{ minutes: 15 }}
+                  label='Date and Time'
+                  sx={{ mb: 1 }}
+                  value={dateTime}
+                  onChange={(e) => setDateTime(e)}
+                />
+            </LocalizationProvider>
+            <FormControl sx={{mb: 1}}>
+              <InputLabel id="demo-simple-select-label">Estimated Time</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={estimatedTime}
+                label="Estimated Time"
+                onChange={(e) => setEstimatedTime(e.target.value)}
+              >
+                <MenuItem value={'1 hr'}>1 hr</MenuItem>
+                <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
+                <MenuItem value={'3 hrs'}>3 hrs</MenuItem>
+                <MenuItem value={'4 hrs'}>4 hrs</MenuItem>
+                <MenuItem value={'5 hrs'}>5 hrs</MenuItem>
+                <MenuItem value={'6 hrs'}>6 hrs</MenuItem>
+                <MenuItem value={'7 hrs'}>7 hrs</MenuItem>
+                <MenuItem value={'8 hrs'}>8 hrs</MenuItem>
+                <MenuItem value={'1+ day'}>1+ day</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="h6">Services</Typography>
+            <Grid container spacing={2}>
+              {serviceOptions.map((service, index) => (
+                <Grid item xs={6} key={index}>
+                  <FormControlLabel
+                    key={index}
+                    control={
+                      <Checkbox
+                        checked={services.includes(service)}
+                        onChange={handleCheckboxChange(service)}
+                        color="primary"
+                      />
+                    }
+                    label={service}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            <TextField
+              id='customer-notes'
+              label='Customer Notes'
+              variant='outlined'
+              multiline
+              rows={4}
+              value={customerNotes}
+              onChange={(e) => setCustomerNotes(e.target.value)}
+              sx={{mb: 1}}
+            />
+            <Button variant='contained' onClick={scheduleServices}>Submit</Button>
+          </FormGroup>
+        </Box>
+      </Modal>
+      {/* Modal end for adding service */}
+
       <br/>
       <Typography variant='h4'>Service Record</Typography>
       <br/>
-      <Button variant='outlined'>Add Service</Button>
+      <Button variant='outlined' onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
       <Typography>No service records for this vehicle</Typography>
