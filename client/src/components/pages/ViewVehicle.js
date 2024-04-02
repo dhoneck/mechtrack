@@ -81,6 +81,11 @@ export default function ViewVehicle() {
     'Other',
   ];
 
+
+  const formatDateTime = (dateTime) => {
+    return dayjs(dateTime).format('YYYY-MM-DD hh:mm a');
+  }
+
   const handleCheckboxChange = (service) => (event) => {
     if (event.target.checked) {
       setServices([...services, service]);
@@ -311,14 +316,14 @@ export default function ViewVehicle() {
         aria-describedby="service-modal-description"
       >
         <Box sx={style}>
-          <Typography id="service-modal-title" variant="h6" component="h2">
+          <Typography id="service-modal-title" sx={{mb: 2}} variant="h6" component="h2">
             Schedule Service
           </Typography>
           <FormGroup>
             <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
                 <DateTimePicker
                   timeSteps={{ minutes: 15 }}
-                  label='Date and Time'
+                  label='Service Date & Time'
                   sx={{ mb: 1 }}
                   value={dateTime}
                   onChange={(e) => setDateTime(e)}
@@ -384,28 +389,29 @@ export default function ViewVehicle() {
       <Button variant='outlined' onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
-      <Typography>No service records for this vehicle</Typography>
       <TableContainer container={Paper} sx={{textAlign: 'center'}}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Date</TableCell>
+                <TableCell>Service Date & Time</TableCell>
                 <TableCell>Description</TableCell>
+                <TableCell>Estimated Time</TableCell>
                 <TableCell>Mileage</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {vehicle.services ? vehicle.services.map(service => (
+              {vehicle.services && vehicle.services.map(service => (
                 <TableRow key={service.id}>
-                  <TableCell>{service.date}</TableCell>
+                  <TableCell>{formatDateTime(service.datetime)}</TableCell>
                   <TableCell>{service.services.join(', ')}</TableCell>
+                  <TableCell>{service.estimated_time}</TableCell>
                   <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
                   <TableCell>n/a</TableCell>
                   <TableCell>{service.completed ? service.completed : 'Not completed'}</TableCell>
                 </TableRow>
-              )) : 'No services found'}
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

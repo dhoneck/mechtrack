@@ -92,7 +92,7 @@ export default function VehicleSearch() {
                   <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.license}</Link></TableCell>
                   <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.vin}</Link></TableCell>
                   <TableCell><Link to={'/vehicles/' + vehicle.id}><Tooltip title={vehicle.list_owners}>{vehicle.owner_count}</Tooltip></Link></TableCell>
-                  <TableCell><Link to={'/vehicles/' + vehicle.id}>n/a</Link></TableCell>
+                  <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.service_count}</Link></TableCell>
                 </TableRow>
               ))}
             </TableBody>
