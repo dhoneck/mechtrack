@@ -6,6 +6,7 @@ import Vehicles from './Vehicles';
 import Services from './Services';
 import AddCustomer from './AddCustomer';
 import ViewCustomer from './ViewCustomer';
+import ViewService from './ViewService';
 import ViewVehicle from './ViewVehicle';
 import PageNotFound from './PageNotFound';
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
         <Route path='add-customer' element={<AddCustomer />} />
+        <Route path='services/:id' element={<ViewService />} />
         <Route path='*' element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
