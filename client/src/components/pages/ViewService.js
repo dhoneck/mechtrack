@@ -1,17 +1,10 @@
+import { useParams } from 'react-router-dom';
 import {
-  Autocomplete,
   Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
   Typography
 } from '@mui/material';
-import {Link, useParams} from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
-import NavBar from '../partials/NavBar';
+import NavBar from '../layout/NavBar';
 
 export default function ViewService() {
   // Get ID of customer from URL

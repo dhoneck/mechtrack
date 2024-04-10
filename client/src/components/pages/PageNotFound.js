@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import NavBar from '../partials/NavBar';
+
+import NavBar from '../layout/NavBar';
 
 export default function PageNotFound() {
   return (

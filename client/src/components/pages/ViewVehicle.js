@@ -1,9 +1,11 @@
+import { useParams} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import axios from 'axios';
+
 import {
   Box,
   Button,
-  Card,
-  CardActions,
-  CardContent,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -23,20 +25,10 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-
-import {
-  LocalizationProvider ,
-  DateTimePicker
-} from '@mui/x-date-pickers';
-
+import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-import dayjs from 'dayjs';
-import {Link, useParams} from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-import NavBar from '../partials/NavBar';
+import NavBar from '../layout/NavBar';
 
 export default function ViewVehicle() {
   // Get ID of customer from URL

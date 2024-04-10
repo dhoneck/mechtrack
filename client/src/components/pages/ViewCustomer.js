@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import {Link, useParams} from 'react-router-dom';
+import axios from 'axios';
 import {
   Autocomplete,
   Box,
@@ -12,11 +15,8 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import {Link, useParams} from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
-import NavBar from '../partials/NavBar';
+import NavBar from '../layout/NavBar';
 
 export default function ViewCustomer() {
   // Get ID of customer from URL
@@ -261,22 +261,6 @@ export default function ViewCustomer() {
           console.log(response.data);
           let rawVehicleList = response.data;
           console.log(rawVehicleList);
-          let cleanVehicleList = [];
-          // for (let index in rawVehicleList) {
-          //   console.log('VEHICLE');
-          //   let vehicle = rawVehicleList[index];
-          //   let id = vehicle.id;
-          //   let color = vehicle.color;
-          //   let year = vehicle.year;
-          //   let make = vehicle.make;
-          //   let model = vehicle.model;
-          //   let license = vehicle.license;
-          //   let otherOwners = vehicle.list_owners;
-          //   let vehicleDescription = `(ID: ${id}) ${color} ${year} ${make} ${model} ${license} ${otherOwners}`
-          //   console.log('Vehicle Description:');
-          //   console.log(vehicleDescription);
-          //   cleanVehicleList.push(vehicleDescription);
-          // }
           setVehicles(rawVehicleList.map(vehicle => makeVehicleDescription(vehicle)));
         });
     } catch (error) {

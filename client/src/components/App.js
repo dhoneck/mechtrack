@@ -1,14 +1,15 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Dashboard from './Dashboard';
-import Customers from './Customers';
-import Vehicles from './Vehicles';
-import Services from './Services';
-import AddCustomer from './AddCustomer';
-import ViewCustomer from './ViewCustomer';
-import ViewService from './ViewService';
-import ViewVehicle from './ViewVehicle';
-import PageNotFound from './PageNotFound';
+
+import Dashboard from './pages/Dashboard';
+import Customers from './pages/Customers';
+import Vehicles from './pages/Vehicles';
+import Services from './pages/Services';
+import AddCustomer from './pages/AddCustomer';
+import ViewCustomer from './pages/ViewCustomer';
+import ViewVehicle from './pages/ViewVehicle';
+import ViewService from './pages/ViewService';
+import PageNotFound from './pages/PageNotFound';
 
 export default function App() {
   return (
@@ -18,9 +19,9 @@ export default function App() {
         <Route path='customers' element={<Customers />} />
         <Route path='vehicles' element={<Vehicles />} />
         <Route path='services' element={<Services />} />
+        <Route path='add-customer' element={<AddCustomer />} />
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
-        <Route path='add-customer' element={<AddCustomer />} />
         <Route path='services/:id' element={<ViewService />} />
         <Route path='*' element={<PageNotFound />} />
       </Routes>
