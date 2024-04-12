@@ -29,6 +29,7 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import NavBar from '../layout/NavBar';
+import EstimateModal from '../modals/EstimateModal';
 
 export default function ViewVehicle() {
   // Get ID of customer from URL
@@ -377,8 +378,10 @@ export default function ViewVehicle() {
 
       <br/>
       <Typography variant='h4'>Service Record</Typography>
+      <EstimateModal></EstimateModal>
       <br/>
-      <Button variant='outlined' onClick={setOpenService}>Schedule Services</Button>
+      <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Create Estimate</Button>
+      <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{textAlign: 'center'}}>
