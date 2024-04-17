@@ -117,6 +117,36 @@ class Service(models.Model):
             Services: {self.services}
         '''
 
+
+class Estimate(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_total(self):
+        total = 0
+        for item in self.items.all():
+            total += item.amount
+        return total
+
+    def get_total_items(self):
+        return self.items.count()
+
+    def __str__(self):
+        vehicle = Vehicle.objects.get(id=self.vehicle.id)
+        return f'Estimate for {vehicle} | Updated at: {self.updated_at}'
+
+
+class EstimateItem(models.Model):
+    estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, related_name='items')
+    description = models.CharField(max_length=200)
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str__(self):
+        return f'''
+            Description: {self.description}
+            Amount: {self.amount}
+        '''
+
 # TODO: Rework Invoice model
 # class Invoice(models.Model):
 #     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='invoices')
