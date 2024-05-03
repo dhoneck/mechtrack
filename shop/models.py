@@ -123,9 +123,7 @@ class Estimate(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def get_total(self):
-        total = 0
-        for item in self.items.all():
-            total += item.amount
+        total = sum(item.amount for item in self.items.all())
         return total
 
     def get_total_items(self):
@@ -146,19 +144,3 @@ class EstimateItem(models.Model):
             Description: {self.description}
             Amount: {self.amount}
         '''
-
-# TODO: Rework Invoice model
-# class Invoice(models.Model):
-#     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='invoices')
-#     date = models.DateField()
-#     description = models.CharField(max_length=200)
-#     amount = models.DecimalField(max_digits=8, decimal_places=2)
-#
-#     def __str__(self):
-#         customer = Customer.objects.get(id=self.customer.id)
-#         return f'''
-#             Invoice for {customer}
-#             Date: {self.date}
-#             Description: {self.description}
-#             Amount: {self.amount}
-#         '''

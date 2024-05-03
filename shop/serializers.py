@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import Vehicle, Customer, CustomerVehicle, Service
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -34,3 +34,17 @@ class CustomerVehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerVehicle
         fields = '__all__'
+
+
+class EstimateItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EstimateItem
+        fields = ['id', 'description', 'amount']
+
+
+class EstimateSerializer(serializers.ModelSerializer):
+    estimate_items = EstimateItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Estimate
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items']

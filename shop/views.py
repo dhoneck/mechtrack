@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service
-from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate
+from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, EstimateSerializer
 
 
 # Create your views here.
@@ -75,6 +75,14 @@ class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+
+class EstimateList(generics.ListCreateAPIView):
+    """
+    List all estimates, or create a new estimate.
+    """
+    queryset = Estimate.objects.prefetch_related('items').all()
+    serializer_class = EstimateSerializer
 
 
 @api_view(['DELETE'])

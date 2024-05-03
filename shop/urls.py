@@ -12,6 +12,7 @@ urlpatterns = [
     path('customer-vehicle/delete-by-filter/', views.delete_by_filter, name='delete_by_filter'),
     path('services/', views.ServiceList.as_view()),
     path('services/<int:pk>/', views.ServiceDetail.as_view()),
+    path('estimates/', views.EstimateList.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
