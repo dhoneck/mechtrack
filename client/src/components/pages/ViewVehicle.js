@@ -233,7 +233,7 @@ export default function ViewVehicle() {
       >
         <Box sx={style}>
           <Typography id="vehicle-modal-title" variant="h6" component="h2">
-            Add Vehicle
+            Edit Vehicle
           </Typography>
           <FormGroup>
             <TextField
@@ -378,9 +378,8 @@ export default function ViewVehicle() {
 
       <br/>
       <Typography variant='h4'>Service Record</Typography>
-      <EstimateModal></EstimateModal>
       <br/>
-      <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Create Estimate</Button>
+      <EstimateModal></EstimateModal>
       <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
