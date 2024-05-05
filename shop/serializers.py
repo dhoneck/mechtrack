@@ -39,12 +39,14 @@ class CustomerVehicleSerializer(serializers.ModelSerializer):
 class EstimateItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = EstimateItem
-        fields = ['id', 'description', 'amount']
+        fields = ['id', 'description', 'price']
 
 
 class EstimateSerializer(serializers.ModelSerializer):
-    estimate_items = EstimateItemSerializer(many=True, read_only=True)
+    estimate_items = serializers.ReadOnlyField()
+    estimate_total = serializers.ReadOnlyField()
+    total_estimate_items = serializers.ReadOnlyField()
 
     class Meta:
         model = Estimate
-        fields = ['id', 'vehicle', 'updated_at', 'estimate_items']
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_total', 'total_estimate_items']

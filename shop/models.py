@@ -122,11 +122,17 @@ class Estimate(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_total(self):
-        total = sum(item.amount for item in self.items.all())
+    def estimate_items(self):
+        return [{
+            'description': item.description,
+            'price': item.price
+        } for item in self.items.all()]
+
+    def estimate_total(self):
+        total = sum(item.price for item in self.items.all())
         return total
 
-    def get_total_items(self):
+    def total_estimate_items(self):
         return self.items.count()
 
     def __str__(self):
@@ -137,10 +143,10 @@ class Estimate(models.Model):
 class EstimateItem(models.Model):
     estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, related_name='items')
     description = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
         return f'''
             Description: {self.description}
-            Amount: {self.amount}
+            Price: {self.price}
         '''

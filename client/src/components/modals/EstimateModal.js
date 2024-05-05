@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {Button, Modal, TextField, IconButton, Typography, Box, InputAdornment} from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import axios from 'axios';
 
-function EstimateFormModal() {
+function EstimateFormModal({vehicle_id}) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([{ description: '', price: '' }]);
 
@@ -36,9 +37,33 @@ function EstimateFormModal() {
     console.log(rows);
 
     // Remove rows that have empty description and price
-    const filteredRows = rows.filter(row => row.description && row.price);
+    const estimate_items = rows.filter(row => row.description && row.price);
     console.log('Filtered estimate items');
-    console.log(filteredRows);
+    console.log(estimate_items);
+    console.log('Vehicle ID');
+    console.log(vehicle_id);
+
+    let data = {
+      vehicle_id,
+      estimate_items
+    }
+
+
+    let url = 'http://127.0.0.1:8000/api/estimates/'
+
+    axios.post(url, data)
+      .then(function (response) {
+        console.log(response)
+        if (response.status === 201) {
+          console.log('Estimate created successfully!');
+        }
+      }
+    );
+
+    // Reset form
+    setRows([{ description: '', price: '' }]);
+
+
     handleClose();
   };
 

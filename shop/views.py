@@ -2,11 +2,10 @@ from rest_framework.response import Response
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate
-from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, EstimateSerializer
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
+from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, EstimateSerializer, EstimateItemSerializer
 
 
-# Create your views here.
 class CustomerList(generics.ListCreateAPIView):
     """
     List all customers, or create a new customer.
@@ -27,7 +26,7 @@ class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class VehicleList(generics.ListCreateAPIView):
     """
-    List all vehicles, or create a new vehicles.
+    List all vehicles, or create a new vehicle.
     """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
@@ -45,7 +44,7 @@ class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class CustomerVehicleList(generics.ListCreateAPIView):
     """
-    List all customer/vehicle pairs, or create a new pairs.
+    List all customer/vehicle pairs, or create a new customer/vehicle pair.
     """
     queryset = CustomerVehicle.objects.all()
     serializer_class = CustomerVehicleSerializer
@@ -61,12 +60,10 @@ class CustomerVehicleDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class ServiceList(generics.ListCreateAPIView):
     """
-    List all services, or create a new vehicles.
+    List all services, or create a new service.
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['make', 'model', 'year', 'color', 'license', 'vin', 'notes']
 
 
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -81,8 +78,43 @@ class EstimateList(generics.ListCreateAPIView):
     """
     List all estimates, or create a new estimate.
     """
-    queryset = Estimate.objects.prefetch_related('items').all()
+    queryset = Estimate.objects.all()
     serializer_class = EstimateSerializer
+
+    def create(self, request, *args, **kwargs):
+        print('request.data')
+        print(request.data)
+
+        vehicle_id = request.data.pop('vehicle_id')
+        estimate_items = request.data.pop('estimate_items')
+        estimate = Estimate.objects.create(vehicle_id=vehicle_id)
+        for item in estimate_items:
+            EstimateItem.objects.create(estimate_id=estimate.id, description=item['description'], price=item['price'])
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class EstimateDetail(generics.ListCreateAPIView):
+    """
+    Retrieve, update or delete an estimate instance.
+    """
+    queryset = Estimate.objects.all()
+    serializer_class = EstimateSerializer
+
+
+class EstimateItemList(generics.ListCreateAPIView):
+    """
+    List all estimate items, or create a new estimate item.
+    """
+    queryset = EstimateItem.objects.all()
+    serializer_class = EstimateItemSerializer
+
+
+class EstimateItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete an estimate item instance.
+    """
+    queryset = EstimateItem.objects.all()
+    serializer_class = EstimateItemSerializer
 
 
 @api_view(['DELETE'])

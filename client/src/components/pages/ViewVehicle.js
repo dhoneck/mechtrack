@@ -379,7 +379,7 @@ export default function ViewVehicle() {
       <br/>
       <Typography variant='h4'>Service Record</Typography>
       <br/>
-      <EstimateModal></EstimateModal>
+      <EstimateModal vehicle_id={1}></EstimateModal>
       <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
