@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import Vehicles from './pages/Vehicles';
-import Services from './pages/Services';
+import Reports from './pages/Reports';
 import AddCustomer from './pages/AddCustomer';
 import ViewCustomer from './pages/ViewCustomer';
 import ViewVehicle from './pages/ViewVehicle';
@@ -18,8 +18,8 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path='customers' element={<Customers />} />
         <Route path='vehicles' element={<Vehicles />} />
-        <Route path='services' element={<Services />} />
-        <Route path='add-customer' element={<AddCustomer />} />
+        <Route path='reports' element={<Reports />} />
+        <Route path='customers/add' element={<AddCustomer />} />
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
         <Route path='services/:id' element={<ViewService />} />

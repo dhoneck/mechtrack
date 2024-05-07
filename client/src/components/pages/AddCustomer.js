@@ -11,6 +11,8 @@ import {
   Typography,
 } from '@mui/material'
 
+import NavBar from '../layout/NavBar';
+
 const style = {
   my: 5
 }
@@ -81,7 +83,7 @@ export default function AddCustomer() {
       }}
     >
       <Typography variant='h2' align='center'>Add Customer</Typography>
-      <Button variant='contained' sx={{my: 1}} onClick={() => navigate(-1)}>Back</Button>
+      <NavBar></NavBar>
       <FormGroup>
         <TextField
           style={style}

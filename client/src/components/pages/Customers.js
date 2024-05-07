@@ -64,7 +64,7 @@ function CustomerSearch() {
         </IconButton>
       </form>
 
-      <Link to='/add-customer' style={{ textDecoration: 'none' }}>
+      <Link to='/customers/add' style={{ textDecoration: 'none' }}>
         <Button variant='contained' sx={{ my: 1}} >Add Customer</Button>
       </Link>
 
