@@ -128,6 +128,9 @@ class Estimate(models.Model):
             'price': item.price
         } for item in self.items.all()]
 
+    def estimate_items_str(self):
+        return ', '.join([str(item.description) for item in self.items.all()])
+
     def estimate_total(self):
         total = sum(item.price for item in self.items.all())
         return total

@@ -30,17 +30,17 @@ class EstimateItemInline(admin.TabularInline):
 
 
 class EstimateAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'updated_at', 'get_total', 'get_total_items')
+    list_display = ('vehicle', 'updated_at', 'estimate_items_str', 'estimate_total', 'total_estimate_items')
     inlines = [EstimateItemInline]
 
-    def get_total(self, obj):
-        return '$' + str(obj.get_total())
+    def estimate_items(self, obj):
+        return obj.estimate_items_str()
 
-    def get_total_items(self, obj):
-        return obj.get_total_items()
+    def estimate_total(self, obj):
+        return '$' + str(obj.estimate_total())
 
-    get_total.short_description = 'Estimate Total'
-    get_total_items.short_description = '# of Items'
+    def total_estimate_items(self, obj):
+        return obj.total_estimate_items()
 
 
 admin.site.register(Vehicle, VehicleAdmin)

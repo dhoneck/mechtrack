@@ -23,8 +23,12 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography
+  Typography, IconButton
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
@@ -377,9 +381,42 @@ export default function ViewVehicle() {
       {/* Modal end for adding service */}
 
       <br/>
-      <Typography variant='h4'>Service Record</Typography>
+      <Typography variant='h4'>Estimates</Typography>
       <br/>
       <EstimateModal vehicle_id={1}></EstimateModal>
+      <br/>
+      <br/>
+      <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Last Modified</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {vehicle.estimates && vehicle.estimates.map(estimate => (
+              <TableRow key={estimate.id}>
+                <TableCell>{formatDateTime(estimate.updated_at)}</TableCell>
+                <TableCell>{estimate.estimate_items_str}</TableCell>
+                <TableCell>${estimate.estimate_total}</TableCell>
+                <TableCell>
+                  <IconButton><ScheduleIcon /></IconButton>
+                  <IconButton><VisibilityIcon /></IconButton>
+                  <IconButton><EditIcon /></IconButton>
+                  <IconButton><DeleteIcon /></IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <br/>
+      <Typography variant='h4'>Services</Typography>
+      <br/>
       <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
