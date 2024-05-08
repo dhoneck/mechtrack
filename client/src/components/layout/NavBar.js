@@ -3,15 +3,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@mui/material'
 
 export default function NavBar() {
-  const [activeLink, setActiveLink] = useState('Dashboard');
-
-  const handleLinkClick = (link, event) => {
-    event.preventDefault();
-    if (link !== activeLink) {
-      setActiveLink(link);
-    }
-  };
-
   return (
     <>
       <nav>
@@ -20,8 +11,7 @@ export default function NavBar() {
             <Button
               as={Link}
               to='/'
-              variant={activeLink === 'Dashboard' ? 'contained': 'outlined'}
-              onClick={(event) => handleLinkClick('Dashboard', event)}
+              variant='outlined'
             >
               Dashboard
             </Button>
@@ -30,8 +20,7 @@ export default function NavBar() {
             <Button
               as={Link}
               to='/customers'
-              variant={activeLink === 'Customers' ? 'contained': 'outlined'}
-              onClick={(event) => handleLinkClick('Customers', event)}
+              variant='outlined'
             >
               Customers
             </Button>
@@ -40,8 +29,7 @@ export default function NavBar() {
             <Button
               as={Link}
               to='/vehicles'
-              variant={activeLink === 'Vehicles' ? 'contained': 'outlined'}
-              onClick={(event) => handleLinkClick('Vehicles', event)}
+              variant='outlined'
             >
               Vehicles
             </Button>
@@ -50,8 +38,7 @@ export default function NavBar() {
             <Button
               as={Link}
               to='/reports'
-              variant={activeLink === 'Reports' ? 'contained': 'outlined'}
-              onClick={(event) => handleLinkClick('Reports', event)}
+              variant='outlined'
             >
               Reports
             </Button>
