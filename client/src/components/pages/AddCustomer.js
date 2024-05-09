@@ -68,8 +68,6 @@ export default function AddCustomer() {
     });
   }
 
-  let navigate = useNavigate();
-
   return (
     <Box
       component='form'
@@ -83,7 +81,7 @@ export default function AddCustomer() {
       }}
     >
       <Typography variant='h2' align='center'>Add Customer</Typography>
-      <NavBar></NavBar>
+      <NavBar active='Customers' />
       <FormGroup>
         <TextField
           style={style}
@@ -92,7 +90,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          sx={{mb: 1}}
+          sx={{ mb: 1 }}
         />
         <TextField
           required id='last-name'
@@ -100,7 +98,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          sx={{mb: 1}}
+          sx={{ mb: 1 }}
         />
         <TextField
           required id='phone-number'
@@ -108,7 +106,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
-          sx={{mb: 1}}
+          sx={{ mb: 1 }}
         />
         <TextField
           id='email'
@@ -116,7 +114,7 @@ export default function AddCustomer() {
           variant='outlined'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          sx={{mb: 1}}
+          sx={{ mb: 1 }}
         />
         <FormControlLabel
           control={<Checkbox />}
@@ -144,7 +142,7 @@ export default function AddCustomer() {
           rows={4}
           value={customerNotes}
           onChange={(e) => setCustomerNotes(e.target.value)}
-          sx={{mb: 1}}
+          sx={{ mb: 1 }}
         />
         <Button variant='contained' onClick={handleSubmit}>Submit</Button>
       </FormGroup>

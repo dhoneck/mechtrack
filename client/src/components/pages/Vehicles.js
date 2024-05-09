@@ -59,15 +59,15 @@ function VehicleSearch() {
     >
       <form className='search-form'>
         <TextField label='Vehicle Search' id='vehicle-query' fullWidth />
-        <IconButton type='submit' onClick={searchVehicles} sx={{ ml: .5, borderRadius: 1}}>
+        <IconButton type='submit' onClick={searchVehicles} sx={{ ml: .5, borderRadius: 1 }}>
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
 
       <Box id='results'>
         <Typography variant='h4'>Results</Typography>
-        <Typography>Searching for "{query}"</Typography>
-        <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+        <Typography>Searching for {query ? `"${query}"` : 'all vehicles'}</Typography>
+        <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -106,7 +106,7 @@ export default function Customers() {
   return (
     <Box>
       <Typography variant='h2' align='center'>Vehicles</Typography>
-      <NavBar></NavBar>
+      <NavBar active='Vehicles' />
       <VehicleSearch />
     </Box>
   );

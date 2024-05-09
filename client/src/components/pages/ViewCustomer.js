@@ -268,42 +268,6 @@ export default function ViewCustomer() {
     }
   }
 
-  /** Make GET request to get all customer vehicle */
-  // TODO: Do I need this if I'm already getting the customer's vehicles in getCustomerInfo?
-  const getCustomerVehicles = async () => {
-    // Try to get all customer vehicles
-    try {
-      let url = `http://127.0.0.1:8000/api/vehicles/`;
-
-      await axios.get(url)
-        .then(function (response) {
-          console.log('All vehicles');
-          console.log(response.data);
-          let rawVehicleList = response.data;
-          console.log(rawVehicleList);
-          let cleanVehicleList = [];
-          for (let index in rawVehicleList) {
-            console.log('VEHICLE');
-            let vehicle = rawVehicleList[index];
-            let id = vehicle.id;
-            let color = vehicle.color;
-            let year = vehicle.year;
-            let make = vehicle.make;
-            let model = vehicle.model;
-            let license = vehicle.license;
-            let otherOwners = vehicle.list_owners;
-            let vehicleDescription = `(ID: ${id}) ${color} ${year} ${make} ${model} ${license} ${otherOwners}`
-            console.log('Vehicle Description:');
-            console.log(vehicleDescription);
-            cleanVehicleList.push(vehicleDescription);
-          }
-          setVehicles(cleanVehicleList);
-        });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   // Get customer info
   useEffect(() => {
     getCustomerInfo();
@@ -328,9 +292,9 @@ export default function ViewCustomer() {
   }
 
   return (
-    <Box sx={{textAlign: 'center'}}>
+    <Box sx={{ textAlign: 'center' }}>
       <Typography variant='h2'>Customer Detail</Typography>
-      <NavBar></NavBar>
+      <NavBar active='Customers' />
       <br/>
       <Typography><strong>{customerInfo.first_name} {customerInfo.last_name}</strong></Typography>
       <br/>
@@ -355,7 +319,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='last-name'
@@ -363,7 +327,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='phone-number'
@@ -371,7 +335,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='email'
@@ -379,7 +343,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <FormControlLabel
               control={<Checkbox />}
@@ -407,7 +371,7 @@ export default function ViewCustomer() {
               rows={4}
               value={customerNotes}
               onChange={(e) => setCustomerNotes(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <Button variant='contained' onClick={updateCustomer}>Submit</Button>
           </FormGroup>
@@ -434,7 +398,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={make}
               onChange={(e) => setMake(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='model'
@@ -442,7 +406,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='year'
@@ -450,7 +414,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='color'
@@ -458,7 +422,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='license'
@@ -466,7 +430,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={license}
               onChange={(e) => setLicense(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='vin'
@@ -474,7 +438,7 @@ export default function ViewCustomer() {
               variant='outlined'
               value={vin}
               onChange={(e) => setVin(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='notes'
@@ -484,7 +448,7 @@ export default function ViewCustomer() {
               rows={4}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <Button variant='contained' onClick={addVehicle}>Submit</Button>
           </FormGroup>
@@ -562,7 +526,7 @@ export default function ViewCustomer() {
       <br/>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>
        {customerInfo.vehicles && customerInfo.vehicles.map(vehicle => (
-        <Card sx={{ maxWidth: 275 }} style={{backgroundColor: 'lightgray'}}>
+        <Card sx={{ maxWidth: 275 }} style={{ backgroundColor: 'lightgray' }}>
           <CardContent>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
               {vehicle.year} {vehicle.make} {vehicle.model}

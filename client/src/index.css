@@ -12,10 +12,6 @@ a {
   text-decoration: none;
 }
 
-a, a:visited, a:hover, a:active {
-  color: inherit;
-}
-
 /***** Navigation *****/
 nav ul {
   display: flex;
@@ -23,6 +19,7 @@ nav ul {
   gap: 20px;
 }
 
-nav a {
-  text-decoration: none;
+/***** Tables *****/
+table a, table a:visited, table a:hover, table a:active {
+  color: inherit;
 }

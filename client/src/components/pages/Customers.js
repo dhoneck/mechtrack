@@ -70,8 +70,8 @@ function CustomerSearch() {
 
       <Box id='results'>
         <Typography variant='h4'>Results</Typography>
-        <Typography>Searching for "{query}"</Typography>
-        <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+        <Typography>Searching for {query ? `"${query}"` : 'all customers'}</Typography>
+        <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -102,7 +102,7 @@ export default function Customers() {
   return (
     <Box>
       <Typography variant='h2' align='center'>Customers</Typography>
-      <NavBar></NavBar>
+      <NavBar active='Customers' />
       <CustomerSearch />
     </Box>
   );

@@ -209,10 +209,10 @@ export default function ViewVehicle() {
   };
 
   return (
-    <Box sx={{textAlign: 'center'}}>
+    <Box sx={{ textAlign: 'center' }}>
       <Typography variant='h2'>Vehicle Detail</Typography>
-      <NavBar></NavBar>
-      <br/>
+      <NavBar active="Vehicles" />
+      <br />
       <Typography><strong>{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.color ? `(${vehicle.color})` : ''}</strong></Typography>
       <Typography><strong>Owners: {vehicle.list_owners}</strong></Typography>
       <Typography></Typography>
@@ -247,7 +247,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={make}
               onChange={(e) => setMake(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='model'
@@ -255,7 +255,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={model}
               onChange={(e) => setModel(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               required id='year'
@@ -263,7 +263,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='color'
@@ -271,7 +271,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='license'
@@ -279,7 +279,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={license}
               onChange={(e) => setLicense(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='vin'
@@ -287,7 +287,7 @@ export default function ViewVehicle() {
               variant='outlined'
               value={vin}
               onChange={(e) => setVin(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <TextField
               id='notes'
@@ -297,7 +297,7 @@ export default function ViewVehicle() {
               rows={4}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <Button variant='contained' onClick={updateVehicle}>Submit</Button>
           </FormGroup>
@@ -313,7 +313,7 @@ export default function ViewVehicle() {
         aria-describedby="service-modal-description"
       >
         <Box sx={style}>
-          <Typography id="service-modal-title" sx={{mb: 2}} variant="h6" component="h2">
+          <Typography id="service-modal-title" sx={{ mb: 2 }} variant="h6" component="h2">
             Schedule Service
           </Typography>
           <FormGroup>
@@ -326,7 +326,7 @@ export default function ViewVehicle() {
                   onChange={(e) => setDateTime(e)}
                 />
             </LocalizationProvider>
-            <FormControl sx={{mb: 1}}>
+            <FormControl sx={{ mb: 1 }}>
               <InputLabel id="demo-simple-select-label">Estimated Time</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
@@ -372,7 +372,7 @@ export default function ViewVehicle() {
               rows={4}
               value={customerNotes}
               onChange={(e) => setCustomerNotes(e.target.value)}
-              sx={{mb: 1}}
+              sx={{ mb: 1 }}
             />
             <Button variant='contained' onClick={scheduleServices}>Submit</Button>
           </FormGroup>
@@ -386,7 +386,7 @@ export default function ViewVehicle() {
       <EstimateModal vehicle_id={1}></EstimateModal>
       <br/>
       <br/>
-      <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+      <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -417,10 +417,10 @@ export default function ViewVehicle() {
       <br/>
       <Typography variant='h4'>Services</Typography>
       <br/>
-      <Button variant='outlined' sx={{mx: 1}} onClick={setOpenService}>Schedule Services</Button>
+      <Button variant='outlined' sx={{ mx: 1 }} onClick={setOpenService}>Schedule Services</Button>
       <br/>
       <br/>
-      <TableContainer container={Paper} sx={{textAlign: 'center'}}>
+      <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table>
             <TableHead>
               <TableRow>

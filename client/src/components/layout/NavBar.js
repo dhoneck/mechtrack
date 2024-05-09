@@ -1,51 +1,53 @@
-import { Outlet, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Link, Outlet } from 'react-router-dom';
 import { Button } from '@mui/material'
 
-export default function NavBar() {
+export default function NavBar({active}) {
   return (
     <>
       <nav>
         <ul>
+          {/* Dashboard */}
           <li>
             <Button
               as={Link}
               to='/'
-              variant='outlined'
+              variant={active === 'Dashboard' ? 'contained' : 'outlined'}
             >
               Dashboard
             </Button>
           </li>
+          {/* Customers */}
           <li>
             <Button
               as={Link}
               to='/customers'
-              variant='outlined'
+              variant={active === 'Customers' ? 'contained' : 'outlined'}
             >
               Customers
             </Button>
           </li>
+          {/* Vehicles */}
           <li>
             <Button
               as={Link}
               to='/vehicles'
-              variant='outlined'
+              variant={active === 'Vehicles' ? 'contained' : 'outlined'}
             >
               Vehicles
             </Button>
           </li>
+          {/* Reports */}
           <li>
             <Button
               as={Link}
               to='/reports'
-              variant='outlined'
+              variant={active === 'Reports' ? 'contained' : 'outlined'}
             >
               Reports
             </Button>
           </li>
         </ul>
       </nav>
-
       <Outlet />
     </>
   )

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Modal, TextField, IconButton, Typography, Box, InputAdornment} from '@mui/material';
+import { Box, Button, IconButton, InputAdornment, Modal, TextField, Typography, } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import axios from 'axios';
 
@@ -33,21 +33,18 @@ function EstimateFormModal({vehicle_id}) {
   // Handle estimate form submission
   const handleSubmit = () => {
     console.log('Submitting estimate');
-    console.log('Raw estimate items');
+    console.log('Unfiltered estimate items');
     console.log(rows);
 
     // Remove rows that have empty description and price
     const estimate_items = rows.filter(row => row.description && row.price);
     console.log('Filtered estimate items');
     console.log(estimate_items);
-    console.log('Vehicle ID');
-    console.log(vehicle_id);
 
     let data = {
       vehicle_id,
       estimate_items
     }
-
 
     let url = 'http://127.0.0.1:8000/api/estimates/'
 
@@ -63,7 +60,6 @@ function EstimateFormModal({vehicle_id}) {
     // Reset form
     setRows([{ description: '', price: '' }]);
 
-
     handleClose();
   };
 
@@ -75,7 +71,7 @@ function EstimateFormModal({vehicle_id}) {
           <Typography variant="h6" gutterBottom>
             Create Estimate
           </Typography>
-          <Box sx={{display: 'flex', flexDirection: 'row', gap: '10px'}}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
             <Typography display="inline" sx={{ flexGrow: 1 }}>Description</Typography>
             <Typography display="inline" sx={{ width: '200px' }}>Price</Typography>
           </Box>

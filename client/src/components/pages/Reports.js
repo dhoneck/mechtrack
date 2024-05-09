@@ -21,7 +21,7 @@ import './Reports.css';
 
 function ReportCard({title, content}) {
   return (
-    <Card variant='outlined' sx={{borderRadius:'15px'}}>
+    <Card variant='outlined' sx={{ borderRadius:'15px' }}>
       <CardContent>
         <Typography variant='h3' fontSize='22px'>
           {title}
@@ -70,10 +70,10 @@ const preDefinedRanges = [
 ];
 
 const pickDateRange = (
-  <Box sx={{display:'flex', justifyContent:'space-between', gap:'15px'}}>
+  <Box sx={{ display:'flex', justifyContent:'space-between', gap:'15px' }}>
     <Box>
       <Typography>Pre-Defined Range</Typography>
-      <FormControl sx={{my:'10px', display:'block'}}>
+      <FormControl sx={{ my:'10px', display:'block' }}>
         <Select
           value={'This month'}
           // onChange={handleChange}
@@ -88,8 +88,8 @@ const pickDateRange = (
     <Box>
       <Typography>Custom Range</Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker label="Start Date" sx={{my:'10px', display:'block'}} />
-        <DatePicker label="End Date" sx={{my:'10px', display:'block'}} />
+        <DatePicker label="Start Date" sx={{ my:'10px', display:'block' }} />
+        <DatePicker label="End Date" sx={{ my:'10px', display:'block' }} />
       </LocalizationProvider>
     </Box>
   </Box>
@@ -103,10 +103,10 @@ const pickOutput = (
         defaultValue='PDF'
         name='radio-buttons-group'
       >
-        <FormControlLabel value='PDF' control={<Radio size='small' />} label='PDF' sx={{marginBottom:'15px'}}/>
-        <FormControlLabel value='CSV' control={<Radio size='small' />} label='CSV' sx={{marginBottom:'15px'}}/>
+        <FormControlLabel value='PDF' control={<Radio size='small' />} label='PDF' sx={{ marginBottom:'15px' }}/>
+        <FormControlLabel value='CSV' control={<Radio size='small' />} label='CSV' sx={{ marginBottom:'15px' }}/>
       </RadioGroup>
-      <Button variant='contained' sx={{marginTop:'10px'}}>Execute</Button>
+      <Button variant='contained' sx={{ marginTop:'10px' }}>Execute</Button>
     </FormControl>
   </>
 );
@@ -115,8 +115,8 @@ export default function Reports() {
   return (
     <Box>
       <Typography variant='h2' align='center'>Reports</Typography>
-      <NavBar></NavBar>
-      <Box sx={{display:'flex', justifyContent:'center', gap:'15px', flexWrap:'wrap'}}>
+      <NavBar active='Reports' />
+      <Box sx={{ display:'flex', justifyContent:'center', gap:'15px', flexWrap:'wrap' }}>
         <ReportCard title='Step #1 - Pick Report' content={pickReport}></ReportCard>
         <ReportCard title='Step #2 - Pick Date Range' content={pickDateRange}></ReportCard>
         <ReportCard title='Step #3 - Pick Output' content={pickOutput}></ReportCard>

@@ -6,7 +6,7 @@ export default function Dashboard() {
   return (
     <Box>
       <Typography variant='h2' align='center'>Dashboard</Typography>
-      <NavBar></NavBar>
+      <NavBar active='Dashboard' />
       <Typography align='center'>Dashboard content coming soon!</Typography>
     </Box>
   );

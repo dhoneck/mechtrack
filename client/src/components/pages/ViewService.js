@@ -34,9 +34,9 @@ export default function ViewService() {
   }
 
   return (
-    <Box sx={{textAlign: 'center'}}>
+    <Box sx={{ textAlign: 'center' }}>
       <Typography variant='h2'>Service Detail</Typography>
-      <NavBar></NavBar>
+      <NavBar />
     </Box>
   );
 }
