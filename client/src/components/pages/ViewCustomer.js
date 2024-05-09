@@ -272,7 +272,7 @@ export default function ViewCustomer() {
   useEffect(() => {
     getCustomerInfo();
     getVehicles();
-  }, [])
+  }, [customerInfo, vehicles])
 
   // Custom styles
     const style = {

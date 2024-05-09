@@ -383,7 +383,7 @@ export default function ViewVehicle() {
       <br/>
       <Typography variant='h4'>Estimates</Typography>
       <br/>
-      <EstimateModal vehicle_id={1}></EstimateModal>
+      <EstimateModal vehicle_id={id}></EstimateModal>
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
@@ -403,10 +403,10 @@ export default function ViewVehicle() {
                 <TableCell>{estimate.estimate_items_str}</TableCell>
                 <TableCell>${estimate.estimate_total}</TableCell>
                 <TableCell>
-                  <IconButton><ScheduleIcon /></IconButton>
-                  <IconButton><VisibilityIcon /></IconButton>
-                  <IconButton><EditIcon /></IconButton>
-                  <IconButton><DeleteIcon /></IconButton>
+                  <IconButton sx={{ padding:'0 8px 0 0' }}><ScheduleIcon /></IconButton>
+                  <IconButton sx={{ paddingY:'0' }}><VisibilityIcon /></IconButton>
+                  <IconButton sx={{ paddingY:'0' }}><EditIcon  /></IconButton>
+                  <IconButton sx={{ paddingY:'0' }}><DeleteIcon /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
