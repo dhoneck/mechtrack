@@ -187,14 +187,35 @@ export default function ViewVehicle() {
     }
   }
 
+  /** Make DELETE request to delete an estimate */
+  const deleteEstimate = async (id) => {
+    console.log(`Attempting to delete estimate #${id}`);
+    try {
+      let url = `http://127.0.0.1:8000/api/estimates/${id}`;
+
+      // Verify deletion of estimate
+      const confirmation = window.confirm('Are you sure you want to delete this estimate?\nThis action cannot be undone.');
+      if (!confirmation) {
+        return;
+      }
+
+      await axios.delete(url)
+        .then(function (response) {
+          console.log('Estimate Deleted:');
+          console.log(response.data);
+
+          // Refresh vehicle info
+          getVehicleInfo();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   // Get customer info
   useEffect(() => {
     getVehicleInfo();
   }, [])
-
-  const style2 = {
-    my: 5
-  }
 
   const style = {
     position: 'absolute',
@@ -208,8 +229,17 @@ export default function ViewVehicle() {
     p: 4,
   };
 
+  const style2 = {
+    my: 5
+  }
+
   return (
-    <Box sx={{ textAlign: 'center' }}>
+    <Box sx={{
+      textAlign: 'center',
+      minWidth: '519px',
+      maxWidth: '75%',
+      margin: 'auto' }}
+    >
       <Typography variant='h2'>Vehicle Detail</Typography>
       <NavBar active="Vehicles" />
       <br />
@@ -398,7 +428,7 @@ export default function ViewVehicle() {
           </TableHead>
           <TableBody>
             {vehicle.estimates && vehicle.estimates.map(estimate => (
-              <TableRow key={estimate.id}>
+              <TableRow key={estimate.id} id={estimate.id}>
                 <TableCell>{formatDateTime(estimate.updated_at)}</TableCell>
                 <TableCell>{estimate.estimate_items_str}</TableCell>
                 <TableCell>${estimate.estimate_total}</TableCell>
@@ -406,7 +436,9 @@ export default function ViewVehicle() {
                   <IconButton sx={{ padding:'0 8px 0 0' }}><ScheduleIcon /></IconButton>
                   <IconButton sx={{ paddingY:'0' }}><VisibilityIcon /></IconButton>
                   <IconButton sx={{ paddingY:'0' }}><EditIcon  /></IconButton>
-                  <IconButton sx={{ paddingY:'0' }}><DeleteIcon /></IconButton>
+                  <IconButton sx={{ paddingY:'0' }}>
+                    <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -415,7 +447,7 @@ export default function ViewVehicle() {
       </TableContainer>
 
       <br/>
-      <Typography variant='h4'>Services</Typography>
+      <Typography variant='h4' sx={{ marginTop:'20px'}}>Services</Typography>
       <br/>
       <Button variant='outlined' sx={{ mx: 1 }} onClick={setOpenService}>Schedule Services</Button>
       <br/>

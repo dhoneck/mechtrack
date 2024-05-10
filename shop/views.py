@@ -93,7 +93,7 @@ class EstimateList(generics.ListCreateAPIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class EstimateDetail(generics.ListCreateAPIView):
+class EstimateDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete an estimate instance.
     """

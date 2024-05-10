@@ -272,7 +272,7 @@ export default function ViewCustomer() {
   useEffect(() => {
     getCustomerInfo();
     getVehicles();
-  }, [customerInfo, vehicles])
+  }, [])
 
   // Custom styles
     const style = {
@@ -292,7 +292,12 @@ export default function ViewCustomer() {
   }
 
   return (
-    <Box sx={{ textAlign: 'center' }}>
+    <Box sx={{
+      textAlign: 'center',
+      minWidth: '519px',
+      maxWidth: '75%',
+      margin: 'auto' }}
+    >
       <Typography variant='h2'>Customer Detail</Typography>
       <NavBar active='Customers' />
       <br/>
@@ -524,7 +529,7 @@ export default function ViewCustomer() {
       <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleUnlink}>Unlink Vehicle</Button>
       <br/>
       <br/>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px'}}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap:'wrap'}}>
        {customerInfo.vehicles && customerInfo.vehicles.map(vehicle => (
         <Card sx={{ maxWidth: 275 }} style={{ backgroundColor: 'lightgray' }}>
           <CardContent>
