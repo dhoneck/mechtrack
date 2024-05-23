@@ -2,19 +2,23 @@ from rest_framework import serializers
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
 
 class EstimateItemSerializer(serializers.ModelSerializer):
+    estimate_item_total = serializers.ReadOnlyField()
+
     class Meta:
         model = EstimateItem
-        fields = ['id', 'description', 'price']
+        fields = ['id', 'description', 'part_price', 'labor_price', 'estimate_item_total']
 
 
 class EstimateSerializer(serializers.ModelSerializer):
     estimate_items = serializers.ReadOnlyField()
+    parts_total = serializers.ReadOnlyField()
+    labor_total = serializers.ReadOnlyField()
     estimate_total = serializers.ReadOnlyField()
     total_estimate_items = serializers.ReadOnlyField()
 
     class Meta:
         model = Estimate
-        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'estimate_total', 'total_estimate_items']
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_total', 'total_estimate_items']
 
 
 class ServiceSerializer(serializers.ModelSerializer):

@@ -422,7 +422,9 @@ export default function ViewVehicle() {
             <TableRow>
               <TableCell>Last Modified</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell>Price</TableCell>
+              <TableCell>Parts</TableCell>
+              <TableCell>Labor</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -431,6 +433,8 @@ export default function ViewVehicle() {
               <TableRow key={estimate.id} id={estimate.id}>
                 <TableCell>{formatDateTime(estimate.updated_at)}</TableCell>
                 <TableCell>{estimate.estimate_items_str}</TableCell>
+                <TableCell>${estimate.parts_total}</TableCell>
+                <TableCell>${estimate.labor_total}</TableCell>
                 <TableCell>${estimate.estimate_total}</TableCell>
                 <TableCell>
                   <IconButton sx={{ padding:'0 8px 0 0' }}><ScheduleIcon /></IconButton>

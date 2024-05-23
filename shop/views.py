@@ -89,7 +89,7 @@ class EstimateList(generics.ListCreateAPIView):
         estimate_items = request.data.pop('estimate_items')
         estimate = Estimate.objects.create(vehicle_id=vehicle_id)
         for item in estimate_items:
-            EstimateItem.objects.create(estimate_id=estimate.id, description=item['description'], price=item['price'])
+            EstimateItem.objects.create(estimate_id=estimate.id, description=item['description'], part_price=item['part_price'], labor_price=item['labor_price'])
         return Response(status=status.HTTP_201_CREATED)
 
 

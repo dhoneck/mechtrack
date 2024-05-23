@@ -125,14 +125,24 @@ class Estimate(models.Model):
     def estimate_items(self):
         return [{
             'description': item.description,
-            'price': item.price
+            'part_price': item.part_price,
+            'labor_price': item.labor_price,
+            'total_price': item.estimate_item_total()
         } for item in self.items.all()]
 
     def estimate_items_str(self):
         return ', '.join([str(item.description) for item in self.items.all()])
 
+    def parts_total(self):
+        total = sum(item.part_price for item in self.items.all())
+        return total
+
+    def labor_total(self):
+        total = sum(item.labor_price for item in self.items.all())
+        return total
+
     def estimate_total(self):
-        total = sum(item.price for item in self.items.all())
+        total = sum(item.estimate_item_total() for item in self.items.all())
         return total
 
     def total_estimate_items(self):
@@ -146,10 +156,16 @@ class Estimate(models.Model):
 class EstimateItem(models.Model):
     estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, related_name='items')
     description = models.CharField(max_length=200)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    part_price = models.DecimalField(max_digits=8, decimal_places=2)
+    labor_price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def estimate_item_total(self):
+        return self.part_price + self.labor_price
 
     def __str__(self):
         return f'''
             Description: {self.description}
-            Price: {self.price}
+            Part Price: {self.part_price}
+            Labor Price: {self.labor_price}
+            Total Price: {self.estimate_item_total()}
         '''
