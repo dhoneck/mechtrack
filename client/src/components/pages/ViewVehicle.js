@@ -1,4 +1,4 @@
-import { useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
@@ -435,10 +435,10 @@ export default function ViewVehicle() {
                 <TableCell>{estimate.estimate_items_str}</TableCell>
                 <TableCell>${estimate.parts_total}</TableCell>
                 <TableCell>${estimate.labor_total}</TableCell>
-                <TableCell>${estimate.estimate_total}</TableCell>
+                <TableCell>${estimate.estimate_total} + Tax</TableCell>
                 <TableCell>
                   <IconButton sx={{ padding:'0 8px 0 0' }}><ScheduleIcon /></IconButton>
-                  <IconButton sx={{ paddingY:'0' }}><VisibilityIcon /></IconButton>
+                  <IconButton sx={{ paddingY:'0' }}><Link to={'estimate/' + estimate.id} target='_blank'><VisibilityIcon /></Link></IconButton>
                   <IconButton sx={{ paddingY:'0' }}><EditIcon  /></IconButton>
                   <IconButton sx={{ paddingY:'0' }}>
                     <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
