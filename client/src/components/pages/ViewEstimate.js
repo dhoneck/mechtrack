@@ -50,7 +50,7 @@ export default function ViewEstimate() {
 
   useEffect(() => {
     getEstimate();
-  });
+  }, []);
 
   return (
     <Box sx={{

@@ -211,7 +211,32 @@ export default function ViewVehicle() {
       console.error(error);
     }
   };
-  
+
+  /** Make DELETE request to delete an vehicle */
+  const deleteVehicle = async () => {
+    console.log(`Attempting to delete vehicle #${id}`);
+    try {
+      let url = `http://127.0.0.1:8000/api/vehicles/${id}/`;
+
+      // Verify deletion of vehicle
+      const confirmation = window.confirm('Are you sure you want to delete this vehicle?\nThis action cannot be undone.');
+      if (!confirmation) {
+        return;
+      }
+
+      await axios.delete(url)
+        .then(function (response) {
+          console.log('Vehicle Deleted:');
+          console.log(response.data);
+
+          // Redirect to vehicles search
+          window.location = 'http://localhost:3000/vehicles'
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // Get customer info
   useEffect(() => {
     getVehicleInfo();
@@ -247,7 +272,10 @@ export default function ViewVehicle() {
       <Typography><strong>Owners: {vehicle.list_owners}</strong></Typography>
       <Typography></Typography>
       <br/>
-      <Button variant='outlined' onClick={handleOpenVehicle}>Edit</Button>
+      <Box sx={{ display:'Flex', justifyContent:'center', gap: '5px' }}>
+        <Button variant='outlined' onClick={handleOpenVehicle}>Edit</Button>
+        <Button variant='outlined' color='error' onClick={deleteVehicle}>Delete</Button>
+      </Box>
       <br/>
       <br/>
       <Typography><strong>VIN: {vehicle.vin ? vehicle.vin : 'n/a'}</strong></Typography>
