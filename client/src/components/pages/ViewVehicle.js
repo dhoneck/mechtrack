@@ -1,21 +1,16 @@
-import {Link, useParams} from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import { Link, useParams } from 'react-router-dom';
+
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 import {
   Box,
   Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
   FormGroup,
-  InputLabel,
-  Grid,
-  MenuItem,
+  IconButton,
   Modal,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -23,17 +18,16 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography, IconButton
+  Typography,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import NavBar from '../layout/NavBar';
 import EstimateModal from '../modals/EstimateModal';
+import ServiceModal from '../modals/ServiceModal';
 
 export default function ViewVehicle() {
   // Get ID of customer from URL
@@ -61,35 +55,10 @@ export default function ViewVehicle() {
   const [vin, setVin] = useState(null);
   const [notes, setNotes] = useState('');
 
-  // Set service form values
-  const [dateTime, setDateTime] = useState(dayjs());
-  const [estimatedTime, setEstimatedTime] = useState('1 hr');
-  const [services, setServices] = useState([]);
-  const [customerNotes, setCustomerNotes] = useState('');
-
-  const serviceOptions = [
-    'Oil lube and filter',
-    'Diagnostic',
-    'Tire rotation',
-    'Brake replacement',
-    'Alignment',
-    'Transmission',
-    'Electrical systems',
-    'Other',
-  ];
-
-
+  /** Formats a datetime string using dayjs */
   const formatDateTime = (dateTime) => {
     return dayjs(dateTime).format('YYYY-MM-DD hh:mm a');
   }
-
-  const handleCheckboxChange = (service) => (event) => {
-    if (event.target.checked) {
-      setServices([...services, service]);
-    } else {
-      setServices(services.filter((item) => item !== service));
-    }
-  };
 
   /** Make GET request using ID from URL param to grab customer data  */
   const getVehicleInfo = async () => {
@@ -148,42 +117,6 @@ export default function ViewVehicle() {
         });
     } catch (error) {
       console.error(error);
-    }
-  }
-
-  /** Make POST request to add new service for a vehicle */
-  const scheduleServices = async () => {
-    console.log('Attempting to schedule service');
-
-    // Combine 'Schedule Service' form values to use in POST request
-    let values = {
-      'vehicle': vehicle.id,
-      'datetime': dateTime,
-      'estimated_time': estimatedTime,
-      'services': services,
-      'customer_notes': customerNotes,
-    };
-
-    console.log(values);
-
-    // Try to create a new vehicle
-    try {
-      let url = `http://127.0.0.1:8000/api/services/`;
-
-      await axios.post(url, values)
-        .then(function (response) {
-          console.log('Service Scheduled:');
-          console.log(response.data);
-
-          // Close modal
-          handleCloseService();
-
-          // Refresh vehicle info
-          getVehicleInfo();
-        });
-    } catch (error) {
-      console.error(error);
-      console.error(values)
     }
   }
 
@@ -363,85 +296,17 @@ export default function ViewVehicle() {
       </Modal>
       {/* Modal end for editing vehicle */}
 
-      {/* Modal start for adding service */}
-      <Modal
+      {/* Estimate modal */}
+      <ServiceModal
         open={openService}
-        onClose={handleCloseService}
-        aria-labelledby="service-modal-title"
-        aria-describedby="service-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="service-modal-title" sx={{ mb: 2 }} variant="h6" component="h2">
-            Schedule Service
-          </Typography>
-          <FormGroup>
-            <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
-                <DateTimePicker
-                  timeSteps={{ minutes: 15 }}
-                  label='Service Date & Time'
-                  sx={{ mb: 1 }}
-                  value={dateTime}
-                  onChange={(e) => setDateTime(e)}
-                />
-            </LocalizationProvider>
-            <FormControl sx={{ mb: 1 }}>
-              <InputLabel id="demo-simple-select-label">Estimated Time</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={estimatedTime}
-                label="Estimated Time"
-                onChange={(e) => setEstimatedTime(e.target.value)}
-              >
-                <MenuItem value={'1 hr'}>1 hr</MenuItem>
-                <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
-                <MenuItem value={'3 hrs'}>3 hrs</MenuItem>
-                <MenuItem value={'4 hrs'}>4 hrs</MenuItem>
-                <MenuItem value={'5 hrs'}>5 hrs</MenuItem>
-                <MenuItem value={'6 hrs'}>6 hrs</MenuItem>
-                <MenuItem value={'7 hrs'}>7 hrs</MenuItem>
-                <MenuItem value={'8 hrs'}>8 hrs</MenuItem>
-                <MenuItem value={'1+ day'}>1+ day</MenuItem>
-              </Select>
-            </FormControl>
-            <Typography variant="h6">Services</Typography>
-            <Grid container spacing={2}>
-              {serviceOptions.map((service, index) => (
-                <Grid item xs={6} key={index}>
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox
-                        checked={services.includes(service)}
-                        onChange={handleCheckboxChange(service)}
-                        color="primary"
-                      />
-                    }
-                    label={service}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-            <TextField
-              id='customer-notes'
-              label='Customer Notes'
-              variant='outlined'
-              multiline
-              rows={4}
-              value={customerNotes}
-              onChange={(e) => setCustomerNotes(e.target.value)}
-              sx={{ mb: 1 }}
-            />
-            <Button variant='contained' onClick={scheduleServices}>Submit</Button>
-          </FormGroup>
-        </Box>
-      </Modal>
-      {/* Modal end for adding service */}
-
+        handleClose={handleCloseService}
+        vehicleId={vehicle.id}
+        getVehicleInfo={getVehicleInfo}
+      ></ServiceModal>
       <br/>
       <Typography variant='h4'>Estimates</Typography>
       <br/>
-      <EstimateModal vehicle_id={id}></EstimateModal>
+      <EstimateModal vehicleId={id}></EstimateModal>
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
@@ -481,7 +346,8 @@ export default function ViewVehicle() {
       <br/>
       <Typography variant='h4' sx={{ marginTop:'20px'}}>Services</Typography>
       <br/>
-      <Button variant='outlined' sx={{ mx: 1 }} onClick={setOpenService}>Schedule Services</Button>
+      {/* TODO: Add onClick to open modal */}
+      <Button variant='outlined' onClick={handleOpenService} sx={{ mx: 1 }}>Schedule Services</Button>
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>

@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
-import { Box, Button, IconButton, InputAdornment, Modal, TextField, Typography, } from '@mui/material';
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useState } from 'react';
+
 import axios from 'axios';
 
-function EstimateFormModal({vehicle_id}) {
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Modal,
+  TextField,
+  Typography,
+} from '@mui/material';
+import {
+  AddCircleOutline,
+  RemoveCircleOutline,
+} from '@mui/icons-material';
+
+function EstimateFormModal({vehicleId}) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState([{ description: '', part_price: '', labor_price: '' }]);
 
@@ -48,7 +61,7 @@ function EstimateFormModal({vehicle_id}) {
     console.log(estimate_items);
 
     let data = {
-      vehicle_id,
+      vehicle_id: vehicleId,
       estimate_items
     }
 
