@@ -42,6 +42,8 @@ export default function ViewEstimate() {
     try {
       let url = `http://127.0.0.1:8000/api/estimates/${eid}`
       let response = await axios.get(url);
+      console.log('response.data');
+      console.log(response.data);
       setEstimate(response.data);
     } catch (error) {
       console.error(error);
@@ -66,12 +68,6 @@ export default function ViewEstimate() {
       <br />
 
       <Box sx={{ display:'flex', justifyContent:'space-around', gap:'20px'}}>
-        {/*<Box>*/}
-        {/*  <Typography variant='h2' sx={{fontSize: '20px'}}>Customer Information</Typography>*/}
-        {/*  <Typography variant='h3' sx={{fontSize: '14px'}}>Name Placeholder</Typography>*/}
-        {/*  <Typography variant='h4' sx={{fontSize: '14px'}}>+Phone Placeholder</Typography>*/}
-        {/*  <Typography variant='h4' sx={{fontSize: '14px'}}>Email Placeholder</Typography>*/}
-        {/*</Box>*/}
         <Box>
           <Typography variant='h2' sx={{fontSize: '20px'}}>Vehicle Information</Typography>
           <Typography variant='h3' sx={{fontSize: '14px'}}>2013 Ford F150</Typography>
@@ -96,26 +92,26 @@ export default function ViewEstimate() {
                 <TableCell>{item.description}</TableCell>
                 <TableCell sx={{textAlign:'right'}}>${item.part_price}</TableCell>
                 <TableCell sx={{textAlign:'right'}}>${item.labor_price}</TableCell>
-                <TableCell sx={{textAlign:'right'}}>${item.total_price}</TableCell>
+                <TableCell sx={{textAlign:'right'}}>${item.estimate_item_total}</TableCell>
               </TableRow>
             ))}
             <TableRow>
               <TableCell sx={{fontWeight:'bold'}}>SUB-TOTALS</TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.parts_total}</TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.labor_total}</TableCell>
-              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.estimate_total}</TableCell>
+              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.estimate_subtotal}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{fontWeight:'bold'}}>SALES TAX (5.5%)</TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
-              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.estimate_total * .055}</TableCell>
+              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.sales_tax_total}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell sx={{fontWeight:'bold'}}>ESTIMATE TOTAL</TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
-              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.estimate_total * 1.055}</TableCell>
+              <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${estimate.estimate_total}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

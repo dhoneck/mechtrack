@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.core import serializers
 from django.http import HttpResponse
@@ -122,14 +124,6 @@ class Estimate(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
 
-    def estimate_items(self):
-        return [{
-            'description': item.description,
-            'part_price': item.part_price,
-            'labor_price': item.labor_price,
-            'total_price': item.estimate_item_total()
-        } for item in self.items.all()]
-
     def estimate_items_str(self):
         return ', '.join([str(item.description) for item in self.items.all()])
 
@@ -141,9 +135,15 @@ class Estimate(models.Model):
         total = sum(item.labor_price for item in self.items.all())
         return total
 
-    def estimate_total(self):
+    def estimate_subtotal(self):
         total = sum(item.estimate_item_total() for item in self.items.all())
         return total
+
+    def sales_tax_total(self):
+        return self.estimate_subtotal() * Decimal(0.055)
+
+    def estimate_total(self):
+        return self.estimate_subtotal() + self.sales_tax_total()
 
     def total_estimate_items(self):
         return self.items.count()
@@ -159,6 +159,17 @@ class EstimateItem(models.Model):
     part_price = models.DecimalField(max_digits=8, decimal_places=2)
     labor_price = models.DecimalField(max_digits=8, decimal_places=2)
 
+    def save(self, *args, **kwargs):
+        if self.part_price is not None:
+            self.part_price = Decimal(self.part_price)
+            self.part_price = self.part_price.quantize(Decimal('0.01'))
+
+        if self.labor_price is not None:
+            self.labor_price = Decimal(self.labor_price)
+            self.labor_price = self.labor_price.quantize(Decimal('0.01'))
+
+        super(EstimateItem, self).save(*args, **kwargs)
+
     def estimate_item_total(self):
         return self.part_price + self.labor_price
 
@@ -167,5 +178,5 @@ class EstimateItem(models.Model):
             Description: {self.description}
             Part Price: {self.part_price}
             Labor Price: {self.labor_price}
-            Total Price: {self.estimate_item_total()}
+            Total Price: {self.estimate_item_total}
         '''

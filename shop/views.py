@@ -86,11 +86,12 @@ class EstimateList(generics.ListCreateAPIView):
         print(request.data)
 
         vehicle_id = request.data.pop('vehicle_id')
-        estimate_items = request.data.pop('estimate_items')
-        estimate = Estimate.objects.create(vehicle_id=vehicle_id)
-        for item in estimate_items:
-            EstimateItem.objects.create(estimate_id=estimate.id, description=item['description'], part_price=item['part_price'], labor_price=item['labor_price'])
-        return Response(status=status.HTTP_201_CREATED)
+        estimate_items_data = request.data.pop('estimate_items')
+        estimate = Estimate.objects.create(vehicle_id=vehicle_id, **request.data)
+        for item_data in estimate_items_data:
+            EstimateItem.objects.create(estimate=estimate, **item_data)
+        serializer = self.get_serializer(estimate)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class EstimateDetail(generics.RetrieveUpdateDestroyAPIView):

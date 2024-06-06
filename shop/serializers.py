@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
 
+
 class EstimateItemSerializer(serializers.ModelSerializer):
-    estimate_item_total = serializers.ReadOnlyField()
+    estimate_item_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    part_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    labor_price = serializers.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:
         model = EstimateItem
@@ -10,15 +13,17 @@ class EstimateItemSerializer(serializers.ModelSerializer):
 
 
 class EstimateSerializer(serializers.ModelSerializer):
-    estimate_items = serializers.ReadOnlyField()
-    parts_total = serializers.ReadOnlyField()
-    labor_total = serializers.ReadOnlyField()
-    estimate_total = serializers.ReadOnlyField()
+    estimate_items = EstimateItemSerializer(many=True, read_only=True, source='items')
+    parts_total = serializers.DecimalField(max_digits=8, decimal_places=2)
+    labor_total = serializers.DecimalField(max_digits=8, decimal_places=2)
+    estimate_subtotal = serializers.DecimalField(max_digits=8, decimal_places=2)
+    sales_tax_total = serializers.DecimalField(max_digits=8, decimal_places=2)
+    estimate_total = serializers.DecimalField(max_digits=8, decimal_places=2)
     total_estimate_items = serializers.ReadOnlyField()
 
     class Meta:
         model = Estimate
-        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_total', 'total_estimate_items']
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_subtotal', 'sales_tax_total', 'estimate_total', 'total_estimate_items']
 
 
 class ServiceSerializer(serializers.ModelSerializer):

@@ -310,7 +310,7 @@ export default function ViewVehicle() {
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
-        <Table>
+        <Table size={'small'}>
           <TableHead>
             <TableRow>
               <TableCell>Last Modified</TableCell>
@@ -318,7 +318,7 @@ export default function ViewVehicle() {
               <TableCell>Parts</TableCell>
               <TableCell>Labor</TableCell>
               <TableCell>Total</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{ paddingLeft: '24px' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -328,12 +328,16 @@ export default function ViewVehicle() {
                 <TableCell>{estimate.estimate_items_str}</TableCell>
                 <TableCell>${estimate.parts_total}</TableCell>
                 <TableCell>${estimate.labor_total}</TableCell>
-                <TableCell>${estimate.estimate_total} + Tax</TableCell>
+                <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
                 <TableCell>
-                  <IconButton sx={{ padding:'0 8px 0 0' }}><ScheduleIcon /></IconButton>
-                  <IconButton sx={{ paddingY:'0' }}><Link to={'estimate/' + estimate.id} target='_blank'><VisibilityIcon /></Link></IconButton>
-                  <IconButton sx={{ paddingY:'0' }}><EditIcon  /></IconButton>
-                  <IconButton sx={{ paddingY:'0' }}>
+                  <IconButton sx={{ }}><ScheduleIcon /></IconButton>
+                  <Link to={'estimate/' + estimate.id} target='_blank'>
+                    <IconButton sx={{ }}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Link>
+                  <IconButton sx={{ }}><EditIcon  /></IconButton>
+                  <IconButton sx={{ }}>
                     <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
                   </IconButton>
                 </TableCell>
@@ -351,7 +355,7 @@ export default function ViewVehicle() {
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
-          <Table>
+          <Table size={'small'}>
             <TableHead>
               <TableRow>
                 <TableCell>Service Date & Time</TableCell>
