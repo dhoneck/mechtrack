@@ -1,16 +1,14 @@
 from decimal import Decimal
 
 from django.db import models
-from django.core import serializers
-from django.http import HttpResponse
-
-from multiselectfield.utils import get_max_length
 from multiselectfield import MultiSelectField
+from multiselectfield.utils import get_max_length
 from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
 class Vehicle(models.Model):
+    """Vehicle model is a vehicle being worked on by an auto shop."""
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField(blank=True, null=True)
@@ -20,21 +18,19 @@ class Vehicle(models.Model):
     notes = models.TextField(blank=True, default='')
 
     def owner_count(self):
+        """Returns the number of customers linked to the vehicle."""
         return self.customer_set.count()
 
     def list_owners(self):
-        # Join customer_set into a string
+        """Returns a comma separated list of owners."""
         return ', '.join([str(customer) for customer in self.customer_set.all()])
 
     def service_count(self):
+        """Returns the number of services for the vehicle."""
         return self.services.count()
 
-    # def list_services(self):
-    #     # Return service_set as a JSON string
-    #     return serializers.serialize('json', self.service_set.all())
-    #     # return self.service_set.count()
-
     def __str__(self):
+        """Returns '<Year> <Make> <Model> | <Color> | <License> | <VIN>' unless information is missing."""
         description = ''
         if self.year:
             description += f' {self.year}'
@@ -52,6 +48,7 @@ class Vehicle(models.Model):
 
 
 class Customer(models.Model):
+    """Customer model is a customer of the auto shop."""
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)
@@ -67,6 +64,7 @@ class Customer(models.Model):
 
 
 class CustomerVehicle(models.Model):
+    """CustomerVehicle model joins customers and vehicles to show ownership."""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
 
@@ -74,32 +72,37 @@ class CustomerVehicle(models.Model):
         unique_together = ('customer', 'vehicle')
 
     def __str__(self):
+        """Returns '<Customer First Name> - <Vehicle Make> <Vehicle Model>.'"""
         customer = Customer.objects.get(id=self.customer.id)
         vehicle = Vehicle.objects.get(id=self.vehicle.id)
         return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
 
 
-TIME_CHOICES = (('1 hr', '1 hr'),
-                ('2 hrs', '2 hrs'),
-                ('3 hrs', '3 hrs'),
-                ('4 hrs', '4 hrs'),
-                ('5 hrs', '5 hrs'),
-                ('6 hrs', '6 hrs'),
-                ('7 hrs', '7 hrs'),
-                ('8 hrs', '8 hrs'),
-                ('1+ day', '1+ day'))
-
-SERVICE_CHOICES = (('Oil lube and filter', 'Oil lube and filter'),
-                   ('Diagnostic', 'Diagnostic'),
-                   ('Tire rotation', 'Tire rotation'),
-                   ('Brake replacement', 'Brake replacement'),
-                   ('Alignment', 'Alignment'),
-                   ('Transmission', 'Transmission'),
-                   ('Electrical systems', 'Electrical systems'),
-                   ('Other', 'Other'))
-
-
 class Service(models.Model):
+    """Service model is scheduled vehicle work."""
+    TIME_CHOICES = (
+        ('1 hr', '1 hr'),
+        ('2 hrs', '2 hrs'),
+        ('3 hrs', '3 hrs'),
+        ('4 hrs', '4 hrs'),
+        ('5 hrs', '5 hrs'),
+        ('6 hrs', '6 hrs'),
+        ('7 hrs', '7 hrs'),
+        ('8 hrs', '8 hrs'),
+        ('1+ day', '1+ day')
+    )
+
+    SERVICE_CHOICES = (
+        ('Oil lube and filter', 'Oil lube and filter'),
+        ('Diagnostic', 'Diagnostic'),
+        ('Tire rotation', 'Tire rotation'),
+        ('Brake replacement', 'Brake replacement'),
+        ('Alignment', 'Alignment'),
+        ('Transmission', 'Transmission'),
+        ('Electrical systems', 'Electrical systems'),
+        ('Other', 'Other')
+    )
+
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
     datetime = models.DateTimeField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
@@ -112,6 +115,7 @@ class Service(models.Model):
     completed = models.BooleanField(default=False)
 
     def __str__(self):
+        """Returns a multiline string that states the vehicle, datetime of the service, and the scheduled services."""
         vehicle = Vehicle.objects.get(id=self.vehicle.id)
         return f'''
             Service for {vehicle}
@@ -120,46 +124,92 @@ class Service(models.Model):
         '''
 
 
+class ServiceItem(models.Model):
+    """ServiceItem is a single piece of work that is scheduled in a service."""
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='items')
+    description = models.CharField(max_length=200)
+    part_price = models.DecimalField(max_digits=8, decimal_places=2)
+    labor_price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        """Override save method to standardize decimal placements for part and labor prices."""
+        if self.part_price is not None:
+            self.part_price = Decimal(self.part_price)
+            self.part_price = self.part_price.quantize(Decimal('0.01'))
+
+        if self.labor_price is not None:
+            self.labor_price = Decimal(self.labor_price)
+            self.labor_price = self.labor_price.quantize(Decimal('0.01'))
+
+        super(ServiceItem, self).save(*args, **kwargs)
+
+    def service_item_total(self):
+        """Returns the sum of the part and labor price."""
+        return self.part_price + self.labor_price
+
+    def __str__(self):
+        """
+        Returns a multiline string containing the service item description, part price, labor price, and total price.
+        """
+        return f'''
+            Description: {self.description}
+            Part Price: {self.part_price}
+            Labor Price: {self.labor_price}
+            Total Price: {self.service_item_total}
+        '''
+
+
 class Estimate(models.Model):
+    """Estimate model is unscheduled vehicle work."""
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
 
     def estimate_items_str(self):
+        """Returns a comma separated list of estimate items."""
         return ', '.join([str(item.description) for item in self.items.all()])
 
     def parts_total(self):
+        """Returns the sum of all part prices."""
         total = sum(item.part_price for item in self.items.all())
         return total
 
     def labor_total(self):
+        """Returns the sum of all labor prices."""
         total = sum(item.labor_price for item in self.items.all())
         return total
 
     def estimate_subtotal(self):
+        """Returns the sum of all part and labor prices."""
         total = sum(item.estimate_item_total() for item in self.items.all())
         return total
 
     def sales_tax_total(self):
+        """Returns the sales tax amount based on 5.5% sales tax."""
         return self.estimate_subtotal() * Decimal(0.055)
 
     def estimate_total(self):
+        """Returns the sum of all parts, labor, and tax."""
         return self.estimate_subtotal() + self.sales_tax_total()
 
     def total_estimate_items(self):
+        """Returns the number of estimate items."""
         return self.items.count()
 
     def __str__(self):
+        """Returns 'Estimate for <Vehicle> | Updated at: <updated_at>'."""
         vehicle = Vehicle.objects.get(id=self.vehicle.id)
         return f'Estimate for {vehicle} | Updated at: {self.updated_at}'
 
 
 class EstimateItem(models.Model):
+    """EstimateItem is a single piece of work for an estimate."""
     estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, related_name='items')
     description = models.CharField(max_length=200)
     part_price = models.DecimalField(max_digits=8, decimal_places=2)
     labor_price = models.DecimalField(max_digits=8, decimal_places=2)
 
     def save(self, *args, **kwargs):
+        """Override save method to standardize decimal placements for part and labor prices."""
         if self.part_price is not None:
             self.part_price = Decimal(self.part_price)
             self.part_price = self.part_price.quantize(Decimal('0.01'))
@@ -171,9 +221,13 @@ class EstimateItem(models.Model):
         super(EstimateItem, self).save(*args, **kwargs)
 
     def estimate_item_total(self):
+        """Returns the sum of the part and labor price."""
         return self.part_price + self.labor_price
 
     def __str__(self):
+        """
+        Returns a multiline string containing the estimate item description, part price, labor price, and total price.
+        """
         return f'''
             Description: {self.description}
             Part Price: {self.part_price}
