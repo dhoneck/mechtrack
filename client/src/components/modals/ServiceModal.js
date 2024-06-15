@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 import {
   Box,
@@ -20,8 +20,9 @@ import {
 import {
   DateTimePicker,
   LocalizationProvider,
-} from "@mui/x-date-pickers";
+} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
 
 function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
@@ -49,7 +50,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 550,
+    width: '800px',
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -106,72 +107,91 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="service-modal-title"
-        aria-describedby="service-modal-description"
+        aria-labelledby='service-modal-title'
+        aria-describedby='service-modal-description'
       >
         <Box sx={style}>
-          <Typography id="service-modal-title" sx={{ mb: 2 }} variant="h6" component="h2">
+          <Typography id='service-modal-title' sx={{ mb: 2 }} variant='h5' component='h2'>
             Schedule Service
           </Typography>
-          <FormGroup>
-            <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
-                <DateTimePicker
-                  timeSteps={{ minutes: 15 }}
-                  label='Service Date & Time'
-                  sx={{ mb: 1 }}
-                  value={dateTime}
-                  onChange={(e) => setDateTime(e)}
-                />
-            </LocalizationProvider>
-            <FormControl sx={{ mb: 1 }}>
-              <InputLabel id="demo-simple-select-label">Estimated Time</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={estimatedTime}
-                label="Estimated Time"
-                onChange={(e) => setEstimatedTime(e.target.value)}
-              >
-                <MenuItem value={'1 hr'}>1 hr</MenuItem>
-                <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
-                <MenuItem value={'3 hrs'}>3 hrs</MenuItem>
-                <MenuItem value={'4 hrs'}>4 hrs</MenuItem>
-                <MenuItem value={'5 hrs'}>5 hrs</MenuItem>
-                <MenuItem value={'6 hrs'}>6 hrs</MenuItem>
-                <MenuItem value={'7 hrs'}>7 hrs</MenuItem>
-                <MenuItem value={'8 hrs'}>8 hrs</MenuItem>
-                <MenuItem value={'1+ day'}>1+ day</MenuItem>
-              </Select>
-            </FormControl>
-            <Typography variant="h6">Services</Typography>
-            <Grid container spacing={2}>
-              {serviceOptions.map((service, index) => (
-                <Grid item xs={6} key={index}>
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox
-                        checked={services.includes(service)}
-                        onChange={handleCheckboxChange(service)}
-                        color="primary"
-                      />
-                    }
-                    label={service}
+          <FormGroup sx={{display: 'flex', flexDirection: 'row', gap: '20px' }}>
+            <Box sx={{flex: '1'}}>
+              <Typography variant='h6' sx={{marginBottom: '15px'}}>Service Details</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
+                  <DateTimePicker
+                    timeSteps={{ minutes: 15 }}
+                    label='Service Date & Time'
+                    sx={{ mb: 1, width: '300px' }}
+                    value={dateTime}
+                    onChange={(e) => setDateTime(e)}
                   />
-                </Grid>
-              ))}
-            </Grid>
-            <TextField
-              id='customer-notes'
-              label='Customer Notes'
-              variant='outlined'
-              multiline
-              rows={4}
-              value={customerNotes}
-              onChange={(e) => setCustomerNotes(e.target.value)}
-              sx={{ mb: 1 }}
-            />
-            <Button variant='contained' onClick={scheduleServices}>Submit</Button>
+              </LocalizationProvider>
+              <FormControl sx={{ mb: 1, width: '300px' }}>
+                <InputLabel id='demo-simple-select-label'>Estimated Time</InputLabel>
+                <Select
+                  sx={{display: 'block'}}
+                  labelId='demo-simple-select-label'
+                  id='demo-simple-select'
+                  value={estimatedTime}
+                  label='Estimated Time'
+                  onChange={(e) => setEstimatedTime(e.target.value)}
+                >
+                  <MenuItem value={'1 hr'}>1 hr</MenuItem>
+                  <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
+                  <MenuItem value={'3 hrs'}>3 hrs</MenuItem>
+                  <MenuItem value={'4 hrs'}>4 hrs</MenuItem>
+                  <MenuItem value={'5 hrs'}>5 hrs</MenuItem>
+                  <MenuItem value={'6 hrs'}>6 hrs</MenuItem>
+                  <MenuItem value={'7 hrs'}>7 hrs</MenuItem>
+                  <MenuItem value={'8 hrs'}>8 hrs</MenuItem>
+                  <MenuItem value={'1+ day'}>1+ day</MenuItem>
+                </Select>
+              </FormControl>
+              <Typography variant='h6'>Services</Typography>
+              <Grid container spacing={2}>
+                {serviceOptions.map((service, index) => (
+                  <Grid item xs={6} key={index}>
+                    <FormControlLabel
+                      key={index}
+                      control={
+                        <Checkbox
+                          checked={services.includes(service)}
+                          onChange={handleCheckboxChange(service)}
+                          color='primary'
+                        />
+                      }
+                      label={service}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+              <TextField
+                id='customer-notes'
+                label='Customer Notes'
+                variant='outlined'
+                multiline
+                rows={4}
+                fullWidth
+                value={customerNotes}
+                onChange={(e) => setCustomerNotes(e.target.value)}
+                sx={{ mb: 1 }}
+              />
+              <Button variant='contained' onClick={scheduleServices}>Submit</Button>
+            </Box>
+            <Box sx={{flex: '1'}}>
+              <Typography textAlign='center' variant='h6' sx={{marginBottom: '15px'}}>Preview Schedule</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs} sx={{marginTop:'0px'}}>
+                <StaticDatePicker
+                  displayStaticWrapperAs="desktop"
+                  defaultValue={dayjs('2024-06-08')} sx={{marginTop:'0px'}}
+                  sx={{
+                    '& .MuiPickersCalendarHeader-root': {
+                      marginTop: 0,
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </Box>
           </FormGroup>
         </Box>
       </Modal>
