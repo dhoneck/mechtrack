@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios, {Axios} from 'axios';
 import dayjs from 'dayjs';
 
 import {
@@ -12,8 +12,8 @@ import {
   Grid,
   InputLabel,
   MenuItem,
-  Modal,
-  Select,
+  Modal, Paper,
+  Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -23,6 +23,7 @@ import {
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import {Link} from "react-router-dom";
 
 
 function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
@@ -30,6 +31,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
   const [dateTime, setDateTime] = useState(dayjs());
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
   const [services, setServices] = useState([]);
+  const [scheduledServices, setScheduledServices] = useState([]);
   const [customerNotes, setCustomerNotes] = useState('');
 
   // Define available services
@@ -50,12 +52,30 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '800px',
+    width: '900px',
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
   };
+
+  const handlePreview = async (e) => {
+    console.log('handlePreview');
+    console.log(e);
+    console.log('Look up services based on date');
+    let date = new Date(e);
+    let dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    let url = 'http://127.0.0.1:8000/api/services/?service_date=' + dateStr;
+
+    // Make a GET request to the API
+    try {
+      console.log(`API URL: ${url}`)
+      const response = await axios.get(url);
+      setScheduledServices(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   /** Tracks which services are selected in the checkbox inputs */
   const handleCheckboxChange = (service) => (event) => {
@@ -115,7 +135,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
             Schedule Service
           </Typography>
           <FormGroup sx={{display: 'flex', flexDirection: 'row', gap: '20px' }}>
-            <Box sx={{flex: '1'}}>
+            <Box sx={{flex: '4'}}>
               <Typography variant='h6' sx={{marginBottom: '15px'}}>Service Details</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
                   <DateTimePicker
@@ -178,12 +198,13 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
               />
               <Button variant='contained' onClick={scheduleServices}>Submit</Button>
             </Box>
-            <Box sx={{flex: '1'}}>
+            <Box sx={{flex: '5'}}>
               <Typography textAlign='center' variant='h6' sx={{marginBottom: '15px'}}>Preview Schedule</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs} sx={{marginTop:'0px'}}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
-                  defaultValue={dayjs('2024-06-08')} sx={{marginTop:'0px'}}
+                  defaultValue={dayjs(new Date())}
+                  onChange={(e)=> { handlePreview(e) }}
                   sx={{
                     '& .MuiPickersCalendarHeader-root': {
                       marginTop: 0,
@@ -191,6 +212,33 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
                   }}
                 />
               </LocalizationProvider>
+              <Typography textAlign='center' variant='h6'>Scheduled Services</Typography>
+              <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
+                <Table size={'small'}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Drop Off</TableCell>
+                      <TableCell>Estimated Time</TableCell>
+                      <TableCell>Description</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                  {scheduledServices && scheduledServices.length > 0 ? (
+                    scheduledServices.map(service => (
+                      <TableRow key={service.id}>
+                        <TableCell>{new Date(service.datetime).toLocaleString()}</TableCell>
+                        <TableCell>{service.estimated_time}</TableCell>
+                        <TableCell>{service.services}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={3} sx={{textAlign:'center'}}>No Services Scheduled</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           </FormGroup>
         </Box>

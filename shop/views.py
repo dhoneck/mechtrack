@@ -1,6 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import ServiceFilter
+
 
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, EstimateSerializer, EstimateItemSerializer
@@ -64,6 +67,8 @@ class ServiceList(generics.ListCreateAPIView):
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ServiceFilter
 
 
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
