@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios, {Axios} from 'axios';
+import axios from 'axios';
 import dayjs from 'dayjs';
 
 import {
@@ -23,7 +23,6 @@ import {
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
-import {Link} from "react-router-dom";
 
 
 function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
@@ -33,6 +32,8 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
   const [services, setServices] = useState([]);
   const [scheduledServices, setScheduledServices] = useState([]);
   const [customerNotes, setCustomerNotes] = useState('');
+
+  const [previewDate, setPreviewDate] = useState(new Date());
 
   // Define available services
   const serviceOptions = [
@@ -60,6 +61,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
   };
 
   const handlePreview = async (e) => {
+    setPreviewDate(new Date(e));
     console.log('handlePreview');
     console.log(e);
     console.log('Look up services based on date');
@@ -233,7 +235,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={3} sx={{textAlign:'center'}}>No Services Scheduled</TableCell>
+                      <TableCell colSpan={3} sx={{textAlign:'center'}}>No Services Scheduled for {previewDate.toDateString()}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

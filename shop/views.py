@@ -1,12 +1,13 @@
-from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
-from django_filters.rest_framework import DjangoFilterBackend
-from .filters import ServiceFilter
-
+from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
 
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
-from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, EstimateSerializer, EstimateItemSerializer
+from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
+    EstimateSerializer, EstimateItemSerializer
+from .filters import ServiceFilter
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -67,8 +68,10 @@ class ServiceList(generics.ListCreateAPIView):
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ServiceFilter
+    ordering_fields = ['datetime']
+    ordering = ['datetime']
 
 
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
