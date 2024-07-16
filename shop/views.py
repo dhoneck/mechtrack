@@ -90,13 +90,24 @@ class EstimateList(generics.ListCreateAPIView):
     serializer_class = EstimateSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Custom create method that will also trigger the creation of estimate item objects
+        """
         print('request.data')
         print(request.data)
 
         vehicle_id = request.data.pop('vehicle_id')
         estimate_items_data = request.data.pop('estimate_items')
+
+        if not estimate_items_data:
+            return Response({'error': 'No estimate items'}, status=status.HTTP_400_BAD_REQUEST)
+
         estimate = Estimate.objects.create(vehicle_id=vehicle_id, **request.data)
         for item_data in estimate_items_data:
+            if item_data['part_price'] is None or item_data['part_price'] == '':
+                item_data['part_price'] = 0
+            if item_data['labor_price'] is None or item_data['labor_price'] == '':
+                item_data['labor_price'] = 0
             EstimateItem.objects.create(estimate=estimate, **item_data)
         serializer = self.get_serializer(estimate)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

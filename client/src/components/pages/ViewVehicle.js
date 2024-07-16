@@ -46,6 +46,17 @@ export default function ViewVehicle() {
   const handleOpenService = () => setOpenService(true);
   const handleCloseService = () => setOpenService(false);
 
+  // Stores whether estimate modal is in create or edit mode
+  const [editEstimate, setEditEstimate] = useState(false)
+
+  // Tracks modal state for estimate modal
+  const [openEstimate, setOpenEstimate] = useState(false);
+  const handleOpenEstimate = (edit = false ) => {
+    setEditEstimate(edit);
+    setOpenEstimate(true);
+  }
+  const handleCloseEstimate = () => setOpenEstimate(false);
+
   // Set empty vehicle form values
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
@@ -89,7 +100,7 @@ export default function ViewVehicle() {
     }
   }
 
-  // /** Make PUT request to update vehicle data */
+  /** Make PUT request to update vehicle data */
   const updateVehicle = async () => {
     console.log('Attempting to update vehicle');
 
@@ -215,7 +226,7 @@ export default function ViewVehicle() {
       <br/>
       <Typography><strong>License: {vehicle.license ? vehicle.license : 'n/a'}</strong></Typography>
       <br/>
-    <Typography><strong>Notes: {vehicle.notes ? vehicle.notes : 'n/a'}</strong></Typography>
+      <Typography><strong>Notes: {vehicle.notes ? vehicle.notes : 'n/a'}</strong></Typography>
       <br/>
 
 
@@ -296,17 +307,15 @@ export default function ViewVehicle() {
       </Modal>
       {/* Modal end for editing vehicle */}
 
-      {/* Estimate modal */}
-      <ServiceModal
-        open={openService}
-        handleClose={handleCloseService}
-        vehicleId={vehicle.id}
-        getVehicleInfo={getVehicleInfo}
-      ></ServiceModal>
       <br/>
+
+      {/* Estimate modal and table display */}
       <Typography variant='h4'>Estimates</Typography>
       <br/>
-      <EstimateModal vehicleId={id}></EstimateModal>
+
+      <Button variant='outlined' onClick={() => handleOpenEstimate()}>Create Estimate</Button>
+      <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} edit={editEstimate}/>
+
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
@@ -336,7 +345,7 @@ export default function ViewVehicle() {
                       <VisibilityIcon />
                     </IconButton>
                   </Link>
-                  <IconButton sx={{ }}><EditIcon  /></IconButton>
+                  <IconButton onClick={() => handleOpenEstimate(true)} sx={{ }}><EditIcon /></IconButton>
                   <IconButton sx={{ }}>
                     <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
                   </IconButton>
@@ -348,9 +357,16 @@ export default function ViewVehicle() {
       </TableContainer>
 
       <br/>
+
+      {/* Service modal and table display */}
+      <ServiceModal
+        open={openService}
+        handleClose={handleCloseService}
+        vehicleId={vehicle.id}
+        getVehicleInfo={getVehicleInfo}
+      ></ServiceModal>
       <Typography variant='h4' sx={{ marginTop:'20px'}}>Services</Typography>
       <br/>
-      {/* TODO: Add onClick to open modal */}
       <Button variant='outlined' onClick={handleOpenService} sx={{ mx: 1 }}>Schedule Services</Button>
       <br/>
       <br/>

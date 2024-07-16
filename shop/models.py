@@ -128,8 +128,8 @@ class ServiceItem(models.Model):
     """ServiceItem is a single piece of work that is scheduled in a service."""
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='items')
     description = models.CharField(max_length=200)
-    part_price = models.DecimalField(max_digits=8, decimal_places=2)
-    labor_price = models.DecimalField(max_digits=8, decimal_places=2)
+    part_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    labor_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
 
     def save(self, *args, **kwargs):
         """Override save method to standardize decimal placements for part and labor prices."""
