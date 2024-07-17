@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 import axios from 'axios';
 
@@ -6,19 +6,42 @@ import {Box, Button, IconButton, InputAdornment, Modal, TextField, Typography,} 
 import {AddCircleOutline, RemoveCircleOutline,} from '@mui/icons-material';
 
 /** Modal form for creating or editing an estimate */
-function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
+function EstimateFormModal({open, handleClose, vehicleId, estimate=null}) {
   // Store an array of estimate item values (i.e. description, part price, and labor price)
-  const [rows, setRows] = useState([{ description: '', part_price: '', labor_price: '' }]);
+  const [rows, setRows] = useState([]);
+
+  // Dynamically sets the rows based on which estimate is passed as a param, if any
+  useEffect(() => {
+    if (open) {
+      if (estimate) {  // If estimate exists, use its estimate items for the rows
+        setRows(estimate.estimate_items);
+        console.log('setRows');
+        console.log(rows);
+      } else { //  If no estimate exists, set rows to have one empty estimate item dictionary
+        setRows([{id: null, description: '', part_price: '', labor_price: ''}]);
+      }
+      // When modal updates, reset the array that tracks estimate items that are pending deletion
+      setItemsToDelete([]);
+    }
+  }, [open, estimate]);
 
   /** Add new blank row for estimate */
-  const handleAddRow = () => setRows([...rows, { description: '', part_price: '', labor_price: '' }]);
+  const handleAddRow = () => setRows([...rows, { id: null, description: '', part_price: '', labor_price: '' }]);
+
+  const [itemsToDelete, setItemsToDelete] = useState([]);
 
   /** Remove row containing an estimate item */
-  const handleRemoveRow = (index) => {
+  const handleRemoveRow = (index, id) => {
     if (rows.length === 1) return; // Ensure at least one row
     const newRows = [...rows];
     newRows.splice(index, 1);
     setRows(newRows);
+
+    // Set estimate item id to item to be deleted
+    if (id) {
+      console.log(`Adding ${id} to the itemsToDelete array.`)
+      setItemsToDelete([...itemsToDelete, id]);
+    }
   };
 
   /** Update description for specified row */
@@ -44,6 +67,9 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
 
   /** Handle estimate form submission */
   const handleSubmit = async () => {
+    console.log('These estimate items should be deleted');
+    console.log(itemsToDelete ? itemsToDelete : 'None');
+
     console.log('Attempting to submit estimate');
     console.log('Unmodified estimate items');
     console.log(rows);
@@ -53,8 +79,13 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
     console.log('Filtered estimate items');
     console.log(estimate_items);
 
+    let values;
+    if (estimate) {
+      estimate.estimate_items = estimate_items
+    } else
+
     // Construct POST values for creating an estimate
-    let values = {
+    values = {
       vehicle_id: vehicleId,
       estimate_items,
     }
@@ -67,15 +98,31 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
 
     // Send POST to create new estimate
     try {
-      const response = await axios.post(url, values);
+      let response;
+      if (estimate) {
+        console.log('Attempting to PUT');
+        console.log('itemsToDelete');
+        console.log(itemsToDelete);
+        for (const itemId of itemsToDelete) {
+          console.log('Attempting to delete item #:', itemId);
+          response = await axios.delete(`http://127.0.0.1:8000/api/estimate-items/${itemId}`)
+        }
+      } else {
+        console.log('Attempting to POST');
+        response = await axios.post(url, values);
+      }
       console.log('Response');
       console.log(response);
+
+      console.log('response.status');
+      console.log(response.status);
 
       if (response.status === 201) {
         console.log('Estimate created successfully!');
 
+
         // Reset form
-        setRows([{ description: '', labor_price: '', part_price: '' }]);
+        setRows([{ id: null, description: '', labor_price: '', part_price: '' }]);
 
         // Close modal
         handleClose();
@@ -100,7 +147,7 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
       <Modal open={open} onClose={handleClose}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 550, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Create Estimate
+            {estimate ? 'Edit Estimate' : 'Create Estimate'}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
             <Typography display="inline" sx={{ flexGrow: 1 }}>Description</Typography>
@@ -109,7 +156,7 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
             <Typography display="inline" sx={{ width: '40px' }}></Typography>
           </Box>
           {rows.map((row, index) => (
-            <Box key={index} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
+            <Box key={index} data-id={row.id} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
               <TextField sx={{ flexGrow: 1 }} value={row.description} onChange={(e) => handleDescriptionChange(index, e.target.value)} />
               <TextField
                 sx={{ width: '125px' }}
@@ -126,7 +173,7 @@ function EstimateFormModal({open, handleClose, vehicleId, edit=false}) {
                   startAdornment: <InputAdornment position="start">$</InputAdornment>,
                 }}
               />
-              <IconButton onClick={() => handleRemoveRow(index)} disabled={rows.length === 1}>
+              <IconButton onClick={() => handleRemoveRow(index, row.id)} disabled={rows.length === 1}>
                 <RemoveCircleOutline />
               </IconButton>
             </Box>

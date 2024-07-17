@@ -47,12 +47,14 @@ export default function ViewVehicle() {
   const handleCloseService = () => setOpenService(false);
 
   // Stores whether estimate modal is in create or edit mode
-  const [editEstimate, setEditEstimate] = useState(false)
+  const [editEstimate, setEditEstimate] = useState(null)
 
   // Tracks modal state for estimate modal
   const [openEstimate, setOpenEstimate] = useState(false);
-  const handleOpenEstimate = (edit = false ) => {
-    setEditEstimate(edit);
+  const handleOpenEstimate = (estimate = null ) => {
+    console.log('Estimate in handleOpenEstimate');
+    console.log(estimate);
+    setEditEstimate(estimate);
     setOpenEstimate(true);
   }
   const handleCloseEstimate = () => setOpenEstimate(false);
@@ -314,7 +316,7 @@ export default function ViewVehicle() {
       <br/>
 
       <Button variant='outlined' onClick={() => handleOpenEstimate()}>Create Estimate</Button>
-      <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} edit={editEstimate}/>
+      <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} estimate={editEstimate}/>
 
       <br/>
       <br/>
@@ -345,7 +347,7 @@ export default function ViewVehicle() {
                       <VisibilityIcon />
                     </IconButton>
                   </Link>
-                  <IconButton onClick={() => handleOpenEstimate(true)} sx={{ }}><EditIcon /></IconButton>
+                  <IconButton onClick={() => handleOpenEstimate(estimate)} sx={{ }}><EditIcon /></IconButton>
                   <IconButton sx={{ }}>
                     <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
                   </IconButton>
