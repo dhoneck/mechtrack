@@ -6,10 +6,11 @@ class EstimateItemSerializer(serializers.ModelSerializer):
     estimate_item_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     part_price = serializers.DecimalField(max_digits=8, decimal_places=2)
     labor_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    estimate = serializers.PrimaryKeyRelatedField(queryset=Estimate.objects.all())
 
     class Meta:
         model = EstimateItem
-        fields = ['id', 'description', 'part_price', 'labor_price', 'estimate_item_total']
+        fields = ['id', 'estimate', 'description', 'part_price', 'labor_price', 'estimate_item_total']
 
 
 class EstimateSerializer(serializers.ModelSerializer):

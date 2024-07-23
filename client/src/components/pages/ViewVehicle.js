@@ -137,7 +137,7 @@ export default function ViewVehicle() {
   const deleteEstimate = async (id) => {
     console.log(`Attempting to delete estimate #${id}`);
     try {
-      let url = `http://127.0.0.1:8000/api/estimates/${id}`;
+      let url = `http://127.0.0.1:8000/api/estimates/${id}/`;
 
       // Verify deletion of estimate
       const confirmation = window.confirm('Are you sure you want to delete this estimate?\nThis action cannot be undone.');
@@ -186,7 +186,7 @@ export default function ViewVehicle() {
   // Get customer info
   useEffect(() => {
     getVehicleInfo();
-  }, [])
+  }, [openVehicle, openEstimate, openService])
 
   const style = {
     position: 'absolute',

@@ -13,7 +13,7 @@ urlpatterns = [
     path('services/', views.ServiceList.as_view()),
     path('services/<int:pk>/', views.ServiceDetail.as_view()),
     path('estimates/', views.EstimateList.as_view()),
-    path('estimates/<int:pk>', views.EstimateDetail.as_view()),
+    path('estimates/<int:pk>/', views.EstimateDetail.as_view()),
     path('estimate-items/', views.EstimateItemList.as_view()),
     path('estimate-items/<int:pk>/', views.EstimateItemDetail.as_view()),
 ]
