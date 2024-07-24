@@ -43,7 +43,12 @@ export default function ViewVehicle() {
 
   // Track modal state for the add service modal
   const [openService, setOpenService] = useState(false);
-  const handleOpenService = () => setOpenService(true);
+  const handleOpenService = (estimate = null) => {
+    console.log('Estimate in handleOpenService');
+    console.log(estimate);
+    setEditEstimate(estimate);
+    setOpenService(true);
+  }
   const handleCloseService = () => setOpenService(false);
 
   // Stores whether estimate modal is in create or edit mode
@@ -341,7 +346,7 @@ export default function ViewVehicle() {
                 <TableCell>${estimate.labor_total}</TableCell>
                 <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
                 <TableCell>
-                  <IconButton sx={{ }}><ScheduleIcon /></IconButton>
+                  <IconButton onClick={() => handleOpenService(estimate)} sx={{ }}><ScheduleIcon /></IconButton>
                   <Link to={'estimate/' + estimate.id} target='_blank'>
                     <IconButton sx={{ }}>
                       <VisibilityIcon />
@@ -366,10 +371,11 @@ export default function ViewVehicle() {
         handleClose={handleCloseService}
         vehicleId={vehicle.id}
         getVehicleInfo={getVehicleInfo}
+        estimate={editEstimate}
       ></ServiceModal>
       <Typography variant='h4' sx={{ marginTop:'20px'}}>Services</Typography>
       <br/>
-      <Button variant='outlined' onClick={handleOpenService} sx={{ mx: 1 }}>Schedule Services</Button>
+      <Button variant='outlined' onClick={() => handleOpenService(null)} sx={{ mx: 1 }}>Schedule Services</Button>
       <br/>
       <br/>
       <TableContainer container={Paper} sx={{ textAlign: 'center' }}>

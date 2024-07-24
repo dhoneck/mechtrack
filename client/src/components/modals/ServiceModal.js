@@ -25,7 +25,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
 
-function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
+function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo, estimate=null }) {
+  console.log('Here is the estimate from the schedule service form');
+  console.log(estimate)
+
   // Set service form values
   const [dateTime, setDateTime] = useState(dayjs());
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
@@ -36,16 +39,23 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
   const [previewDate, setPreviewDate] = useState(new Date());
 
   // Define available services
-  const serviceOptions = [
-    'Oil lube and filter',
-    'Diagnostic',
-    'Tire rotation',
-    'Brake replacement',
-    'Alignment',
-    'Transmission',
-    'Electrical systems',
-    'Other',
-  ];
+  let serviceOptions = [];
+  if (estimate) {
+    for (const item of estimate.estimate_items) {
+      serviceOptions.push(`${item.description} - $${item.estimate_item_total} + tax`);
+    }
+  } else {
+    serviceOptions = [
+      'Oil lube and filter',
+      'Diagnostic',
+      'Tire rotation',
+      'Brake replacement',
+      'Alignment',
+      'Transmission',
+      'Electrical systems',
+      'Other',
+    ];
+  }
 
   // Define modal style
   const style = {
@@ -134,7 +144,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
       >
         <Box sx={style}>
           <Typography id='service-modal-title' sx={{ mb: 2 }} variant='h5' component='h2'>
-            Schedule Service
+            {estimate ? 'Schedule Service From Estimate' : 'Schedule Service'}
           </Typography>
           <FormGroup sx={{display: 'flex', flexDirection: 'row', gap: '20px' }}>
             <Box sx={{flex: '4'}}>
@@ -170,9 +180,9 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
                 </Select>
               </FormControl>
               <Typography variant='h6'>Services</Typography>
-              <Grid container spacing={2}>
+              <Grid container>
                 {serviceOptions.map((service, index) => (
-                  <Grid item xs={6} key={index}>
+                  <Grid item xs={estimate ? 12 : 6} key={index}>
                     <FormControlLabel
                       key={index}
                       control={
@@ -187,6 +197,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo }) {
                   </Grid>
                 ))}
               </Grid>
+
               <TextField
                 id='customer-notes'
                 label='Customer Notes'

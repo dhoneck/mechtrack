@@ -272,7 +272,7 @@ export default function ViewCustomer() {
   useEffect(() => {
     getCustomerInfo();
     getVehicles();
-  }, [])
+  }, [openVehicle, openVehicleLink, openVehicleUnlink])
 
   // Custom styles
     const style = {

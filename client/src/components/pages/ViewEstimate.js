@@ -40,7 +40,7 @@ export default function ViewEstimate() {
 
   async function getEstimate() {
     try {
-      let url = `http://127.0.0.1:8000/api/estimates/${eid}`
+      let url = `http://127.0.0.1:8000/api/estimates/${eid}/`
       let response = await axios.get(url);
       console.log('response.data');
       console.log(response.data);
