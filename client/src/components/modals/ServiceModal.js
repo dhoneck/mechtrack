@@ -25,7 +25,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
 
-function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo, estimate=null }) {
+function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null }) {
   console.log('Here is the estimate from the schedule service form');
   console.log(estimate)
 

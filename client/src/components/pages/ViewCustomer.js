@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 
 import NavBar from '../layout/NavBar';
+import ServiceModal from "../modals/ServiceModal";
 
 export default function ViewCustomer() {
   // Get ID of customer from URL
@@ -44,6 +45,17 @@ export default function ViewCustomer() {
   const [openVehicleUnlink, setOpenVehicleUnlink] = useState(false);
   const handleOpenVehicleUnlink = () => setOpenVehicleUnlink(true);
   const handleCloseVehicleUnlink = () => setOpenVehicleUnlink(false);
+
+  // Track vehicle that has the add service button clicked
+  const [targetVehicle, setTargetVehicle] = useState(null);
+
+  // Track modal state for the add service modal
+  const [openService, setOpenService] = useState(false);
+  const handleOpenService = (vehicleId) => {
+    setTargetVehicle(vehicleId);
+    setOpenService(true);
+  }
+  const handleCloseService = () => setOpenService(false);
 
   // Set empty customer form values which will be populated by the fetched customer data for editing customer
   const [firstName, setFirstName] = useState('');
@@ -529,6 +541,13 @@ export default function ViewCustomer() {
       <Button sx={{ width: 225, mx: 1 }} variant='outlined' onClick={handleOpenVehicleUnlink}>Unlink Vehicle</Button>
       <br/>
       <br/>
+
+      <ServiceModal
+        open={openService}
+        handleClose={handleCloseService}
+        vehicleId={targetVehicle}
+      ></ServiceModal>
+
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap:'wrap'}}>
        {customerInfo.vehicles && customerInfo.vehicles.map(vehicle => (
         <Card sx={{ maxWidth: 275 }} style={{ backgroundColor: 'lightgray' }}>
@@ -539,7 +558,7 @@ export default function ViewCustomer() {
 
           </CardContent>
           <CardActions>
-            <Button size="small">Add Service</Button>
+            <Button size="small" onClick={() => handleOpenService(vehicle.id)}>Add Service</Button>
             <Button as={Link} to={'/vehicles/' + vehicle.id} size="small">View Record</Button>
           </CardActions>
         </Card>
