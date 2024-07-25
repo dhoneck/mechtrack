@@ -163,6 +163,31 @@ export default function ViewVehicle() {
     }
   };
 
+  /** Make DELETE request to delete an service */
+  const deleteService = async (id) => {
+    console.log(`Attempting to delete service #${id}`);
+    try {
+      let url = `http://127.0.0.1:8000/api/services/${id}/`;
+
+      // Verify deletion of service
+      const confirmation = window.confirm('Are you sure you want to delete this service?\nThis action cannot be undone.');
+      if (!confirmation) {
+        return;
+      }
+
+      await axios.delete(url)
+        .then(function (response) {
+          console.log('Service Deleted:');
+          console.log(response.data);
+
+          // Refresh vehicle info
+          getVehicleInfo();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   /** Make DELETE request to delete an vehicle */
   const deleteVehicle = async () => {
     console.log(`Attempting to delete vehicle #${id}`);
@@ -334,6 +359,7 @@ export default function ViewVehicle() {
               <TableCell>Parts</TableCell>
               <TableCell>Labor</TableCell>
               <TableCell>Total</TableCell>
+              <TableCell>Scheduled</TableCell>
               <TableCell sx={{ paddingLeft: '24px' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -345,9 +371,10 @@ export default function ViewVehicle() {
                 <TableCell>${estimate.parts_total}</TableCell>
                 <TableCell>${estimate.labor_total}</TableCell>
                 <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
+                <TableCell>{estimate.status}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpenService(estimate)} sx={{ }}><ScheduleIcon /></IconButton>
-                  <Link to={'estimate/' + estimate.id} target='_blank'>
+                  <Link to={'/estimates/' + estimate.id} target='_blank'>
                     <IconButton sx={{ }}>
                       <VisibilityIcon />
                     </IconButton>
@@ -388,6 +415,7 @@ export default function ViewVehicle() {
                 <TableCell>Mileage</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -399,6 +427,17 @@ export default function ViewVehicle() {
                   <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
                   <TableCell>n/a</TableCell>
                   <TableCell>{service.completed ? service.completed : 'Not completed'}</TableCell>
+                  <TableCell>
+                    <Link to={'/services/' + service.id} target='_blank'>
+                      <IconButton sx={{ }}>
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Link>
+                    <IconButton onClick={() => handleOpenService(service)} sx={{ }}><EditIcon /></IconButton>
+                    <IconButton sx={{ }}>
+                      <DeleteIcon onClick={() => deleteService(service.id)} />
+                    </IconButton>
+                </TableCell>
                 </TableRow>
               ))}
             </TableBody>

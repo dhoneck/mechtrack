@@ -24,7 +24,7 @@ class EstimateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Estimate
-        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_subtotal', 'sales_tax_total', 'estimate_total', 'total_estimate_items']
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_subtotal', 'sales_tax_total', 'estimate_total', 'total_estimate_items', 'status']
 
 
 class ServiceSerializer(serializers.ModelSerializer):

@@ -23,7 +23,7 @@ export default function App() {
         <Route path='customers/add' element={<AddCustomer />} />
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
-        <Route path='vehicles/:id/estimate/:eid' element={<ViewEstimate />} />
+        <Route path='estimates/:eid' element={<ViewEstimate />} />
         <Route path='services/:id' element={<ViewService />} />
         <Route path='*' element={<PageNotFound />} />
       </Routes>

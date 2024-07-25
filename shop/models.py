@@ -78,91 +78,16 @@ class CustomerVehicle(models.Model):
         return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
 
 
-class Service(models.Model):
-    """Service model is scheduled vehicle work."""
-    TIME_CHOICES = (
-        ('1 hr', '1 hr'),
-        ('2 hrs', '2 hrs'),
-        ('3 hrs', '3 hrs'),
-        ('4 hrs', '4 hrs'),
-        ('5 hrs', '5 hrs'),
-        ('6 hrs', '6 hrs'),
-        ('7 hrs', '7 hrs'),
-        ('8 hrs', '8 hrs'),
-        ('1+ day', '1+ day')
-    )
-
-    SERVICE_CHOICES = (
-        ('Oil lube and filter', 'Oil lube and filter'),
-        ('Diagnostic', 'Diagnostic'),
-        ('Tire rotation', 'Tire rotation'),
-        ('Brake replacement', 'Brake replacement'),
-        ('Alignment', 'Alignment'),
-        ('Transmission', 'Transmission'),
-        ('Electrical systems', 'Electrical systems'),
-        ('Other', 'Other')
-    )
-
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
-    datetime = models.DateTimeField()
-    estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
-    # MultiSelectField has bug that requires max_length to be specified
-    # More info: https://github.com/goinnn/django-multiselectfield/issues/131
-    services = MultiSelectField(choices=SERVICE_CHOICES, max_length=get_max_length(SERVICE_CHOICES, None))
-    internal_notes = models.TextField(blank=True, default='')
-    customer_notes = models.TextField(blank=True, default='')
-    mileage = models.PositiveIntegerField(blank=True, null=True)
-    completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        """Returns a multiline string that states the vehicle, datetime of the service, and the scheduled services."""
-        vehicle = Vehicle.objects.get(id=self.vehicle.id)
-        return f'''
-            Service for {vehicle}
-            Datetime: {self.datetime}
-            Services: {self.services}
-        '''
-
-
-class ServiceItem(models.Model):
-    """ServiceItem is a single piece of work that is scheduled in a service."""
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='items')
-    description = models.CharField(max_length=200)
-    part_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-    labor_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
-
-    def save(self, *args, **kwargs):
-        """Override save method to standardize decimal placements for part and labor prices."""
-        if self.part_price is not None:
-            self.part_price = Decimal(self.part_price)
-            self.part_price = self.part_price.quantize(Decimal('0.01'))
-
-        if self.labor_price is not None:
-            self.labor_price = Decimal(self.labor_price)
-            self.labor_price = self.labor_price.quantize(Decimal('0.01'))
-
-        super(ServiceItem, self).save(*args, **kwargs)
-
-    def service_item_total(self):
-        """Returns the sum of the part and labor price."""
-        return self.part_price + self.labor_price
-
-    def __str__(self):
-        """
-        Returns a multiline string containing the service item description, part price, labor price, and total price.
-        """
-        return f'''
-            Description: {self.description}
-            Part Price: {self.part_price}
-            Labor Price: {self.labor_price}
-            Total Price: {self.service_item_total}
-        '''
-
-
 class Estimate(models.Model):
     """Estimate model is unscheduled vehicle work."""
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def status(self):
+        if self.services.exists():
+            return 'Yes'
+        return 'No'
 
     def estimate_items_str(self):
         """Returns a comma separated list of estimate items."""
@@ -233,4 +158,86 @@ class EstimateItem(models.Model):
             Part Price: {self.part_price}
             Labor Price: {self.labor_price}
             Total Price: {self.estimate_item_total}
+        '''
+
+
+class Service(models.Model):
+    """Service model is scheduled vehicle work."""
+    TIME_CHOICES = (
+        ('1 hr', '1 hr'),
+        ('2 hrs', '2 hrs'),
+        ('3 hrs', '3 hrs'),
+        ('4 hrs', '4 hrs'),
+        ('5 hrs', '5 hrs'),
+        ('6 hrs', '6 hrs'),
+        ('7 hrs', '7 hrs'),
+        ('8 hrs', '8 hrs'),
+        ('1+ day', '1+ day')
+    )
+
+    SERVICE_CHOICES = (
+        ('Oil lube and filter', 'Oil lube and filter'),
+        ('Diagnostic', 'Diagnostic'),
+        ('Tire rotation', 'Tire rotation'),
+        ('Brake replacement', 'Brake replacement'),
+        ('Alignment', 'Alignment'),
+        ('Transmission', 'Transmission'),
+        ('Electrical systems', 'Electrical systems'),
+        ('Other', 'Other')
+    )
+
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
+    datetime = models.DateTimeField()
+    estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
+    # MultiSelectField has bug that requires max_length to be specified
+    # More info: https://github.com/goinnn/django-multiselectfield/issues/131
+    services = MultiSelectField(choices=SERVICE_CHOICES, max_length=get_max_length(SERVICE_CHOICES, None))
+    internal_notes = models.TextField(blank=True, default='')
+    customer_notes = models.TextField(blank=True, default='')
+    mileage = models.PositiveIntegerField(blank=True, null=True)
+    completed = models.BooleanField(default=False)
+    estimate = models.ForeignKey(Estimate, related_name='services', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        """Returns a multiline string that states the vehicle, datetime of the service, and the scheduled services."""
+        vehicle = Vehicle.objects.get(id=self.vehicle.id)
+        return f'''
+            Service for {vehicle}
+            Datetime: {self.datetime}
+            Services: {self.services}
+        '''
+
+
+class ServiceItem(models.Model):
+    """ServiceItem is a single piece of work that is scheduled in a service."""
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='items')
+    description = models.CharField(max_length=200)
+    part_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    labor_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+
+    def save(self, *args, **kwargs):
+        """Override save method to standardize decimal placements for part and labor prices."""
+        if self.part_price is not None:
+            self.part_price = Decimal(self.part_price)
+            self.part_price = self.part_price.quantize(Decimal('0.01'))
+
+        if self.labor_price is not None:
+            self.labor_price = Decimal(self.labor_price)
+            self.labor_price = self.labor_price.quantize(Decimal('0.01'))
+
+        super(ServiceItem, self).save(*args, **kwargs)
+
+    def service_item_total(self):
+        """Returns the sum of the part and labor price."""
+        return self.part_price + self.labor_price
+
+    def __str__(self):
+        """
+        Returns a multiline string containing the service item description, part price, labor price, and total price.
+        """
+        return f'''
+            Description: {self.description}
+            Part Price: {self.part_price}
+            Labor Price: {self.labor_price}
+            Total Price: {self.service_item_total}
         '''
