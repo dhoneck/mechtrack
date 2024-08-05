@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
 
 
-# Register your models here.
 class VehicleAdmin(admin.ModelAdmin):
     all_fields = ('make', 'model', 'year', 'color', 'license', 'vin', 'notes',)
     list_display = all_fields
@@ -11,7 +10,7 @@ class VehicleAdmin(admin.ModelAdmin):
 
 
 class CustomerAdmin(admin.ModelAdmin):
-    all_fields = ('first_name', 'last_name', 'phone', 'accepts_texts', 'email', 'accepts_emails', 'flagged', 'notes',)
+    all_fields = ('first_name', 'last_name', 'phone', 'email', 'accepts_texts', 'accepts_emails', 'flagged', 'notes',)
     list_display = all_fields
     search_fields = all_fields
 
@@ -45,17 +44,23 @@ class EstimateItemInline(admin.TabularInline):
 
 
 class EstimateAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'updated_at', 'estimate_items_str', 'estimate_total', 'total_estimate_items')
+    list_display = ('vehicle', 'updated_at', 'estimate_items_str', 'total_estimate_items', 'estimate_total',)
     inlines = [EstimateItemInline]
 
-    def estimate_items(self, obj):
+    def estimate_items_str(self, obj):
         return obj.estimate_items_str()
 
     def estimate_total(self, obj):
-        return '$' + str(obj.estimate_total())
+        """Display the estimate total with a dollar sign."""
+        return f'${obj.estimate_total():,.2f}'
 
     def total_estimate_items(self, obj):
+        """Display the total number of estimate items."""
         return obj.total_estimate_items()
+
+    estimate_items_str.short_description = 'Description'
+    estimate_total.short_description = 'Total Estimate'
+    total_estimate_items.short_description = 'Number of Service Items'
 
 
 admin.site.register(Vehicle, VehicleAdmin)

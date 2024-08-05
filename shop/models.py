@@ -1,12 +1,9 @@
 from decimal import Decimal
 
 from django.db import models
-from multiselectfield import MultiSelectField
-from multiselectfield.utils import get_max_length
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-# Create your models here.
 class Vehicle(models.Model):
     """Vehicle model is a vehicle being worked on by an auto shop."""
     make = models.CharField(max_length=50)
@@ -73,7 +70,7 @@ class CustomerVehicle(models.Model):
 
     def __str__(self):
         """Returns '<Customer First Name> - <Vehicle Make> <Vehicle Model>'."""
-        return f'{self.customer.first_name} - {self.vehicle.make} {self.vehicle.model}'
+        return f'{self.customer.first_name} {self.customer.last_name} - {self.vehicle.make} {self.vehicle.model}'
 
 
 class Estimate(models.Model):
@@ -81,15 +78,14 @@ class Estimate(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
 
-    @property
-    def status(self):
-        if self.services.exists():
+    def scheduled(self):
+        if self.service.exists():
             return 'Yes'
         return 'No'
 
     def estimate_items_str(self):
         """Returns a comma separated list of estimate items."""
-        return ', '.join([str(item.description) for item in self.items.all()])
+        return ', '.join([item.description for item in self.items.all()])
 
     def parts_total(self):
         """Returns the sum of all part prices."""
@@ -120,8 +116,7 @@ class Estimate(models.Model):
 
     def __str__(self):
         """Returns 'Estimate for <Vehicle> | Updated at: <updated_at>'."""
-        return f'Estimate for {self.vehicle} | Updated at: {self.updated_at}'
-
+        return f'Estimate for {self.vehicle.year} {self.vehicle.make} {self.vehicle.model} | Updated at: {self.updated_at}'
 
 
 class EstimateItem(models.Model):
@@ -155,7 +150,7 @@ class EstimateItem(models.Model):
             Description: {self.description}
             Part Price: {self.part_price}
             Labor Price: {self.labor_price}
-            Total Price: {self.estimate_item_total}
+            Total Price: {self.estimate_item_total()}
         '''
 
 
@@ -187,18 +182,15 @@ class Service(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
     datetime = models.DateTimeField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
-    # # MultiSelectField has bug that requires max_length to be specified
-    # # More info: https://github.com/goinnn/django-multiselectfield/issues/131
-    # services = MultiSelectField(choices=SERVICE_CHOICES, max_length=get_max_length(SERVICE_CHOICES, None))
     internal_notes = models.TextField(blank=True, default='')
     customer_notes = models.TextField(blank=True, default='')
     mileage = models.PositiveIntegerField(blank=True, null=True)
     completed = models.BooleanField(default=False)
-    estimate = models.ForeignKey(Estimate, related_name='services', on_delete=models.SET_NULL, null=True)
+    estimate = models.ForeignKey(Estimate, related_name='service', on_delete=models.SET_NULL, blank=True, null=True)
 
     def service_items_str(self):
         """Returns a comma separated list of service items."""
-        return ', '.join([str(item.description) for item in self.items.all()])
+        return ', '.join([item.description for item in self.items.all()])
 
     def parts_total(self):
         """Returns the sum of all part prices."""

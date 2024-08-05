@@ -106,6 +106,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
       'estimated_time': estimatedTime,
       'service_items': services,
       'customer_notes': customerNotes,
+      'estimate_id': estimate.id,
     };
 
     console.log('Service values');

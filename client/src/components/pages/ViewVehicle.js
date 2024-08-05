@@ -371,7 +371,7 @@ export default function ViewVehicle() {
                 <TableCell>${estimate.parts_total}</TableCell>
                 <TableCell>${estimate.labor_total}</TableCell>
                 <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
-                <TableCell>{estimate.status}</TableCell>
+                <TableCell>{estimate.scheduled}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleOpenService(estimate)} sx={{ }}><ScheduleIcon /></IconButton>
                   <Link to={'/estimates/' + estimate.id} target='_blank'>
@@ -422,11 +422,11 @@ export default function ViewVehicle() {
               {vehicle.services && vehicle.services.map(service => (
                 <TableRow key={service.id}>
                   <TableCell>{formatDateTime(service.datetime)}</TableCell>
-                  <TableCell>{service.service_items.map(item => item.description).join(', ')}</TableCell>
+                  <TableCell>{service.service_items_str}</TableCell>
                   <TableCell>{service.estimated_time}</TableCell>
                   <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
                   <TableCell>n/a</TableCell>
-                  <TableCell>{service.completed ? service.completed : 'Not completed'}</TableCell>
+                  <TableCell>{service.completed ? 'Completed' : 'Not completed'}</TableCell>
                   <TableCell>
                     <Link to={'/services/' + service.id} target='_blank'>
                       <IconButton sx={{ }}>
