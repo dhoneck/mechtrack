@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -12,76 +12,73 @@ import {
   Grid,
   InputLabel,
   MenuItem,
-  Modal, Paper,
-  Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Modal,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
-import {
-  DateTimePicker,
-  LocalizationProvider,
-} from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import {DateTimePicker, LocalizationProvider,} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {StaticDatePicker} from '@mui/x-date-pickers/StaticDatePicker';
 
-
+/** A modal form for scheduling auto service work */
 function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null }) {
-  console.log('Here is the estimate from the schedule service form');
-  console.log(estimate)
+  if (estimate) {
+    console.log('Estimate passed to service form:');
+    console.log(estimate);
+  }
 
-  // Set service form values
+  // Set default service form values
   const [dateTime, setDateTime] = useState(dayjs());
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
   const [services, setServices] = useState([]);
   const [scheduledServices, setScheduledServices] = useState([]);
   const [customerNotes, setCustomerNotes] = useState('');
 
+  // Track date being used in schedule preview widget
   const [previewDate, setPreviewDate] = useState(new Date());
 
   // Define available services
   let serviceOptions = [];
-  if (estimate) {
+  if (estimate) {  // Add service options matching a quote
     for (const item of estimate.estimate_items) {
-      serviceOptions.push(`${item.description} - $${item.estimate_item_total} + tax`);
+      console.log('item');
+      console.log(item);
+      serviceOptions.push(
+        { description: item.description, part_price: item.part_price, labor_price: item.labor_price });
     }
-  } else {
+  } else {  // Add default service options
     serviceOptions = [
-      'Oil lube and filter',
-      'Diagnostic',
-      'Tire rotation',
-      'Brake replacement',
-      'Alignment',
-      'Transmission',
-      'Electrical systems',
-      'Other',
+      { description: 'Oil lube and filter', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Diagnostic', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Tire rotation', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Brake replacement', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Alignment', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Transmission', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Electrical systems', part_price: 0.00, labor_price: 0.00 },
+      { description: 'Other', part_price: 0.00, labor_price: 0.00 },
     ];
   }
 
-  // Define modal style
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '1000px',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
-
+  /** Searches for services on a particular date */
   const handlePreview = async (e) => {
+    // Set date for schedule preview widget
     setPreviewDate(new Date(e));
-    console.log('handlePreview');
-    console.log(e);
-    console.log('Look up services based on date');
+
+    // Format date and endpoint URL
     let date = new Date(e);
     let dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     let url = 'http://127.0.0.1:8000/api/services/?service_date=' + dateStr;
 
-    // Make a GET request to the API
+    // Make a GET request to the API to get scheduled services for a particular date
     try {
-      console.log(`API URL: ${url}`)
       const response = await axios.get(url);
       setScheduledServices(response.data)
     } catch (error) {
@@ -89,12 +86,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     }
   }
 
-  /** Tracks which services are selected in the checkbox inputs */
+  /** Tracks which services are selected in the service option checkboxes */
   const handleCheckboxChange = (service) => (event) => {
     if (event.target.checked) {
-      setServices([...services, service]);
+      setServices([...services, { description: service.description, part_price: 0.00, labor_price: 0.00 }]);
     } else {
-      setServices(services.filter((item) => item !== service));
+      setServices(services.filter((item) => item.description !== service.description));
     }
   };
 
@@ -104,13 +101,14 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
     // Combine 'Schedule Service' form values to use in POST request
     let values = {
-      'vehicle': vehicleId,
+      'vehicle_id': vehicleId,
       'datetime': dateTime,
       'estimated_time': estimatedTime,
-      'services': services,
+      'service_items': services,
       'customer_notes': customerNotes,
     };
 
+    console.log('Service values');
     console.log(values);
 
     // Try to create a new vehicle
@@ -133,6 +131,21 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
       console.error(values);
     }
   }
+
+
+  // Define modal style
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '1000px',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
 
   return (
     <>
@@ -181,18 +194,18 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
               </FormControl>
               <Typography variant='h6'>Services</Typography>
               <Grid container>
-                {serviceOptions.map((service, index) => (
+                {serviceOptions.map((serviceOption, index) => (
                   <Grid item xs={estimate ? 12 : 6} key={index}>
                     <FormControlLabel
                       key={index}
                       control={
                         <Checkbox
-                          checked={services.includes(service)}
-                          onChange={handleCheckboxChange(service)}
+                          checked={services.some((s1) => s1.description === serviceOption.description)}
+                          onChange={handleCheckboxChange(serviceOption)}
                           color='primary'
                         />
                       }
-                      label={service}
+                      label={serviceOption.description}
                     />
                   </Grid>
                 ))}

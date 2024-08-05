@@ -72,10 +72,8 @@ class CustomerVehicle(models.Model):
         unique_together = ('customer', 'vehicle')
 
     def __str__(self):
-        """Returns '<Customer First Name> - <Vehicle Make> <Vehicle Model>.'"""
-        customer = Customer.objects.get(id=self.customer.id)
-        vehicle = Vehicle.objects.get(id=self.vehicle.id)
-        return f'{customer.first_name} - {vehicle.make} {vehicle.model}'
+        """Returns '<Customer First Name> - <Vehicle Make> <Vehicle Model>'."""
+        return f'{self.customer.first_name} - {self.vehicle.make} {self.vehicle.model}'
 
 
 class Estimate(models.Model):
@@ -122,16 +120,16 @@ class Estimate(models.Model):
 
     def __str__(self):
         """Returns 'Estimate for <Vehicle> | Updated at: <updated_at>'."""
-        vehicle = Vehicle.objects.get(id=self.vehicle.id)
-        return f'Estimate for {vehicle} | Updated at: {self.updated_at}'
+        return f'Estimate for {self.vehicle} | Updated at: {self.updated_at}'
+
 
 
 class EstimateItem(models.Model):
     """EstimateItem is a single piece of work for an estimate."""
     estimate = models.ForeignKey(Estimate, on_delete=models.CASCADE, related_name='items')
     description = models.CharField(max_length=200)
-    part_price = models.DecimalField(max_digits=8, decimal_places=2)
-    labor_price = models.DecimalField(max_digits=8, decimal_places=2)
+    part_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    labor_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
 
     def save(self, *args, **kwargs):
         """Override save method to standardize decimal placements for part and labor prices."""
@@ -189,23 +187,49 @@ class Service(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
     datetime = models.DateTimeField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
-    # MultiSelectField has bug that requires max_length to be specified
-    # More info: https://github.com/goinnn/django-multiselectfield/issues/131
-    services = MultiSelectField(choices=SERVICE_CHOICES, max_length=get_max_length(SERVICE_CHOICES, None))
+    # # MultiSelectField has bug that requires max_length to be specified
+    # # More info: https://github.com/goinnn/django-multiselectfield/issues/131
+    # services = MultiSelectField(choices=SERVICE_CHOICES, max_length=get_max_length(SERVICE_CHOICES, None))
     internal_notes = models.TextField(blank=True, default='')
     customer_notes = models.TextField(blank=True, default='')
     mileage = models.PositiveIntegerField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     estimate = models.ForeignKey(Estimate, related_name='services', on_delete=models.SET_NULL, null=True)
 
+    def service_items_str(self):
+        """Returns a comma separated list of service items."""
+        return ', '.join([str(item.description) for item in self.items.all()])
+
+    def parts_total(self):
+        """Returns the sum of all part prices."""
+        total = sum(item.part_price for item in self.items.all())
+        return total
+
+    def labor_total(self):
+        """Returns the sum of all labor prices."""
+        total = sum(item.labor_price for item in self.items.all())
+        return total
+
+    def service_subtotal(self):
+        """Returns the sum of all part and labor prices."""
+        total = sum(item.service_item_total() for item in self.items.all())
+        return total
+
+    def sales_tax_total(self):
+        """Returns the sales tax amount based on 5.5% sales tax."""
+        return self.service_subtotal() * Decimal(0.055)
+
+    def service_total(self):
+        """Returns the sum of all parts, labor, and tax."""
+        return self.service_subtotal() + self.sales_tax_total()
+
+    def total_service_items(self):
+        """Returns the number of service items."""
+        return self.items.count()
+
     def __str__(self):
-        """Returns a multiline string that states the vehicle, datetime of the service, and the scheduled services."""
-        vehicle = Vehicle.objects.get(id=self.vehicle.id)
-        return f'''
-            Service for {vehicle}
-            Datetime: {self.datetime}
-            Services: {self.services}
-        '''
+        """Returns a string that states the vehicle ID and the datetime of the service."""
+        return f'Service for vehicle ID {self.vehicle.id} on {self.datetime}'
 
 
 class ServiceItem(models.Model):
@@ -239,5 +263,5 @@ class ServiceItem(models.Model):
             Description: {self.description}
             Part Price: {self.part_price}
             Labor Price: {self.labor_price}
-            Total Price: {self.service_item_total}
+            Total Price: {self.service_item_total()}
         '''

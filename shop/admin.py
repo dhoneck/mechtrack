@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
+from .models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
 
 
 # Register your models here.
@@ -20,8 +20,23 @@ class CustomerVehicleAdmin(admin.ModelAdmin):
     list_display = ('customer', 'vehicle',)
 
 
+class ServiceItemInline(admin.TabularInline):
+    model = ServiceItem
+    extra = 1
+
+
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'datetime', 'estimated_time', 'services', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
+    list_display = ('vehicle', 'datetime', 'estimated_time', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
+    inlines = [ServiceItemInline]
+
+    def service_items(self, obj):
+        return obj.estimate_items_str()
+
+    def service_total(self, obj):
+        return '$' + str(obj.service_total())
+
+    def service_items(self, obj):
+        return obj.service_items()
 
 
 class EstimateItemInline(admin.TabularInline):

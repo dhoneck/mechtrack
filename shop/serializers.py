@@ -15,20 +15,38 @@ class EstimateItemSerializer(serializers.ModelSerializer):
 
 class EstimateSerializer(serializers.ModelSerializer):
     estimate_items = EstimateItemSerializer(many=True, read_only=True, source='items')
-    parts_total = serializers.DecimalField(max_digits=8, decimal_places=2)
-    labor_total = serializers.DecimalField(max_digits=8, decimal_places=2)
-    estimate_subtotal = serializers.DecimalField(max_digits=8, decimal_places=2)
-    sales_tax_total = serializers.DecimalField(max_digits=8, decimal_places=2)
-    estimate_total = serializers.DecimalField(max_digits=8, decimal_places=2)
+    parts_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    labor_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    estimate_subtotal = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    sales_tax_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    estimate_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
     total_estimate_items = serializers.ReadOnlyField()
 
     class Meta:
         model = Estimate
-        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total', 'estimate_subtotal', 'sales_tax_total', 'estimate_total', 'total_estimate_items', 'status']
+        fields = ['id', 'vehicle', 'updated_at', 'estimate_items', 'estimate_items_str', 'parts_total', 'labor_total',
+                  'estimate_subtotal', 'sales_tax_total', 'estimate_total', 'total_estimate_items', 'status']
+
+
+class ServiceItemSerializer(serializers.ModelSerializer):
+    service_item_total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    part_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    labor_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
+
+    class Meta:
+        model = EstimateItem
+        fields = ['id', 'description', 'part_price', 'labor_price', 'service_item_total', 'service']
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    services = serializers.ListField(child=serializers.CharField())
+    service_items = ServiceItemSerializer(many=True, read_only=True, source='items')
+    parts_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    labor_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    service_subtotal = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    sales_tax_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    service_total = serializers.DecimalField(max_digits=8, decimal_places=2, read_only=True)
+    total_service_items = serializers.ReadOnlyField()
 
     class Meta:
         model = Service

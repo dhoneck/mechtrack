@@ -422,7 +422,7 @@ export default function ViewVehicle() {
               {vehicle.services && vehicle.services.map(service => (
                 <TableRow key={service.id}>
                   <TableCell>{formatDateTime(service.datetime)}</TableCell>
-                  <TableCell>{service.services.join(', ')}</TableCell>
+                  <TableCell>{service.service_items.map(item => item.description).join(', ')}</TableCell>
                   <TableCell>{service.estimated_time}</TableCell>
                   <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
                   <TableCell>n/a</TableCell>

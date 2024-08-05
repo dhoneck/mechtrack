@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, Estimate, EstimateItem
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
-    EstimateSerializer, EstimateItemSerializer
+    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer
 from .filters import ServiceFilter
 
 
@@ -73,6 +73,33 @@ class ServiceList(generics.ListCreateAPIView):
     ordering_fields = ['datetime']
     ordering = ['datetime']
 
+    def create(self, request, *args, **kwargs):
+        """
+        Custom create method that will also trigger the creation of service item objects
+        """
+        print('request.data')
+        print(request.data)
+
+        vehicle_id = request.data.pop('vehicle_id')
+        service_items_data = request.data.pop('service_items')
+
+        if not service_items_data:
+            return Response({'error': 'No service items'}, status=status.HTTP_400_BAD_REQUEST)
+
+        service = Service.objects.create(vehicle_id=vehicle_id, **request.data)
+        print('service_items_data')
+        print(service_items_data)
+        for item_data in service_items_data:
+            print('Item data')
+            print(item_data)
+            if item_data['part_price'] is None or item_data['part_price'] == '':
+                item_data['part_price'] = 0
+            if item_data['labor_price'] is None or item_data['labor_price'] == '':
+                item_data['labor_price'] = 0
+            ServiceItem.objects.create(service=service, **item_data)
+        serializer = self.get_serializer(service)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -80,6 +107,22 @@ class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+
+class ServiceItemList(generics.ListCreateAPIView):
+    """
+    List all service items, or create a new service item.
+    """
+    queryset = ServiceItem.objects.all()
+    serializer_class = ServiceItemSerializer
+
+
+class ServiceItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete an service item instance.
+    """
+    queryset = ServiceItem.objects.all()
+    serializer_class = ServiceItemSerializer
 
 
 class EstimateList(generics.ListCreateAPIView):
