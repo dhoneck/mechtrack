@@ -31,7 +31,7 @@ export default function ViewService() {
     my: 5
   }
 
-  const { id, eid } = useParams();
+  const { sid } = useParams();
   const [service, setService] = useState({});
 
   const formatDateTime = (dateTime) => {
@@ -40,7 +40,7 @@ export default function ViewService() {
 
   async function getService() {
     try {
-      let url = `http://127.0.0.1:8000/api/services/${eid}/`
+      let url = `http://127.0.0.1:8000/api/services/${sid}/`
       let response = await axios.get(url);
       console.log('response.data');
       console.log(response.data);
@@ -107,7 +107,7 @@ export default function ViewService() {
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${service.sales_tax_total}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{fontWeight:'bold'}}>ESTIMATE TOTAL</TableCell>
+              <TableCell sx={{fontWeight:'bold'}}>SERVICE TOTAL</TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}></TableCell>
               <TableCell sx={{fontWeight:'bold', textAlign:'right'}}>${service.service_total}</TableCell>
@@ -115,66 +115,6 @@ export default function ViewService() {
           </TableBody>
         </Table>
       </TableContainer>
-      <br />
-
-      <Typography sx={{border: '2px solid black', fontSize: '12px'}}>THIS PRICE FOR THE AUTHORIZED REPAIRS WILL NOT BE EXCEEDED IF THE
-        MOTOR VEHICLE IS DELIVERED TO THE SHOP WITHIN 5 DAYS</Typography>
-      <br/>
-      <Box sx={{border: '1px solid black'}}>
-        <Typography sx={{border: '1px solid black', fontSize: '12px'}}>BALL JOINT TOLERANCES</Typography>
-        <Typography sx={{
-          border: '1px solid black',
-          display: 'inline-block',
-          width: 'calc(50% - 2px)',
-          height: '40px',
-          fontSize: '12px'
-        }}>Left</Typography>
-        <Typography sx={{
-          border: '1px solid black',
-          display: 'inline-block',
-          width: 'calc(50% - 2px)',
-          height: '40px',
-          fontSize: '12px'
-        }}>Right</Typography>
-      </Box>
-      <br/>
-      <Typography sx={{border: '2px solid black', fontSize: '12px'}}>TO KEEP YOUR FINAL BILL DOWN, SOME PARTS MAY BE RETURNED TO THE
-        MANUFACTURER, BUT ALL PARTS WILL BE NEW UNLESS OTHERWISE SPECIFIED</Typography>
-      <br/>
-
-
-      <Box sx={{border: '2px solid black', padding: '5px'}}>
-        <Box sx={{display: 'inline-block', width: '70%', marginRight: '10px', textAlign: 'left'}}>
-          <Typography sx={{fontSize: '12px'}}>YOU ARE ENTITLED TO A PRICE ESTIMATE FOR THE REPAIRS YOU HAVE AUTHORIZED. THE REPAIR PRICE MAY BE
-            LESS THAN THE ESTIMATE, BUT WILL NOT EXCEED THE ESTIMATE WITHOUT YOUR PERMISSION. YOUR SIGNATURE WILL
-            INDICATE YOUR ESTIMATE SELECTION.</Typography>
-          <br/>
-          <Typography sx={{fontSize: '12px'}}>1. I request an service in writing before you begin repairs</Typography>
-          <hr/>
-          <Typography sx={{fontSize: '12px'}}>2. Please proceed with repairs, but call me before continuing if the price will exceed
-            $_______</Typography>
-          <hr/>
-          <Typography sx={{fontSize: '12px'}}>3. I do not want an service.</Typography>
-          <hr/>
-        </Box>
-
-        <Box sx={{border: '2px solid black', display: 'inline-block', width: '25%'}}>
-          <Typography sx={{fontSize: '12px'}}>Motor vehicle repair practices are regulated by chapter ATCP 132,
-            Wis. Adm. Code, administered by the Bureau of Consumer Protection, Wisconsin Dept. of Agriculture, Trade and
-            Consumer Protection, P.O. Box 8911, Madison, Wisconin 53708-8911.</Typography>
-        </Box>
-
-        <Box>
-          <Box sx={{display: 'inline-block', width: '50%', textAlign: 'left'}}>
-            <Typography sx={{fontSize: '12px'}}>CHECK ONE:</Typography>
-            <Typography sx={{fontSize: '12px'}}>[ ] I DO WANT OLD PARTS RETURNED</Typography>
-            <Typography sx={{fontSize: '12px'}}>[ ] I DO NOT WANT OLD PARTS RETURNED</Typography>
-          </Box>
-          <Box sx={{display: 'inline-block', width: '50%'}}>
-            <Typography sx={{fontSize: '12px'}}>SIGNATURE ___________________________________</Typography>
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
 }

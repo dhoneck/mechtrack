@@ -425,7 +425,7 @@ export default function ViewVehicle() {
                   <TableCell>{service.service_items_str}</TableCell>
                   <TableCell>{service.estimated_time}</TableCell>
                   <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
-                  <TableCell>n/a</TableCell>
+                  <TableCell>${service.service_subtotal} + Tax</TableCell>
                   <TableCell>{service.completed ? 'Completed' : 'Not completed'}</TableCell>
                   <TableCell>
                     <Link to={'/services/' + service.id} target='_blank'>

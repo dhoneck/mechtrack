@@ -24,7 +24,7 @@ export default function App() {
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
         <Route path='estimates/:eid' element={<ViewEstimate />} />
-        <Route path='services/:id' element={<ViewService />} />
+        <Route path='services/:sid' element={<ViewService />} />
         <Route path='*' element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
