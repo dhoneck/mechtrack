@@ -36,6 +36,16 @@ export default function NavBar({active}) {
               Vehicles
             </Button>
           </li>
+          {/* Vendors */}
+          <li>
+            <Button
+              as={Link}
+              to='/vendors'
+              variant={active === 'Vendors' ? 'contained' : 'outlined'}
+            >
+              Vendors
+            </Button>
+          </li>
           {/* Reports */}
           <li>
             <Button
