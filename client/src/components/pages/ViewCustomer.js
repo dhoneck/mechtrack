@@ -526,12 +526,12 @@ export default function ViewCustomer() {
       <br/>
       <br/>
       <Typography>{customerInfo.phone}</Typography>
-      <Typography>Accepts Texts: {String(customerInfo.accepts_texts)}</Typography>
+      <Typography>Accepts Texts: {customerInfo.accepts_texts ? 'Yes' : 'No'}</Typography>
       <br/>
       <Typography>{customerInfo.email}</Typography>
-      <Typography>Accepts Emails: {String(customerInfo.accepts_emails)}</Typography>
+      <Typography>Accepts Emails: {customerInfo.accepts_emails ? 'Yes' : 'No'}</Typography>
       <br/>
-      <Typography>Flagged: {String(customerInfo.flagged)}</Typography>
+      <Typography>Flagged: {customerInfo.flagged  ? 'Yes' : 'No'}</Typography>
       <Typography>Notes: {customerInfo.notes}</Typography>
       <br/>
       <Typography variant='h4'>Vehicles</Typography>

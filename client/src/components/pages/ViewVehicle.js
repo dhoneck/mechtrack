@@ -73,6 +73,8 @@ export default function ViewVehicle() {
   const [vin, setVin] = useState(null);
   const [notes, setNotes] = useState('');
 
+  const [showEstimates, setShowEstimates] = useState(false)
+
   /** Formats a datetime string using dayjs */
   const formatDateTime = (dateTime) => {
     return dayjs(dateTime).format('YYYY-MM-DD hh:mm a');
@@ -340,109 +342,110 @@ export default function ViewVehicle() {
       {/* Modal end for editing vehicle */}
 
       <br/>
-
+      <Box onClick={()=> setShowEstimates(!showEstimates)} sx={{cursor:'pointer'}}>
+        {showEstimates && <Typography variant='h4'><strong>Estimates</strong> | <span style={{color:'gray'}}>Services</span></Typography>}
+        {!showEstimates && <Typography variant='h4'><span style={{color:'gray'}}>Estimates</span> | <strong>Services</strong></Typography>}
+        <br/>
+      </Box>
       {/* Estimate modal and table display */}
-      <Typography variant='h4'>Estimates</Typography>
-      <br/>
+      {showEstimates && <Box>
+        <Button variant='outlined' onClick={() => handleOpenEstimate()}>Create Estimate</Button>
+        <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} estimate={editEstimate}/>
 
-      <Button variant='outlined' onClick={() => handleOpenEstimate()}>Create Estimate</Button>
-      <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} estimate={editEstimate}/>
-
-      <br/>
-      <br/>
-      <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
-        <Table size={'small'}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Last Modified</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Parts</TableCell>
-              <TableCell>Labor</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Scheduled</TableCell>
-              <TableCell sx={{ paddingLeft: '24px' }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {vehicle.estimates && vehicle.estimates.map(estimate => (
-              <TableRow key={estimate.id} id={estimate.id}>
-                <TableCell>{formatDateTime(estimate.updated_at)}</TableCell>
-                <TableCell>{estimate.estimate_items_str}</TableCell>
-                <TableCell>${estimate.parts_total}</TableCell>
-                <TableCell>${estimate.labor_total}</TableCell>
-                <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
-                <TableCell>{estimate.scheduled}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleOpenService(estimate)} sx={{ }}><ScheduleIcon /></IconButton>
-                  <Link to={'/estimates/' + estimate.id} target='_blank'>
-                    <IconButton sx={{ }}>
-                      <VisibilityIcon />
-                    </IconButton>
-                  </Link>
-                  <IconButton onClick={() => handleOpenEstimate(estimate)} sx={{ }}><EditIcon /></IconButton>
-                  <IconButton sx={{ }}>
-                    <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <br/>
-
-      {/* Service modal and table display */}
-      <ServiceModal
-        open={openService}
-        handleClose={handleCloseService}
-        vehicleId={vehicle.id}
-        getVehicleInfo={getVehicleInfo}
-        estimate={editEstimate}
-      ></ServiceModal>
-      <Typography variant='h4' sx={{ marginTop:'20px'}}>Services</Typography>
-      <br/>
-      <Button variant='outlined' onClick={() => handleOpenService(null)} sx={{ mx: 1 }}>Schedule Services</Button>
-      <br/>
-      <br/>
-      <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
+        <br/>
+        <br/>
+        <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table size={'small'}>
             <TableHead>
               <TableRow>
-                <TableCell>Service Date & Time</TableCell>
+                <TableCell>Last Modified</TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell>Estimated Time</TableCell>
-                <TableCell>Mileage</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Parts</TableCell>
+                <TableCell>Labor</TableCell>
+                <TableCell>Total</TableCell>
+                <TableCell>Scheduled</TableCell>
+                <TableCell sx={{ paddingLeft: '24px' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {vehicle.services && vehicle.services.map(service => (
-                <TableRow key={service.id}>
-                  <TableCell>{formatDateTime(service.datetime)}</TableCell>
-                  <TableCell>{service.service_items_str}</TableCell>
-                  <TableCell>{service.estimated_time}</TableCell>
-                  <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
-                  <TableCell>${service.service_subtotal} + Tax</TableCell>
-                  <TableCell>{service.completed ? 'Completed' : 'Not completed'}</TableCell>
+              {vehicle.estimates && vehicle.estimates.map(estimate => (
+                <TableRow key={estimate.id} id={estimate.id}>
+                  <TableCell>{formatDateTime(estimate.updated_at)}</TableCell>
+                  <TableCell>{estimate.estimate_items_str}</TableCell>
+                  <TableCell>${estimate.parts_total}</TableCell>
+                  <TableCell>${estimate.labor_total}</TableCell>
+                  <TableCell>${estimate.estimate_subtotal} + Tax</TableCell>
+                  <TableCell>{estimate.scheduled}</TableCell>
                   <TableCell>
-                    <Link to={'/services/' + service.id} target='_blank'>
+                    <IconButton onClick={() => handleOpenService(estimate)} sx={{ }}><ScheduleIcon /></IconButton>
+                    <Link to={'/estimates/' + estimate.id} target='_blank'>
                       <IconButton sx={{ }}>
                         <VisibilityIcon />
                       </IconButton>
                     </Link>
-                    <IconButton onClick={() => handleOpenService(service)} sx={{ }}><EditIcon /></IconButton>
+                    <IconButton onClick={() => handleOpenEstimate(estimate)} sx={{ }}><EditIcon /></IconButton>
                     <IconButton sx={{ }}>
-                      <DeleteIcon onClick={() => deleteService(service.id)} />
+                      <DeleteIcon onClick={() => deleteEstimate(estimate.id)} />
                     </IconButton>
-                </TableCell>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+      </Box>}
+
+      {/* Service modal and table display */}
+      {!showEstimates && <Box>
+        <Button variant='outlined' onClick={() => handleOpenService(null)} sx={{ mx: 1 }}>Schedule Services</Button>
+        <ServiceModal
+          open={openService}
+          handleClose={handleCloseService}
+          vehicleId={vehicle.id}
+          getVehicleInfo={getVehicleInfo}
+          estimate={editEstimate}
+        ></ServiceModal>
+        <br/>
+        <br/>
+        <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
+            <Table size={'small'}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Service Date & Time</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Estimated Time</TableCell>
+                  <TableCell>Mileage</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {vehicle.services && vehicle.services.map(service => (
+                  <TableRow key={service.id}>
+                    <TableCell>{formatDateTime(service.datetime)}</TableCell>
+                    <TableCell>{service.service_items_str}</TableCell>
+                    <TableCell>{service.estimated_time}</TableCell>
+                    <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
+                    <TableCell>${service.service_subtotal} + Tax</TableCell>
+                    <TableCell>{service.completed ? 'Completed' : 'Not completed'}</TableCell>
+                    <TableCell>
+                      <Link to={'/services/' + service.id} target='_blank'>
+                        <IconButton sx={{ }}>
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Link>
+                      <IconButton onClick={() => handleOpenService(service)} sx={{ }}><EditIcon /></IconButton>
+                      <IconButton sx={{ }}>
+                        <DeleteIcon onClick={() => deleteService(service.id)} />
+                      </IconButton>
+                  </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>}
     </Box>
   );
 }
