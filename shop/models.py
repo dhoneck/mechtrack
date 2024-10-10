@@ -257,3 +257,19 @@ class ServiceItem(models.Model):
             Labor Price: {self.labor_price}
             Total Price: {self.service_item_total()}
         '''
+
+
+class Vendor(models.Model):
+    """Vehicle model is a customer of the auto shop."""
+    vendor_name = models.CharField(max_length=50)
+    vendor_code = models.CharField(max_length=50)
+    phone = PhoneNumberField(blank=True, default='', unique=True)
+    email = models.EmailField(blank=True, default='', max_length=254)
+    website = models.CharField(blank=True, max_length=200)
+    notes = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        vendor = self.vendor_name
+        if self.vendor_code:
+            vendor += f' ({self.vendor_code})'
+        return vendor

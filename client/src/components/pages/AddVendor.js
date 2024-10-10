@@ -20,12 +20,11 @@ const style = {
 export default function AddVendor() {
   // Hold form values
   const [vendorName, setVendorName] = useState('');
+  const [vendorCode, setVendorCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
-  const [type, setType] = useState('');
   const [notes, setNotes] = useState('');
-  const [vendorCode, setVendorCode] = useState('');
 
 
   async function handleSubmit(event) {
@@ -43,11 +42,10 @@ export default function AddVendor() {
     let url = 'http://127.0.0.1:8000/api/vendors/'
     let values = {
       'vendor_name': vendorName,
-      'vendorCode': vendorCode,
+      'vendor_code': vendorCode,
       'phone_number': verifiedPhoneNumber,
       'email': email,
       'website': website,
-      'type': type,
       'notes': notes
     };
     console.log('Attempting to submit these values:');

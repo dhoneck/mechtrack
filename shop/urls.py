@@ -16,6 +16,8 @@ urlpatterns = [
     path('estimates/<int:pk>/', views.EstimateDetail.as_view()),
     path('estimate-items/', views.EstimateItemList.as_view()),
     path('estimate-items/<int:pk>/', views.EstimateItemDetail.as_view()),
+    path('vendors/', views.VendorList.as_view()),
+    path('vendors/<int:pk>/', views.VendorDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

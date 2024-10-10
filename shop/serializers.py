@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 
 
 class EstimateItemSerializer(serializers.ModelSerializer):
@@ -74,4 +74,11 @@ class CustomerVehicleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerVehicle
+        fields = '__all__'
+
+
+class VendorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Vendor
         fields = '__all__'

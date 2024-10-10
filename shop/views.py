@@ -4,9 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
+from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
-    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer
+    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer
 from .filters import ServiceFilter
 
 
@@ -192,3 +192,21 @@ def delete_by_filter(request):
         return Response(status=status.HTTP_204_NO_CONTENT)
     except CustomerVehicle.DoesNotExist:
         return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class VendorList(generics.ListCreateAPIView):
+    """
+    List all vendor, or create a new vendor.
+    """
+    queryset = Vendor.objects.all()
+    serializer_class = VendorSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['vendor_name', 'vendor_code']
+
+
+class VendorDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a vendor instance.
+    """
+    queryset = Vendor.objects.all()
+    serializer_class = VendorSerializer

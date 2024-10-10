@@ -10,7 +10,7 @@ import AddCustomer from './pages/AddCustomer';
 import AddVendor from './pages/AddVendor';
 import ViewCustomer from './pages/ViewCustomer';
 import ViewVehicle from './pages/ViewVehicle';
-// import ViewVendor from './pages/ViewVendor';
+import ViewVendor from './pages/ViewVendor';
 import ViewEstimate from './pages/ViewEstimate';
 import ViewService from './pages/ViewService';
 import PageNotFound from './pages/PageNotFound';
@@ -27,7 +27,7 @@ export default function App() {
         <Route path='customers/add' element={<AddCustomer />} />
         <Route path='customers/:id' element={<ViewCustomer />} />
         <Route path='vendors/add' element={<AddVendor />} />
-        {/*<Route path='vendors/:id' element={<ViewVendor />} />*/}
+        <Route path='vendors/:id' element={<ViewVendor />} />
         <Route path='vehicles/:id' element={<ViewVehicle />} />
         <Route path='estimates/:eid' element={<ViewEstimate />} />
         <Route path='services/:sid' element={<ViewService />} />

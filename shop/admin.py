@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem
+from .models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 
 
 class VehicleAdmin(admin.ModelAdmin):
@@ -63,8 +63,15 @@ class EstimateAdmin(admin.ModelAdmin):
     total_estimate_items.short_description = 'Number of Service Items'
 
 
+class VendorAdmin(admin.ModelAdmin):
+    all_fields = ('vendor_name', 'vendor_code', 'phone', 'email', 'website', 'notes',)
+    list_display = all_fields
+    search_fields = all_fields
+
+
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(CustomerVehicle, CustomerVehicleAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(Estimate, EstimateAdmin)
+admin.site.register(Vendor, VendorAdmin)
