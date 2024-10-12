@@ -10,6 +10,8 @@ urlpatterns = [
     path('customer-vehicle/', views.CustomerVehicleList.as_view()),
     path('customer-vehicle/<int:pk>/', views.CustomerVehicleDetail.as_view()),
     path('customer-vehicle/delete-by-filter/', views.delete_by_filter, name='delete_by_filter'),
+    path('export/customers/csv/', views.export_customers_csv, name='export_customers_csv'),
+    path('export/customers/pdf/', views.export_customers_pdf, name='export_customers_pdf'),
     path('services/', views.ServiceList.as_view()),
     path('services/<int:pk>/', views.ServiceDetail.as_view()),
     path('estimates/', views.EstimateList.as_view()),

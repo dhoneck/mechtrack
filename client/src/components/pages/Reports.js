@@ -16,9 +16,11 @@ import {useState} from 'react';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import axios from 'axios';
 
 import NavBar from '../layout/NavBar';
 import './Reports.css';
+import {Link} from "react-router-dom";
 
 /** Card template to store different steps in the report creation process  **/
 function ReportCard({ title, content }) {
@@ -92,7 +94,7 @@ export default function Reports() {
   };
 
   // Attempts to generate a report based on user input
-  const executeReport = () => {
+  const executeReport = async () => {
     console.log('Executing the report...');
     const reportValues = {
       'report': selectedReport,
@@ -101,7 +103,26 @@ export default function Reports() {
       'dateEnd': selectedDateEnd,
       'output': selectedOutput,
     }
-    console.log(reportValues);
+
+    // Handle sales breakdown report
+    // TODO: Make Axios call to get sales info
+
+    // Handle export report
+    let url = 'http://localhost:8000/api/export/'
+    if (reportValues.report === 'Customer Export') {
+      url += 'customers/';
+    } else if (reportValues.report === 'Vehicle Export') {
+      url += 'vehicles/';
+    } else if (reportValues.report === 'Service Export') {
+      url += 'services/';
+    }
+
+    if (reportValues.output === 'PDF') {
+      url += 'pdf/'
+    } else if (reportValues.output === 'CSV') {
+      url += 'csv/'
+    }
+    window.location.href = url;
   }
 
   // Date ranges for reports
@@ -212,7 +233,9 @@ export default function Reports() {
           variant='contained'
           sx={{ marginTop:'10px' }}
           onClick={executeReport}
-        >Execute</Button>
+        >
+          Execute
+        </Button>
       </FormControl>
     </>
   );
@@ -220,8 +243,8 @@ export default function Reports() {
   return (
     <Box>
       <Typography variant='h2' align='center'>Reports</Typography>
-      <NavBar active='Reports' />
-      <Box sx={{ display:'flex', justifyContent:'center', gap:'15px', flexWrap:'wrap' }}>
+      <NavBar active='Reports'/>
+      <Box sx={{display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap'}}>
         <ReportCard title='Step #1 - Pick Report' content={pickReport}></ReportCard>
         {!hideDateRangeStep && <ReportCard title='Step #2 - Pick Date Range' content={pickDateRange}></ReportCard>}
         <ReportCard title={outputStepTitle} content={pickOutput}></ReportCard>

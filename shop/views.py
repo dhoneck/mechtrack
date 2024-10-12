@@ -1,14 +1,20 @@
+import csv
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from datetime import datetime
+from reportlab.pdfgen import canvas
 
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
     EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer
 from .filters import ServiceFilter
 
+def generate_timestamp():
+    return datetime.now().strftime('%Y-%m-%d')
 
 class CustomerList(generics.ListCreateAPIView):
     """
@@ -26,6 +32,64 @@ class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+@api_view(['GET'])
+def export_customers_csv(request):
+    print('In the export_customers_csv function')
+
+    # Generate the timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d')
+
+    # Create a HttpResponse object with CSV headers
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="customer-export-{timestamp}.csv"'
+
+
+
+    writer = csv.writer(response)
+    writer.writerow(['First Name', 'Last Name', 'Phone', 'Email', 'Accepts Texts', 'Accepts Emails', 'Flagged', 'Notes', 'Vehicles'])
+
+    # Fetch data from the Customer model
+    customers = Customer.objects.all().values_list(
+        'first_name',
+        'last_name',
+        'phone',
+        'email',
+        'accepts_texts',
+        'accepts_emails',
+        'flagged',
+        'notes',
+        'vehicles',
+    )
+    for customer in customers:
+        writer.writerow(customer)
+
+    return response
+
+
+@api_view(['GET'])
+def export_customers_pdf(request):
+    # Create a HttpResponse object with PDF headers
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="customer-export-{generate_timestamp()}.pdf"'
+
+    # Create the PDF object
+    p = canvas.Canvas(response)
+    p.drawString(25, 800, f'Customer Export - {generate_timestamp()}')
+
+    # Fetch data from the Customer model
+    customers = Customer.objects.all()
+
+    y = 750  # Initial Y position
+    for customer in customers:
+        customerInfo = f'{customer.first_name} {customer.last_name} | {customer.phone} | {customer.email} | {customer.accepts_texts} | {customer.accepts_emails} | {customer.vehicles}'
+        p.drawString(25, y, customerInfo)
+        y -= 30  # Move the cursor down for each entry
+
+    p.showPage()
+    p.save()
+
+    return response
 
 
 class VehicleList(generics.ListCreateAPIView):
