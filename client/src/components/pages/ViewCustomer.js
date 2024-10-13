@@ -486,6 +486,7 @@ export default function ViewCustomer() {
           </Typography>
           <FormGroup>
             <Autocomplete
+              ListboxProps={{ style: { maxHeight: 250, overflow: 'auto' } }}
               sx={{ my: 2 }}
               id="free-solo-demo"
               options={vehicles.map((option) => option)}
@@ -511,6 +512,7 @@ export default function ViewCustomer() {
           </Typography>
           <FormGroup>
             <Autocomplete
+              ListboxProps={{ style: { maxHeight: 250, overflow: 'auto' } }}
               sx={{ my: 2 }}
               id="free-solo-demo"
               options={customerVehicles && customerVehicles.map((option) => option)}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import {
@@ -38,7 +38,9 @@ function CustomerSearch() {
   };
 
   async function searchCustomers(e) {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
 
     let searchQuery = document.getElementById('customer-query').value
 
@@ -63,6 +65,10 @@ function CustomerSearch() {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    searchCustomers(null);
+  }, []);
 
   return (
     <Box sx={{

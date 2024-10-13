@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import {
@@ -13,7 +13,7 @@ import {
   TableRow,
   Tooltip,
   TextField,
-  Typography
+  Typography, TablePagination, TableFooter
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -23,8 +23,23 @@ function VehicleSearch() {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState([]);
 
+  // Pagination handling
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   async function searchVehicles(e) {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
 
     let searchQuery = document.getElementById('vehicle-query').value
 
@@ -49,6 +64,10 @@ function VehicleSearch() {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    searchVehicles(null);
+  }, []);
 
   return (
     <Box sx={{
@@ -82,7 +101,9 @@ function VehicleSearch() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {result.map(vehicle => (
+              {result
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(vehicle => (
                 <TableRow key={vehicle.id}>
                   <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.make}</Link></TableCell>
                   <TableCell><Link to={'/vehicles/' + vehicle.id}>{vehicle.model}</Link></TableCell>
@@ -95,6 +116,24 @@ function VehicleSearch() {
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                count={result.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
+                  },
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableFooter>
           </Table>
         </TableContainer>
       </Box>

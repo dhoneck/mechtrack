@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import {
@@ -9,8 +9,8 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
+  TableContainer, TableFooter,
+  TableHead, TablePagination,
   TableRow,
   TextField,
   Typography
@@ -23,8 +23,23 @@ function VendorSearch() {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState([]);
 
+  // Pagination handling
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   async function searchVendors(e) {
-    e.preventDefault()
+    if (e) {
+      e.preventDefault()
+    }
 
     let searchQuery = document.getElementById('vendor-query').value
 
@@ -49,6 +64,10 @@ function VendorSearch() {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    searchVendors(null);
+  }, []);
 
   return (
     <Box sx={{
@@ -83,7 +102,9 @@ function VendorSearch() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {result.map(vendor => (
+              {result
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(vendor => (
                 <TableRow key={vendor.id}>
                   <TableCell><Link to={'/vendors/' + vendor.id}>{vendor.vendor_name}</Link></TableCell>
                   <TableCell><Link to={'/vendors/' + vendor.id}>{vendor.vendor_code ? vendor.vendor_code : '-'}</Link></TableCell>
@@ -93,6 +114,24 @@ function VendorSearch() {
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                count={result.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
+                  },
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableFooter>
           </Table>
         </TableContainer>
       </Box>
