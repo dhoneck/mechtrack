@@ -9,8 +9,9 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
+  TableContainer, TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Typography
@@ -22,6 +23,19 @@ import NavBar from '../layout/NavBar';
 function CustomerSearch() {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState([]);
+
+  // Pagination handling
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   async function searchCustomers(e) {
     e.preventDefault()
@@ -82,7 +96,9 @@ function CustomerSearch() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {result.map(customer => (
+              {result
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(customer => (
                 <TableRow key={customer.id}>
                   <TableCell><Link to={'/customers/' + customer.id}>{customer.first_name}</Link></TableCell>
                   <TableCell><Link to={'/customers/' + customer.id}>{customer.last_name}</Link></TableCell>
@@ -91,6 +107,24 @@ function CustomerSearch() {
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                count={result.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
+                  },
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableFooter>
           </Table>
         </TableContainer>
       </Box>
