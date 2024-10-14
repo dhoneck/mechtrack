@@ -36,7 +36,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   }
 
   // Set default service form values
-  const [dateTime, setDateTime] = useState(dayjs());
+  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0));
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
   const [services, setServices] = useState([]);
   const [scheduledServices, setScheduledServices] = useState([]);
@@ -72,6 +72,9 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     // Set date for schedule preview widget
     setPreviewDate(new Date(e));
 
+    // Update dateTime with the new date while preserving the time
+    setDateTime((prevDateTime) => dayjs(e).hour(prevDateTime.hour()).minute(prevDateTime.minute()));
+
     // Format date and endpoint URL
     let date = new Date(e);
     let dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -85,6 +88,11 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
       console.error(error);
     }
   }
+
+  const handleDateTimeChange = (e) => {
+    setDateTime(e);
+    setPreviewDate(new Date(e));
+  };
 
   /** Tracks which services are selected in the service option checkboxes */
   const handleCheckboxChange = (service) => (event) => {
@@ -169,7 +177,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                     label='Service Date & Time'
                     sx={{ mb: 1, width: '300px' }}
                     value={dateTime}
-                    onChange={(e) => setDateTime(e)}
+                    onChange={handleDateTimeChange}
                   />
               </LocalizationProvider>
               <FormControl sx={{ mb: 1, width: '300px' }}>
@@ -230,7 +238,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
               <LocalizationProvider dateAdapter={AdapterDayjs} sx={{marginTop:'0px'}}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
-                  defaultValue={dayjs(new Date())}
+                  value={dayjs(previewDate)}
                   onChange={(e)=> { handlePreview(e) }}
                   sx={{
                     '& .MuiPickersCalendarHeader-root': {

@@ -1,5 +1,5 @@
 import csv
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view
@@ -203,21 +203,24 @@ class EstimateList(generics.ListCreateAPIView):
         print('request.data')
         print(request.data)
 
-        vehicle_id = request.data.pop('vehicle_id')
-        estimate_items_data = request.data.pop('estimate_items')
+        try:
+            vehicle_id = request.data.pop('vehicle_id')
+            estimate_items_data = request.data.pop('estimate_items')
 
-        if not estimate_items_data:
-            return Response({'error': 'No estimate items'}, status=status.HTTP_400_BAD_REQUEST)
+            if not estimate_items_data:
+                return Response({'error': 'No estimate items'}, status=status.HTTP_400_BAD_REQUEST)
 
-        estimate = Estimate.objects.create(vehicle_id=vehicle_id, **request.data)
-        for item_data in estimate_items_data:
-            if item_data['part_price'] is None or item_data['part_price'] == '':
-                item_data['part_price'] = 0
-            if item_data['labor_price'] is None or item_data['labor_price'] == '':
-                item_data['labor_price'] = 0
-            EstimateItem.objects.create(estimate=estimate, **item_data)
-        serializer = self.get_serializer(estimate)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            estimate = Estimate.objects.create(vehicle_id=vehicle_id, **request.data)
+            for item_data in estimate_items_data:
+                if item_data['part_price'] is None or item_data['part_price'] == '':
+                    item_data['part_price'] = 0
+                if item_data['labor_price'] is None or item_data['labor_price'] == '':
+                    item_data['labor_price'] = 0
+                EstimateItem.objects.create(estimate=estimate, **item_data)
+            serializer = self.get_serializer(estimate)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 
 class EstimateDetail(generics.RetrieveUpdateDestroyAPIView):

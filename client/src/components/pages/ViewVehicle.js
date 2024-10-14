@@ -341,16 +341,18 @@ export default function ViewVehicle() {
       </Modal>
       {/* Modal end for editing vehicle */}
 
+      <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} estimate={editEstimate}/>
+
       <br/>
       <Box onClick={()=> setShowEstimates(!showEstimates)} sx={{cursor:'pointer'}}>
         {showEstimates && <Typography variant='h4'><strong>Estimates</strong> | <span style={{color:'gray'}}>Services</span></Typography>}
         {!showEstimates && <Typography variant='h4'><span style={{color:'gray'}}>Estimates</span> | <strong>Services</strong></Typography>}
         <br/>
       </Box>
+
       {/* Estimate modal and table display */}
       {showEstimates && <Box>
         <Button variant='outlined' onClick={() => handleOpenEstimate()}>Create Estimate</Button>
-        <EstimateModal open={openEstimate} handleClose={handleCloseEstimate} vehicleId={id} estimate={editEstimate}/>
 
         <br/>
         <br/>
@@ -396,15 +398,17 @@ export default function ViewVehicle() {
       </Box>}
 
       {/* Service modal and table display */}
-      {!showEstimates && <Box>
-        <Button variant='outlined' onClick={() => handleOpenService(null)} sx={{ mx: 1 }}>Schedule Services</Button>
-        <ServiceModal
+      <ServiceModal
           open={openService}
           handleClose={handleCloseService}
           vehicleId={vehicle.id}
           getVehicleInfo={getVehicleInfo}
           estimate={editEstimate}
-        ></ServiceModal>
+      />
+
+      {!showEstimates && <Box>
+        <Button variant='outlined' onClick={() => handleOpenService(null)} sx={{ mx: 1 }}>Schedule Services</Button>
+
         <br/>
         <br/>
         <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
