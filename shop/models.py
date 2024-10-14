@@ -165,7 +165,7 @@ class Service(models.Model):
         ('6 hrs', '6 hrs'),
         ('7 hrs', '7 hrs'),
         ('8 hrs', '8 hrs'),
-        ('1+ day', '1+ day')
+        ('1+ day', '1+ day'),
     )
 
     SERVICE_CHOICES = (
@@ -176,7 +176,18 @@ class Service(models.Model):
         ('Alignment', 'Alignment'),
         ('Transmission', 'Transmission'),
         ('Electrical systems', 'Electrical systems'),
-        ('Other', 'Other')
+        ('Other', 'Other'),
+    )
+
+    STATUS_CHOICES = (
+        ('Scheduled', 'Scheduled'),
+        ('In Progress', 'In Progress'),
+        ('Contact Customer - Approval', 'Contact Customer - Approval'),
+        ('Contact Customer - Pickup', 'Contact Customer - Pickup'),
+        ('Waiting on Pickup', 'Waiting on Pickup'),
+        ('Waiting on Parts', 'Waiting on Parts'),
+        ('Completed', 'Completed'),
+        ('Canceled', 'Canceled'),
     )
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
@@ -185,7 +196,7 @@ class Service(models.Model):
     internal_notes = models.TextField(blank=True, default='')
     customer_notes = models.TextField(blank=True, default='')
     mileage = models.PositiveIntegerField(blank=True, null=True)
-    completed = models.BooleanField(default=False)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=30, blank=False, default='Scheduled')
     estimate = models.ForeignKey(Estimate, related_name='service', on_delete=models.SET_NULL, blank=True, null=True)
 
     def service_items_str(self):

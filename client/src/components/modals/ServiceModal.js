@@ -36,7 +36,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   }
 
   // Set default service form values
-  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0));
+  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
   const [services, setServices] = useState([]);
   const [scheduledServices, setScheduledServices] = useState([]);
@@ -248,22 +248,22 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                 />
               </LocalizationProvider>
               <Typography textAlign='center' variant='h6'>Scheduled Services</Typography>
-              <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
-                <Table size={'small'}>
+              <TableContainer container={Paper} sx={{ textAlign: 'center', maxHeight: 300, overflow: 'auto' }}>
+                <Table size='small'>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Drop Off</TableCell>
-                      <TableCell>Estimated Time</TableCell>
-                      <TableCell>Description</TableCell>
+                      <TableCell sx={{ padding: '8px 3px' }}>Drop Off</TableCell>
+                      <TableCell sx={{ padding: '8px 3px' }}>Estimated Time</TableCell>
+                      <TableCell sx={{ padding: '8px 3px' }}>Description</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                   {scheduledServices && scheduledServices.length > 0 ? (
                     scheduledServices.map(service => (
                       <TableRow key={service.id}>
-                        <TableCell>{new Date(service.datetime).toLocaleString()}</TableCell>
-                        <TableCell>{service.estimated_time}</TableCell>
-                        <TableCell>{service.services}</TableCell>
+                        <TableCell sx={{ padding: '8px 3px' }}>{new Date(service.datetime).toLocaleString([], { hour: '2-digit', minute: '2-digit', year: 'numeric', month: 'numeric', day: 'numeric' })}</TableCell>
+                        <TableCell sx={{ padding: '8px 3px' }}>{service.estimated_time}</TableCell>
+                        <TableCell sx={{ padding: '8px 3px' }}>{service.service_items_str}</TableCell>
                       </TableRow>
                     ))
                   ) : (

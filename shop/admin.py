@@ -25,7 +25,7 @@ class ServiceItemInline(admin.TabularInline):
 
 
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'datetime', 'estimated_time', 'internal_notes', 'customer_notes', 'mileage', 'completed',)
+    list_display = ('vehicle', 'datetime', 'estimated_time', 'internal_notes', 'customer_notes', 'mileage', 'status',)
     inlines = [ServiceItemInline]
 
     def service_items(self, obj):
