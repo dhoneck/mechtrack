@@ -20,6 +20,7 @@ urlpatterns = [
     path('estimate-items/<int:pk>/', views.EstimateItemDetail.as_view()),
     path('vendors/', views.VendorList.as_view()),
     path('vendors/<int:pk>/', views.VendorDetail.as_view()),
+    path('status-choices/', views.get_status_choices, name='status-choices')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

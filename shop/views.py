@@ -16,6 +16,13 @@ from .filters import ServiceFilter
 def generate_timestamp():
     return datetime.now().strftime('%Y-%m-%d')
 
+@api_view(['GET'])
+def get_status_choices(request):
+    print('In the get_status_choices function')
+    choices = Service.STATUS_CHOICES
+    print(choices)
+    return Response(choices)
+
 class CustomerList(generics.ListCreateAPIView):
     """
     List all customers, or create a new customer.

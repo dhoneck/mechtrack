@@ -43,9 +43,11 @@ export default function ViewVehicle() {
 
   // Track modal state for the add service modal
   const [openService, setOpenService] = useState(false);
-  const handleOpenService = (estimate = null) => {
+  const handleOpenService = (estimate = null, service = null) => {
     console.log('Estimate in handleOpenService');
     console.log(estimate);
+    console.log('Service in handleOpenService');
+    console.log(service);
     setEditEstimate(estimate);
     setOpenService(true);
   }
@@ -439,7 +441,7 @@ export default function ViewVehicle() {
                           <VisibilityIcon />
                         </IconButton>
                       </Link>
-                      <IconButton onClick={() => handleOpenService(service)} sx={{ }}><EditIcon /></IconButton>
+                      <IconButton onClick={() => handleOpenService(null, service)} sx={{ }}><EditIcon /></IconButton>
                       <IconButton sx={{ }}>
                         <DeleteIcon onClick={() => deleteService(service.id)} />
                       </IconButton>

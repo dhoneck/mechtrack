@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -29,21 +29,49 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {StaticDatePicker} from '@mui/x-date-pickers/StaticDatePicker';
 
 /** A modal form for scheduling auto service work */
-function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null }) {
+function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null, serviceId=null }) {
+  // Log if optional estimate was passed to service form
   if (estimate) {
     console.log('Estimate passed to service form:');
     console.log(estimate);
   }
 
-  // Set default service form values
+  // Set default service form values for new services
   const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
   const [estimatedTime, setEstimatedTime] = useState('1 hr');
   const [services, setServices] = useState([]);
   const [scheduledServices, setScheduledServices] = useState([]);
   const [customerNotes, setCustomerNotes] = useState('');
 
+  // Extra values for existing services
+  const [service, setService] = useState(null);
+  const [status, setStatus] = useState(service ? service.status : 'Scheduled');
+  const [internalNotes, setInternalNotes] = useState(service ? service.internal_notes : '');
+  const [mileage, setMileage] = useState(service ? service.mileage : null);
+  const [serviceItems, setServiceItems] = useState(service ? service.items : []);
+  const [statusChoices, setStatusChoices] = useState([]);
+
   // Track date being used in schedule preview widget
   const [previewDate, setPreviewDate] = useState(new Date());
+
+  // Define functions to handle form changes
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
+  };
+
+  const handleInternalNotesChange = (event) => {
+    setInternalNotes(event.target.value);
+  };
+
+  const handleMileageChange = (event) => {
+    setMileage(event.target.value);
+  };
+
+  const handleServiceItemChange = (index, field, value) => {
+    const updatedItems = [...serviceItems];
+    updatedItems[index][field] = value;
+    setServiceItems(updatedItems);
+  };
 
   // Define available services
   let serviceOptions = [];
@@ -104,8 +132,27 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   };
 
    /** Make POST request to add new service for a vehicle */
-  const scheduleServices = async () => {
+  const handleSubmit = async () => {
     console.log('Attempting to schedule service');
+
+    // const serviceData = {
+    //   dateTime,
+    //   estimatedTime,
+    //   services,
+    //   customerNotes,
+    //   status,
+    //   internalNotes,
+    //   mileage,
+    //   items: serviceItems,
+    // };
+
+    // if (service) {
+    //   // Update existing service
+    //   updateService(service.id, serviceData);
+    // } else {
+    //   // Create new service
+    //   createService(serviceData);
+    // }
 
     // Combine 'Schedule Service' form values to use in POST request
     let values = {
@@ -141,6 +188,62 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     }
   }
 
+  async function getService() {
+    console.log('Getting service');
+    try {
+      let url = `http://127.0.0.1:8000/api/services/${serviceId}/`;
+
+      await axios.get(url)
+        .then(function (response) {
+          console.log('Service grabbed:');
+          console.log(response.data);
+
+          // Refresh vehicle info
+          setService(response.data);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // async function updateService(serviceId, serviceData) {
+  //   console.log('Getting service');
+  //   try {
+  //     let url = `http://127.0.0.1:8000/api/services/${serviceId}/`;
+  //
+  //     await axios.put(url, data)
+  //       .then(function (response) {
+  //         console.log('Service grabbed:');
+  //         console.log(response.data);
+  //
+  //         // Refresh vehicle info
+  //         setService(response.data);
+  //       });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
+  useEffect(() => {
+    // If serviceId was passed then get the service
+    if (serviceId) {
+      getService();
+    }
+
+    async function fetchStatusChoices() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/status-choices/');
+        setStatusChoices(response.data);
+        console.log('Status choices');
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching status choices:', error);
+      }
+    }
+
+    fetchStatusChoices();
+  }, []);
+
 
   // Define modal style
   const style = {
@@ -175,12 +278,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                   <DateTimePicker
                     timeSteps={{ minutes: 15 }}
                     label='Service Date & Time'
-                    sx={{ mb: 1, width: '300px' }}
+                    sx={{ mb: 1, width: '100%' }}
                     value={dateTime}
                     onChange={handleDateTimeChange}
                   />
               </LocalizationProvider>
-              <FormControl sx={{ mb: 1, width: '300px' }}>
+              <FormControl sx={{ mb: 1, width: '100%' }}>
                 <InputLabel id='demo-simple-select-label'>Estimated Time</InputLabel>
                 <Select
                   sx={{display: 'block'}}
@@ -231,7 +334,77 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                 onChange={(e) => setCustomerNotes(e.target.value)}
                 sx={{ mb: 1 }}
               />
-              <Button variant='contained' onClick={scheduleServices}>Submit</Button>
+
+              {/* New fields */}
+              <TextField
+                id='internal-notes'
+                label='Internal Notes'
+                variant='outlined'
+                multiline
+                rows={4}
+                fullWidth
+                value={internalNotes}
+                onChange={handleInternalNotesChange}
+                sx={{ mb: 1 }}
+              />
+
+              <TextField
+                id='mileage'
+                label='Mileage'
+                variant='outlined'
+                fullWidth
+                value={mileage}
+                onChange={handleMileageChange}
+                sx={{ mb: 1 }}
+              />
+
+              <FormControl fullWidth sx={{ mb: 1 }}>
+                <InputLabel id='status-select-label'>Status</InputLabel>
+                <Select
+                  labelId='status-select-label'
+                  id='status-select'
+                  value={status}
+                  label='Status'
+                  onChange={handleStatusChange}
+                >
+                  {statusChoices.map((statusOption) => (
+                    <MenuItem key={statusOption[0]} value={statusOption[0]}>
+                      {statusOption[1]}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <br />
+              {serviceItems.map((item, index) => (
+              <Box key={index} sx={{ mb: 1 }}>
+                <TextField
+                  label='Description'
+                  variant='outlined'
+                  fullWidth
+                  value={item.description}
+                  onChange={(e) => handleServiceItemChange(index, 'description', e.target.value)}
+                  sx={{ mb: 1 }}
+                />
+                <TextField
+                  label='Part Price'
+                  variant='outlined'
+                  fullWidth
+                  value={item.part_price}
+                  onChange={(e) => handleServiceItemChange(index, 'part_price', e.target.value)}
+                  sx={{ mb: 1 }}
+                />
+                <TextField
+                  label='Labor Price'
+                  variant='outlined'
+                  fullWidth
+                  value={item.labor_price}
+                  onChange={(e) => handleServiceItemChange(index, 'labor_price', e.target.value)}
+                  sx={{ mb: 1 }}
+                />
+              </Box>
+                ))}
+              <Button variant='contained' onClick={handleSubmit}>Submit</Button>
             </Box>
             <Box sx={{flex: '5'}}>
               <Typography textAlign='center' variant='h6' sx={{marginBottom: '15px'}}>Preview Schedule</Typography>
