@@ -181,6 +181,8 @@ class Service(models.Model):
 
     STATUS_CHOICES = (
         ('Scheduled', 'Scheduled'),
+        ('Waiting for vehicle', 'Waiting for vehicle'),
+        ('Vehicle ready for repair', 'Vehicle ready for repair'),
         ('In Progress', 'In Progress'),
         ('Contact Customer - Approval', 'Contact Customer - Approval'),
         ('Contact Customer - Pickup', 'Contact Customer - Pickup'),

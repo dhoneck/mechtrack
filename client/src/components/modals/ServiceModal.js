@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -9,7 +10,7 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
-  Grid,
+  Grid, IconButton, InputAdornment,
   InputLabel,
   MenuItem,
   Modal,
@@ -27,39 +28,86 @@ import {
 import {DateTimePicker, LocalizationProvider,} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {StaticDatePicker} from '@mui/x-date-pickers/StaticDatePicker';
+import {AddCircleOutline, RemoveCircleOutline} from "@mui/icons-material";
 
 /** A modal form for scheduling auto service work */
 function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null, serviceId=null }) {
-  // Log if optional estimate was passed to service form
-  if (estimate) {
-    console.log('Estimate passed to service form:');
-    console.log(estimate);
-  }
 
-  // Set default service form values for new services
-  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
-  const [estimatedTime, setEstimatedTime] = useState('1 hr');
-  const [services, setServices] = useState([]);
-  const [scheduledServices, setScheduledServices] = useState([]);
-  const [customerNotes, setCustomerNotes] = useState('');
+  // Store existing service, if exists
+  const [serviceToEdit, setServiceToEdit] = useState(null);
 
-  // Extra values for existing services
-  const [service, setService] = useState(null);
-  const [status, setStatus] = useState(service ? service.status : 'Scheduled');
-  const [internalNotes, setInternalNotes] = useState(service ? service.internal_notes : '');
-  const [mileage, setMileage] = useState(service ? service.mileage : null);
-  const [serviceItems, setServiceItems] = useState(service ? service.items : []);
+  // Store status choices for status dropdown
   const [statusChoices, setStatusChoices] = useState([]);
 
-  // Track date being used in schedule preview widget
+  // Default service form values
+  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
+  const [estimatedTime, setEstimatedTime] = useState('1 hr');
+  const [services, setServices] = useState([{ id: null, description: '', part_price: '', labor_price: '' }]);
+  const [customerNotes, setCustomerNotes] = useState('');
+  const [internalNotes, setInternalNotes] = useState('');
+  const [mileage, setMileage] = useState(null);
+  const [status, setStatus] = useState('Scheduled');
+
+
+  // Store date being used in schedule preview widget
   const [previewDate, setPreviewDate] = useState(new Date());
 
+  // Store services scheduled happening on preview date
+  const [scheduledServices, setScheduledServices] = useState([]);
+
   // Define functions to handle form changes
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
+  const handleDateTimeChange = (e) => {
+      setDateTime(e);
+      setPreviewDate(new Date(e));
+    };
+
+  const handleEstimatedTimeChange = (event) => {
+    setEstimatedTime(event.target.value);
+  };
+  
+  const handleAddService = () => setServices([...services, { id: null, description: '', part_price: '', labor_price: '' }]);
+
+  const handleRemoveService = (index, id) => {
+    if (services.length === 1) return;  // Ensure at least one service exists
+    // Remove the service and reset services useState
+    const newServices = [...services];
+    newServices.splice(index, 1);
+    setServices(newServices);
+
+    // Add service item id to array that will be deleted upon form submission
+    // An id means that it's an existing service item and will need to be deleted with a DELETE request, hence tracking
+    // No id means that the service doesn't already exist and doesn't need a DELETE request
+    if (id) {
+      setItemsToDelete([...itemsToDelete, id]);
+    }
+  };
+
+  // Store an array of service item IDs that need to be deleted
+  const [itemsToDelete, setItemsToDelete] = useState([]);
+
+  const handleDescriptionChange = (index, value) => {
+    const newServices = [...services];
+    newServices[index].description = value;
+    setServices(newServices);
+  };
+
+  const handlePartPriceChange = (index, value) => {
+    const newServices = [...services];
+    newServices[index].part_price = value;
+    setServices(newServices);
+  };
+
+  const handleLaborPriceChange = (index, value) => {
+    const newServices = [...services];
+    newServices[index].labor_price = value;
+    setServices(newServices);
   };
 
   const handleInternalNotesChange = (event) => {
+    setInternalNotes(event.target.value);
+  };
+
+  const handleCustomerNotesChange = (event) => {
     setInternalNotes(event.target.value);
   };
 
@@ -67,33 +115,9 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     setMileage(event.target.value);
   };
 
-  const handleServiceItemChange = (index, field, value) => {
-    const updatedItems = [...serviceItems];
-    updatedItems[index][field] = value;
-    setServiceItems(updatedItems);
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
   };
-
-  // Define available services
-  let serviceOptions = [];
-  if (estimate) {  // Add service options matching a quote
-    for (const item of estimate.estimate_items) {
-      console.log('item');
-      console.log(item);
-      serviceOptions.push(
-        { description: item.description, part_price: item.part_price, labor_price: item.labor_price });
-    }
-  } else {  // Add default service options
-    serviceOptions = [
-      { description: 'Oil lube and filter', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Diagnostic', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Tire rotation', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Brake replacement', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Alignment', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Transmission', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Electrical systems', part_price: 0.00, labor_price: 0.00 },
-      { description: 'Other', part_price: 0.00, labor_price: 0.00 },
-    ];
-  }
 
   /** Searches for services on a particular date */
   const handlePreview = async (e) => {
@@ -117,20 +141,6 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     }
   }
 
-  const handleDateTimeChange = (e) => {
-    setDateTime(e);
-    setPreviewDate(new Date(e));
-  };
-
-  /** Tracks which services are selected in the service option checkboxes */
-  const handleCheckboxChange = (service) => (event) => {
-    if (event.target.checked) {
-      setServices([...services, { description: service.description, part_price: 0.00, labor_price: 0.00 }]);
-    } else {
-      setServices(services.filter((item) => item.description !== service.description));
-    }
-  };
-
    /** Make POST request to add new service for a vehicle */
   const handleSubmit = async () => {
     console.log('Attempting to schedule service');
@@ -146,13 +156,6 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     //   items: serviceItems,
     // };
 
-    // if (service) {
-    //   // Update existing service
-    //   updateService(service.id, serviceData);
-    // } else {
-    //   // Create new service
-    //   createService(serviceData);
-    // }
 
     // Combine 'Schedule Service' form values to use in POST request
     let values = {
@@ -188,6 +191,16 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     }
   }
 
+  function setFormValues() {
+      setDateTime(dayjs(serviceToEdit.datetime));
+      setEstimatedTime(serviceToEdit.estimated_time);
+      setServices(serviceToEdit.service_items);
+      setCustomerNotes(serviceToEdit.customer_notes);
+      setInternalNotes(serviceToEdit.internal_notes);
+      setMileage(serviceToEdit.mileage);
+      setStatus(serviceToEdit.status);
+  }
+
   async function getService() {
     console.log('Getting service');
     try {
@@ -199,34 +212,28 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
           console.log(response.data);
 
           // Refresh vehicle info
-          setService(response.data);
+          setServiceToEdit(response.data);
+
+          setFormValues();
         });
     } catch (error) {
       console.error(error);
     }
   }
 
-  // async function updateService(serviceId, serviceData) {
-  //   console.log('Getting service');
-  //   try {
-  //     let url = `http://127.0.0.1:8000/api/services/${serviceId}/`;
-  //
-  //     await axios.put(url, data)
-  //       .then(function (response) {
-  //         console.log('Service grabbed:');
-  //         console.log(response.data);
-  //
-  //         // Refresh vehicle info
-  //         setService(response.data);
-  //       });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
   useEffect(() => {
+    console.log('In useEffect');
+    // Assign estimate items to service items if an estimate was passed
+    if (estimate) {
+      console.log('An estimate was passed to service form as a template:');
+      console.log(estimate);
+
+      setServices(estimate.estimate_items);
+    }
+
     // If serviceId was passed then get the service
     if (serviceId) {
+      console.log('Service ID was passed');
       getService();
     }
 
@@ -234,8 +241,6 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/status-choices/');
         setStatusChoices(response.data);
-        console.log('Status choices');
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching status choices:', error);
       }
@@ -244,14 +249,13 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     fetchStatusChoices();
   }, []);
 
-
   // Define modal style
   const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '1000px',
+    width: '1100px',
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -272,6 +276,8 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
             {estimate ? 'Schedule Service From Estimate' : 'Schedule Service'}
           </Typography>
           <FormGroup sx={{display: 'flex', flexDirection: 'row', gap: '20px' }}>
+
+            {/* Service Details Section */}
             <Box sx={{flex: '4'}}>
               <Typography variant='h6' sx={{marginBottom: '15px'}}>Service Details</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
@@ -291,7 +297,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                   id='demo-simple-select'
                   value={estimatedTime}
                   label='Estimated Time'
-                  onChange={(e) => setEstimatedTime(e.target.value)}
+                  onChange={handleEstimatedTimeChange}
                 >
                   <MenuItem value={'1 hr'}>1 hr</MenuItem>
                   <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
@@ -305,33 +311,46 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                 </Select>
               </FormControl>
               <Typography variant='h6'>Services</Typography>
-              <Grid container>
-                {serviceOptions.map((serviceOption, index) => (
-                  <Grid item xs={estimate ? 12 : 6} key={index}>
-                    <FormControlLabel
-                      key={index}
-                      control={
-                        <Checkbox
-                          checked={services.some((s1) => s1.description === serviceOption.description)}
-                          onChange={handleCheckboxChange(serviceOption)}
-                          color='primary'
-                        />
-                      }
-                      label={serviceOption.description}
-                    />
-                  </Grid>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                <Typography display="inline" sx={{ flexGrow: 1 }}>Description</Typography>
+                <Typography display="inline" sx={{ width: '125px' }}>Part Price</Typography>
+                <Typography display="inline" sx={{ width: '125px' }}>Labor Price</Typography>
+                <Typography display="inline" sx={{ width: '40px' }}></Typography>
+              </Box>
+              {services.map((row, index) => (
+                <Box key={index} data-id={row.id} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
+                  <TextField sx={{ flexGrow: 1 }} value={row.description} onChange={(e) => handleDescriptionChange(index, e.target.value)} />
+                  <TextField
+                    sx={{ width: '125px' }}
+                    value={row.part_price}
+                    onChange={(e) => handlePartPriceChange(index, e.target.value)}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    }}
+                  /><TextField
+                    sx={{ width: '125px' }}
+                    value={row.labor_price}
+                    onChange={(e) => handleLaborPriceChange(index, e.target.value)}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    }}
+                  />
+                  <IconButton onClick={() => handleRemoveService(index, row.id)} disabled={services.length === 1}>
+                    <RemoveCircleOutline />
+                  </IconButton>
+                </Box>
                 ))}
-              </Grid>
+                <Button onClick={handleAddService} startIcon={<AddCircleOutline />}>Add Item</Button>
 
               <TextField
                 id='customer-notes'
                 label='Customer Notes'
                 variant='outlined'
                 multiline
-                rows={4}
+                rows={3}
                 fullWidth
                 value={customerNotes}
-                onChange={(e) => setCustomerNotes(e.target.value)}
+                onChange={handleCustomerNotesChange}
                 sx={{ mb: 1 }}
               />
 
@@ -341,7 +360,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                 label='Internal Notes'
                 variant='outlined'
                 multiline
-                rows={4}
+                rows={3}
                 fullWidth
                 value={internalNotes}
                 onChange={handleInternalNotesChange}
@@ -374,45 +393,19 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                   ))}
                 </Select>
               </FormControl>
-
               <br />
-              {serviceItems.map((item, index) => (
-              <Box key={index} sx={{ mb: 1 }}>
-                <TextField
-                  label='Description'
-                  variant='outlined'
-                  fullWidth
-                  value={item.description}
-                  onChange={(e) => handleServiceItemChange(index, 'description', e.target.value)}
-                  sx={{ mb: 1 }}
-                />
-                <TextField
-                  label='Part Price'
-                  variant='outlined'
-                  fullWidth
-                  value={item.part_price}
-                  onChange={(e) => handleServiceItemChange(index, 'part_price', e.target.value)}
-                  sx={{ mb: 1 }}
-                />
-                <TextField
-                  label='Labor Price'
-                  variant='outlined'
-                  fullWidth
-                  value={item.labor_price}
-                  onChange={(e) => handleServiceItemChange(index, 'labor_price', e.target.value)}
-                  sx={{ mb: 1 }}
-                />
-              </Box>
-                ))}
               <Button variant='contained' onClick={handleSubmit}>Submit</Button>
             </Box>
+            {/* End of service details section */}
+
+            {/* Schedule Preview Section */}
             <Box sx={{flex: '5'}}>
               <Typography textAlign='center' variant='h6' sx={{marginBottom: '15px'}}>Preview Schedule</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs} sx={{marginTop:'0px'}}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
                   value={dayjs(previewDate)}
-                  onChange={(e)=> { handlePreview(e) }}
+                  onChange={handlePreview}
                   sx={{
                     '& .MuiPickersCalendarHeader-root': {
                       marginTop: 0,
@@ -448,6 +441,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                 </Table>
               </TableContainer>
             </Box>
+            {/* End of schedule preview section  */}
           </FormGroup>
         </Box>
       </Modal>
