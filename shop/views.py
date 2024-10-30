@@ -2,9 +2,12 @@ import csv
 from django.http import HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.permissions import IsAuthenticated
+
 from datetime import datetime
 from reportlab.pdfgen import canvas
 
@@ -15,6 +18,11 @@ from .filters import ServiceFilter
 
 def generate_timestamp():
     return datetime.now().strftime('%Y-%m-%d')
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def protected_view(request):
+    return Response({"message": "This is a protected view"}, status=200)
 
 @api_view(['GET'])
 def get_status_choices(request):

@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from .models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from .models import Business, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+
+
+class BusinessAdmin(admin.ModelAdmin):
+    all_fields = ('name', 'address', 'phone', 'email', 'website')
+
+
+class CustomUserAdmin(admin.ModelAdmin):
+    all_fields = ('business', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',)
+    list_display = all_fields
+    search_fields = all_fields
 
 
 class VehicleAdmin(admin.ModelAdmin):
@@ -69,6 +79,8 @@ class VendorAdmin(admin.ModelAdmin):
     search_fields = all_fields
 
 
+admin.site.register(Business, BusinessAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(CustomerVehicle, CustomerVehicleAdmin)

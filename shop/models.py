@@ -8,47 +8,29 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Business(models.Model):
     """Business model is the main business entity."""
     name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class Branch(models.Model):
-    """Branch model is a location of the business."""
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='branches')
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True, default='')
     website = models.URLField(blank=True, default='')
 
+    class Meta:
+        verbose_name_plural = 'Businesses'
+
     def __str__(self):
-        return f'{self.business.name} - {self.address}'
+        return self.name
 
 
 class CustomUser(AbstractUser):
     """CustomUser model is a staff member of the auto shop."""
-    phone = PhoneNumberField(blank=True, default='', unique=True)
-    email = models.EmailField(blank=True, default='', max_length=254)
-    branches = models.ManyToManyField('Branch', through='UserBranch', related_name='users')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, blank=True, null=True, related_name='users')
 
     def __str__(self):
         return self.username
-#
-#
-class UserBranch(models.Model):
-    """UserBranch model joins users and branches to show staff location."""
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('user', 'branch')
-
-    def __str__(self):
-        return f'{self.user.username} - {self.branch.address}'
 
 
 class Vehicle(models.Model):
     """Vehicle model is a vehicle being worked on by an auto shop."""
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='vehicles')
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField(blank=True, null=True)
@@ -89,6 +71,7 @@ class Vehicle(models.Model):
 
 class Customer(models.Model):
     """Customer model is a customer of the auto shop."""
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='customers')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)
@@ -118,6 +101,7 @@ class CustomerVehicle(models.Model):
 
 class Estimate(models.Model):
     """Estimate model is unscheduled vehicle work."""
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='estimates')
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='estimates')
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -235,6 +219,7 @@ class Service(models.Model):
         ('Canceled', 'Canceled'),
     )
 
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='services')
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='services')
     datetime = models.DateTimeField()
     estimated_time = models.CharField(choices=TIME_CHOICES, max_length=30, blank=True, default='')
@@ -317,6 +302,7 @@ class ServiceItem(models.Model):
 
 class Vendor(models.Model):
     """Vehicle model is a customer of the auto shop."""
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='vendors')
     vendor_name = models.CharField(max_length=50)
     vendor_code = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)

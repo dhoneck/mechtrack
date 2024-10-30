@@ -1,5 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from shop import views
 
 urlpatterns = [
@@ -20,7 +22,10 @@ urlpatterns = [
     path('estimate-items/<int:pk>/', views.EstimateItemDetail.as_view()),
     path('vendors/', views.VendorList.as_view()),
     path('vendors/<int:pk>/', views.VendorDetail.as_view()),
-    path('status-choices/', views.get_status_choices, name='status-choices')
+    path('status-choices/', views.get_status_choices, name='status-choices'),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('protected/', views.protected_view, name='protected'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
