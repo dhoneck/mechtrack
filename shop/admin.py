@@ -5,6 +5,8 @@ from .models import Business, CustomUser, Vehicle, Customer, CustomerVehicle, Se
 
 class BusinessAdmin(admin.ModelAdmin):
     all_fields = ('name', 'address', 'phone', 'email', 'website')
+    list_display = all_fields
+    search_fields = all_fields
 
 
 class CustomUserAdmin(admin.ModelAdmin):

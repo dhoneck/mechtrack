@@ -1,6 +1,8 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
+import PrivateRoute from './auth/PrivateRoute';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import Vehicles from './pages/Vehicles';
@@ -19,19 +21,23 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<Dashboard />} />
-        <Route path='customers' element={<Customers />} />
-        <Route path='vehicles' element={<Vehicles />} />
-        <Route path='vendors' element={<Vendors />} />
-        <Route path='reports' element={<Reports />} />
-        <Route path='customers/add' element={<AddCustomer />} />
-        <Route path='customers/:id' element={<ViewCustomer />} />
-        <Route path='vendors/add' element={<AddVendor />} />
-        <Route path='vendors/:id' element={<ViewVendor />} />
-        <Route path='vehicles/:id' element={<ViewVehicle />} />
-        <Route path='estimates/:eid' element={<ViewEstimate />} />
-        <Route path='services/:sid' element={<ViewService />} />
-        <Route path='*' element={<PageNotFound />} />
+        <Route path='login' element={<Login />} />
+        <Route element={<PrivateRoute />}>
+          <Route index element={<Dashboard />} />
+          <Route path='customers' element={<Customers />} />
+          <Route path='vehicles' element={<Vehicles />} />
+          <Route path='vendors' element={<Vendors />} />
+          <Route path='reports' element={<Reports />} />
+          <Route path='customers/add' element={<AddCustomer />} />
+          <Route path='customers/:id' element={<ViewCustomer />} />
+          <Route path='vendors/add' element={<AddVendor />} />
+          <Route path='vendors/:id' element={<ViewVendor />} />
+          <Route path='vehicles/:id' element={<ViewVehicle />} />
+          <Route path='estimates/:eid' element={<ViewEstimate />} />
+          <Route path='services/:sid' element={<ViewService />} />
+          <Route path='*' element={<PageNotFound />} />
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );
