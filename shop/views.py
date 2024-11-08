@@ -5,8 +5,6 @@ from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from rest_framework.permissions import IsAuthenticated
 
 from datetime import datetime
 from reportlab.pdfgen import canvas
@@ -19,10 +17,11 @@ from .filters import ServiceFilter
 def generate_timestamp():
     return datetime.now().strftime('%Y-%m-%d')
 
+
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def protected_view(request):
     return Response({"message": "This is a protected view"}, status=200)
+
 
 @api_view(['GET'])
 def get_status_choices(request):
@@ -30,6 +29,7 @@ def get_status_choices(request):
     choices = Service.STATUS_CHOICES
     print(choices)
     return Response(choices)
+
 
 class CustomerList(generics.ListCreateAPIView):
     """
@@ -39,7 +39,7 @@ class CustomerList(generics.ListCreateAPIView):
     serializer_class = CustomerSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['first_name', 'last_name', 'phone']
-
+    # permission_classes = [IsAuthenticatedAndRedirect]
 
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -58,8 +58,6 @@ def export_customers_csv(request):
     # Create a HttpResponse object with CSV headers
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="customer-export-{timestamp}.csv"'
-
-
 
     writer = csv.writer(response)
     writer.writerow(['First Name', 'Last Name', 'Phone', 'Email', 'Accepts Texts', 'Accepts Emails', 'Flagged', 'Notes', 'Vehicles'])
