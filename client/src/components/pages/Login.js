@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box, Typography, TextField, Button, Alert } from '@mui/material';
 import axios from 'axios';
 
 const Login = () => {
@@ -24,31 +25,34 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <Box sx={{ textAlign: 'center', maxWidth: 400, margin: 'auto', mt: 5 }}>
+      <Typography variant='h4' gutterBottom>Login</Typography>
       <form onSubmit={handleLogin}>
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Login</button>
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <TextField
+          label="Password"
+          variant="outlined"
+          type="password"
+          fullWidth
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+          Login
+        </Button>
       </form>
-    </div>
+    </Box>
   );
 };
 
