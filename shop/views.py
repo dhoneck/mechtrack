@@ -39,7 +39,6 @@ class CustomerList(generics.ListCreateAPIView):
     serializer_class = CustomerSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['first_name', 'last_name', 'phone']
-    # permission_classes = [IsAuthenticatedAndRedirect]
 
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     """

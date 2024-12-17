@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Alert } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ const Login = () => {
       localStorage.setItem('token', token);
 
       // Redirect to a protected route or perform other actions
-      window.location.href = '/';
+      navigate('/');
     } catch (err) {
       setError('Invalid username or password');
     }

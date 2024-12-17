@@ -55,7 +55,12 @@ function VehicleSearch() {
       let encodedParam = encodeURIComponent(searchQuery)
       let url = 'http://127.0.0.1:8000/api/vehicles/?search=' + encodedParam
       console.log(`API URL: ${url}`)
-      const response = await axios.get(url);
+      // Do Axios GET request with bearer token
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       console.log('Response:');
       console.log(response.data);
       setResult(response.data)
