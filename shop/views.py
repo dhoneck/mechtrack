@@ -5,13 +5,14 @@ from rest_framework import filters, generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from datetime import datetime
 from reportlab.pdfgen import canvas
 
 from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
-    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer
+    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer,CustomTokenObtainPairSerializer
 from .filters import ServiceFilter
 
 def generate_timestamp():
@@ -29,6 +30,10 @@ def get_status_choices(request):
     choices = Service.STATUS_CHOICES
     print(choices)
     return Response(choices)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 class CustomerList(generics.ListCreateAPIView):

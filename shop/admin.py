@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import Business, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class BusinessAdmin(admin.ModelAdmin):
@@ -9,10 +11,31 @@ class BusinessAdmin(admin.ModelAdmin):
     search_fields = all_fields
 
 
-class CustomUserAdmin(admin.ModelAdmin):
-    all_fields = ('business', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active',)
-    list_display = all_fields
-    search_fields = all_fields
+class CustomUserAdmin(BaseUserAdmin):
+    form = CustomUserChangeForm
+    add_form = CustomUserCreationForm
+
+    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_superuser')
+    list_filter = ('is_staff', 'is_superuser')
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'first_name', 'last_name', 'password1', 'password2'),
+        }),
+    )
+    search_fields = ('email',)
+    ordering = ('email',)
+    filter_horizontal = ()
+
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data.get('password'):
+            obj.set_password(form.cleaned_data['password'])
+        super().save_model(request, obj, form, change)
 
 
 class VehicleAdmin(admin.ModelAdmin):

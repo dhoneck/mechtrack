@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-        username,
+        email,
         password,
       });
       const token = response.data.access; // Extract the token from the response
@@ -22,7 +22,7 @@ const Login = () => {
       // Redirect to a protected route or perform other actions
       navigate('/');
     } catch (err) {
-      setError('Invalid username or password');
+      setError('Invalid email or password');
     }
   };
 
@@ -31,12 +31,12 @@ const Login = () => {
       <Typography variant='h4' gutterBottom>Login</Typography>
       <form onSubmit={handleLogin}>
         <TextField
-          label="Username"
+          label="Email"
           variant="outlined"
           fullWidth
           margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <TextField
