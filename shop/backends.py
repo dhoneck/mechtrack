@@ -3,8 +3,10 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
 
 class EmailBackend(BaseBackend):
-    def authenticate(self, request, email=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, email=None, password=None, **kwargs):
         UserModel = get_user_model()
+        if email is None:
+            email = username
         try:
             user = UserModel.objects.get(email=email)
             if user.check_password(password):
