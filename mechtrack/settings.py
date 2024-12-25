@@ -166,6 +166,6 @@ AUTHENTICATION_BACKENDS = ['shop.backends.EmailBackend']
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'email',
     'USER_ID_CLAIM': 'email',
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }

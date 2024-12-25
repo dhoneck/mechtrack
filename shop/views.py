@@ -45,6 +45,15 @@ class CustomerList(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['first_name', 'last_name', 'phone']
 
+    def get_queryset(self):
+        """
+        This view should return a list of all the customers
+        for the business that the authenticated user belongs to.
+        """
+        business_id = self.request.user.business_id
+        return Customer.objects.filter(branch__business_id=business_id)
+
+
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a customer instance.
@@ -117,6 +126,14 @@ class VehicleList(generics.ListCreateAPIView):
     serializer_class = VehicleSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['make', 'model', 'year', 'color', 'license', 'vin', 'notes']
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the vehicles
+        for the business that the authenticated user belongs to.
+        """
+        business_id = self.request.user.business_id
+        return Vehicle.objects.filter(branch__business_id=business_id)
 
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -286,6 +303,14 @@ class VendorList(generics.ListCreateAPIView):
     serializer_class = VendorSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['vendor_name', 'vendor_code']
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the vendors
+        for the business that the authenticated user belongs to.
+        """
+        business_id = self.request.user.business_id
+        return Vendor.objects.filter(branch__business_id=business_id)
 
 
 class VendorDetail(generics.RetrieveUpdateDestroyAPIView):

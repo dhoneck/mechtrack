@@ -61,8 +61,7 @@ function CustomerSearch() {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      }
-      );
+      });
       console.log('Response:');
       console.log(response.data);
       setResult(response.data)

@@ -101,7 +101,11 @@ export default function ViewVendor() {
     try {
       let url = `http://127.0.0.1:8000/api/vendors/${id}/`;
 
-      await axios.get(url)
+      await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function (response) {
           console.log('Fetched Vendor Data:')
           console.log(response.data)
@@ -153,7 +157,11 @@ export default function ViewVendor() {
     try {
       let url = `http://127.0.0.1:8000/api/vendors/${id}/`;
 
-      await axios.put(url, values)
+      await axios.put(url, values, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function () {
           // Close modal
           handleCloseUser();
@@ -183,7 +191,11 @@ export default function ViewVendor() {
     try {
       let url = `http://127.0.0.1:8000/api/vehicles/`;
 
-      await axios.post(url, values)
+      await axios.post(url, values, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function (response) {
           console.log('New vehicle created:');
           console.log(response.data);
@@ -199,7 +211,11 @@ export default function ViewVendor() {
           let url2 = `http://127.0.0.1:8000/api/vendor-vehicle/`;
 
           // Associate vehicle with vendor
-          axios.post(url2, vendor_vehicle_values);
+          axios.post(url2, vendor_vehicle_values, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
 
           // Close modal
           handleCloseVehicle();

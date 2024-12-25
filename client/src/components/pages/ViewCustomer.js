@@ -100,8 +100,11 @@ export default function ViewCustomer() {
   const getCustomerInfo = async () => {
     try {
       let url = `http://127.0.0.1:8000/api/customers/${id}/`;
-
-      await axios.get(url)
+      await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function (response) {
           console.log('Fetched Customer Data:')
           console.log(response.data)

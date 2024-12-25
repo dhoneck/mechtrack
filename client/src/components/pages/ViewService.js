@@ -41,7 +41,11 @@ export default function ViewService() {
   async function getService() {
     try {
       let url = `http://127.0.0.1:8000/api/services/${sid}/`
-      let response = await axios.get(url);
+      let response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       console.log('response.data');
       console.log(response.data);
       setService(response.data);

@@ -35,7 +35,7 @@ class Branch(models.Model):
         verbose_name_plural = 'Branches'
 
     def __str__(self):
-        if (self.name):
+        if self.name:
             return self.name + ' - ' + self.address
         else:
             return self.business.name + ' - ' + self.address
@@ -55,6 +55,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
+
 
 class CustomUser(AbstractBaseUser):
     """CustomUser model is a staff member of the auto shop."""
