@@ -16,6 +16,7 @@ import {
   Typography
 } from '@mui/material';
 
+import UserInfo from '../layout/UserInfo';
 import NavBar from '../layout/NavBar';
 import ServiceModal from "../modals/ServiceModal";
 
@@ -326,6 +327,7 @@ export default function ViewVendor() {
       maxWidth: '75%',
       margin: 'auto' }}
     >
+      <UserInfo />
       <Typography variant='h2'>Vendor Detail</Typography>
       <NavBar active='Vendors' />
       <br/>

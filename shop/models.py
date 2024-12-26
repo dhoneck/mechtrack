@@ -81,6 +81,18 @@ class CustomUser(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return self.is_superuser
 
+    def business_name(self):
+        """Returns the name of the business."""
+        return self.business.name
+
+    def full_name(self):
+        """Returns the full name of the user if available."""
+        full_name = ''
+        if self.first_name:
+            full_name += self.first_name
+            if self.last_name:
+                full_name += ' ' + self.last_name
+        return full_name
 
 class Vehicle(models.Model):
     """Vehicle model is a vehicle being worked on by an auto shop."""

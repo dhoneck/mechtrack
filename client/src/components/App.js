@@ -2,7 +2,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import PrivateRoute from './auth/PrivateRoute';
-import Login from './pages/Login';
+import Login from './auth/Login';
+import Logout from './auth/Logout';
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import Vehicles from './pages/Vehicles';
@@ -22,6 +23,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path='login' element={<Login />} />
+        <Route path='logout' element={<Logout />} />
         <Route element={<PrivateRoute />}>
           <Route index element={<Dashboard />} />
           <Route path='customers' element={<Customers />} />

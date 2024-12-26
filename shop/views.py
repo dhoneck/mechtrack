@@ -10,9 +10,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from datetime import datetime
 from reportlab.pdfgen import canvas
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from shop.models import CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
-    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer,CustomTokenObtainPairSerializer
+    EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer, \
+    CustomTokenObtainPairSerializer, CustomUserSerializer
 from .filters import ServiceFilter
 
 def generate_timestamp():
@@ -35,6 +36,16 @@ def get_status_choices(request):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
+class CustomUserGet(generics.RetrieveAPIView):
+    """
+    Retrieve a user profile.
+    """
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+    def get_object(self):
+        return self.request.user
 
 class CustomerList(generics.ListCreateAPIView):
     """

@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 
+import UserInfo from '../layout/UserInfo';
 import NavBar from '../layout/NavBar';
 
 const style = {
@@ -76,6 +77,7 @@ export default function AddVendor() {
         maxWidth: '75%',
       }}
     >
+      <UserInfo />
       <Typography variant='h2' align='center'>Add Vendor</Typography>
       <NavBar active='Vendors' />
       <FormGroup>

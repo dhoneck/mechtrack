@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from shop import views
 
 urlpatterns = [
+    path('users/', views.CustomUserGet.as_view()),
     path('customers/', views.CustomerList.as_view()),
     path('customers/<int:pk>/', views.CustomerDetail.as_view()),
     path('vehicles/', views.VehicleList.as_view()),

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from shop.models import Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from shop.models import CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -10,6 +10,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token['email'] = user.email
         return token
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    business_name = serializers.ReadOnlyField()
+    full_name = serializers.ReadOnlyField()
+
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'business_id', 'business_id', 'business_name',]
 
 
 class EstimateItemSerializer(serializers.ModelSerializer):
