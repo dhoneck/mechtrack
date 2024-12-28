@@ -78,6 +78,9 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = '__all__'
+        extra_kwargs = {
+            'business': {'required': False}
+        }
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -86,6 +89,9 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+        extra_kwargs = {
+            'business': {'required': False}
+        }
 
 
 class CustomerVehicleSerializer(serializers.ModelSerializer):
@@ -100,3 +106,7 @@ class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
         fields = '__all__'
+        extra_kwargs = {
+            'business': {'required': False}
+        }
+

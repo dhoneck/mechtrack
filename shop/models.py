@@ -96,7 +96,7 @@ class CustomUser(AbstractBaseUser):
 
 class Vehicle(models.Model):
     """Vehicle model is a vehicle being worked on by an auto shop."""
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='vehicles')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='vehicles')
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     year = models.PositiveIntegerField(blank=True, null=True)
@@ -137,7 +137,7 @@ class Vehicle(models.Model):
 
 class Customer(models.Model):
     """Customer model is a customer of the auto shop."""
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='customers')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='customers')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)
@@ -367,8 +367,8 @@ class ServiceItem(models.Model):
 
 
 class Vendor(models.Model):
-    """Vehicle model is a customer of the auto shop."""
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='vendors')
+    """Vendor model is a customer of the auto shop."""
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='vendors')
     vendor_name = models.CharField(max_length=50)
     vendor_code = models.CharField(max_length=50)
     phone = PhoneNumberField(blank=True, default='', unique=True)

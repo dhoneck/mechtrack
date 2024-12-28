@@ -157,7 +157,11 @@ export default function ViewCustomer() {
     try {
       let url = `http://127.0.0.1:8000/api/customers/${id}/`;
 
-      await axios.put(url, values)
+      await axios.put(url, values, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function () {
           // Close modal
           handleCloseUser();
@@ -187,7 +191,11 @@ export default function ViewCustomer() {
     try {
       let url = `http://127.0.0.1:8000/api/vehicles/`;
 
-      await axios.post(url, values)
+      await axios.post(url, values, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         .then(function (response) {
           console.log('New vehicle created:');
           console.log(response.data);
@@ -203,7 +211,11 @@ export default function ViewCustomer() {
           let url2 = `http://127.0.0.1:8000/api/customer-vehicle/`;
 
           // Associate vehicle with customer
-          axios.post(url2, customer_vehicle_values);
+          axios.post(url2, customer_vehicle_values, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
 
           // Close modal
           handleCloseVehicle();
@@ -229,7 +241,11 @@ export default function ViewCustomer() {
     try {
       let url = `http://127.0.0.1:8000/api/customer-vehicle/`;
 
-      await axios.post(url, values)
+      await axios.post(url, values, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function () {
           // Close modal
           handleCloseVehicleLink();
@@ -252,7 +268,11 @@ export default function ViewCustomer() {
     try {
       let url = `http://127.0.0.1:8000/api/customer-vehicle/delete-by-filter/?customer=${customerID}&vehicle=${vehicleID}`;
 
-      await axios.delete(url)
+      await axios.delete(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function () {
           // Close modal
           handleCloseVehicleUnlink();
@@ -271,7 +291,11 @@ export default function ViewCustomer() {
     try {
       let url = `http://127.0.0.1:8000/api/vehicles/`;
 
-      await axios.get(url)
+      await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function (response) {
           console.log('All vehicles');
           console.log(response.data);

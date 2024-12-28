@@ -89,10 +89,10 @@ export default function ViewVehicle() {
       let url = `http://127.0.0.1:8000/api/vehicles/${id}/`;
 
       await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         .then(function (response) {
           console.log('response:')
           console.log(response.data)
@@ -192,7 +192,11 @@ export default function ViewVehicle() {
         return;
       }
 
-      await axios.delete(url)
+      await axios.delete(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
         .then(function (response) {
           console.log('Service Deleted:');
           console.log(response.data);
@@ -217,7 +221,11 @@ export default function ViewVehicle() {
         return;
       }
 
-      await axios.delete(url)
+      await axios.delete(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         .then(function (response) {
           console.log('Vehicle Deleted:');
           console.log(response.data);

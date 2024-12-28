@@ -62,7 +62,14 @@ class CustomerList(generics.ListCreateAPIView):
         for the business that the authenticated user belongs to.
         """
         business_id = self.request.user.business_id
-        return Customer.objects.filter(branch__business_id=business_id)
+        return Customer.objects.filter(business_id=business_id)
+
+    def perform_create(self, serializer):
+        """
+        Override this method to include the business ID from the authenticated user.
+        """
+        business_id = self.request.user.business_id
+        serializer.save(business_id=business_id)
 
 
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -144,7 +151,15 @@ class VehicleList(generics.ListCreateAPIView):
         for the business that the authenticated user belongs to.
         """
         business_id = self.request.user.business_id
-        return Vehicle.objects.filter(branch__business_id=business_id)
+        return Vehicle.objects.filter(business_id=business_id)
+
+    def perform_create(self, serializer):
+        """
+        Override this method to include the business ID from the authenticated user.
+        """
+        business_id = self.request.user.business_id
+        serializer.save(business_id=business_id)
+
 
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -321,7 +336,14 @@ class VendorList(generics.ListCreateAPIView):
         for the business that the authenticated user belongs to.
         """
         business_id = self.request.user.business_id
-        return Vendor.objects.filter(branch__business_id=business_id)
+        return Vendor.objects.filter(business_id=business_id)
+
+    def perform_create(self, serializer):
+        """
+        Override this method to include the business ID from the authenticated user.
+        """
+        business_id = self.request.user.business_id
+        serializer.save(business_id=business_id)
 
 
 class VendorDetail(generics.RetrieveUpdateDestroyAPIView):

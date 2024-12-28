@@ -44,7 +44,7 @@ export default function AddVendor() {
     let values = {
       'vendor_name': vendorName,
       'vendor_code': vendorCode,
-      'phone_number': verifiedPhoneNumber,
+      'phone': verifiedPhoneNumber,
       'email': email,
       'website': website,
       'notes': notes
@@ -52,7 +52,11 @@ export default function AddVendor() {
     console.log('Attempting to submit these values:');
     console.log(values);
 
-    axios.post(url, values)
+    axios.post(url, values, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
     .then(function (response) {
       console.log(response)
       if (response.status === 201) {
