@@ -21,7 +21,7 @@ export default function UserInfo() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/users/', {
+        const response = await axios.get(process.env.REACT_APP_API_URL + 'users/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -52,9 +52,10 @@ export default function UserInfo() {
           value={defaultBranch}
           onChange={handleBranchChange}
           label='Default Branch'
+          size={'small'}
         >
           {branches.map((branch) => (
-            <MenuItem key={branch.id} value={branch.id}>
+            <MenuItem key={branch.id} value={branch.id} >
               {branch.name}
             </MenuItem>
           ))}

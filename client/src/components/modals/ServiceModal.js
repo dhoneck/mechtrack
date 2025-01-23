@@ -130,7 +130,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     // Format date and endpoint URL
     let date = new Date(e);
     let dateStr = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-    let url = 'http://127.0.0.1:8000/api/services/?service_date=' + dateStr;
+    let url = process.env.REACT_APP_API_URL + 'services/?service_date=' + dateStr;
 
     // Make a GET request to the API to get scheduled services for a particular date
     try {
@@ -239,7 +239,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
     async function fetchStatusChoices() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/status-choices/');
+        const response = await axios.get(process.env.REACT_APP_API_URL + 'status-choices/');
         setStatusChoices(response.data);
       } catch (error) {
         console.error('Error fetching status choices:', error);

@@ -82,7 +82,7 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
         };
 
         // Estimate endpoint URL
-        let estimateUrl = 'http://127.0.0.1:8000/api/estimates/';
+        let estimateUrl = process.env.REACT_APP_API_URL + 'estimates/';
         let response = await axios.post(estimateUrl, values);
         console.log('Estimate POST Response');
         console.log(response);

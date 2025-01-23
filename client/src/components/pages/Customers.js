@@ -55,7 +55,7 @@ function CustomerSearch() {
     try {
       console.log(`Query: ${searchQuery}`)
       let encodedParam = encodeURIComponent(searchQuery)
-      let url = 'http://127.0.0.1:8000/api/customers/?search=' + encodedParam
+      let url = process.env.REACT_APP_API_URL + 'customers/?search=' + encodedParam
       console.log(`API URL: ${url}`)
       // Do Axios GET request with bearer token
       const response = await axios.get(url, {
@@ -89,7 +89,8 @@ function CustomerSearch() {
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
-
+      <p>ENV</p>
+      <p>{process.env.REACT_APP_BASE_URL}</p>
       <Link to='/customers/add' style={{ textDecoration: 'none' }}>
         <Button variant='contained' sx={{ my: 1}} >Add Customer</Button>
       </Link>

@@ -40,7 +40,7 @@ export default function AddVendor() {
     }
 
     // Post the value of the form
-    let url = 'http://127.0.0.1:8000/api/vendors/'
+    let url = process.env.REACT_APP_API_URL + 'vendors/'
     let values = {
       'vendor_name': vendorName,
       'vendor_code': vendorCode,

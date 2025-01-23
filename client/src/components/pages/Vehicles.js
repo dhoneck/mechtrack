@@ -54,7 +54,7 @@ function VehicleSearch() {
     try {
       console.log(`Query: ${searchQuery}`)
       let encodedParam = encodeURIComponent(searchQuery)
-      let url = 'http://127.0.0.1:8000/api/vehicles/?search=' + encodedParam
+      let url = process.env.REACT_APP_API_URL + 'vehicles/?search=' + encodedParam
       console.log(`API URL: ${url}`)
       // Do Axios GET request with bearer token
       const response = await axios.get(url, {

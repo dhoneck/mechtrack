@@ -42,7 +42,7 @@ export default function AddCustomer() {
     }
 
     // Post the value of the form
-    let url = 'http://127.0.0.1:8000/api/customers/'
+    let url = process.env.REACT_APP_API_URL + 'customers/'
     let values = {
       'first_name': firstName,
       'last_name': lastName,

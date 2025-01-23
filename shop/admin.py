@@ -15,17 +15,17 @@ class CustomUserAdmin(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_superuser')
+    list_display = ('email', 'business','first_name', 'last_name', 'is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'business', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name')}),
         ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'password1', 'password2'),
+            'fields': ('business', 'email', 'first_name', 'last_name', 'password1', 'password2'),
         }),
     )
     search_fields = ('email',)

@@ -48,7 +48,7 @@ if IN_PRODUCTION == 'true':
 elif IN_PRODUCTION == 'false':
     print('In development!')
     DEBUG = True
-    ALLOWED_HOSTS = [os.getenv('PROD_API_BASE_URL')]
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
     # Development database settings
     DATABASES = {

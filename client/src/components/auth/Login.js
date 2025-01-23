@@ -12,7 +12,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const response = await axios.post(process.env.REACT_APP_API_URL + 'token/', {
         email,
         password,
       });
@@ -49,6 +49,7 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        {/* TODO: Fix alert width - too large */}
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
           Login

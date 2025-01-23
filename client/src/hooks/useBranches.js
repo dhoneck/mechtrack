@@ -7,7 +7,7 @@ function useBranches() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/branches/', {
+        const response = await axios.get(process.env.REACT_APP_API_URL + 'branches/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
