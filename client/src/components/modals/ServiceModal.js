@@ -172,7 +172,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
     // Try to create a new vehicle
     try {
-      let url = `http://127.0.0.1:8000/api/services/`;
+      let url = `${process.env.REACT_APP_API_URL}services/`;
 
       await axios.post(url, values)
         .then(function (response) {
@@ -204,7 +204,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   async function getService() {
     console.log('Getting service');
     try {
-      let url = `http://127.0.0.1:8000/api/services/${serviceId}/`;
+      let url = `${process.env.REACT_APP_API_URL}services/${serviceId}/`;
 
       await axios.get(url)
         .then(function (response) {

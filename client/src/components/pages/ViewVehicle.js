@@ -231,7 +231,7 @@ export default function ViewVehicle() {
           console.log(response.data);
 
           // Redirect to vehicles search
-          window.location = process.env.REACT_APP_BASE_URL + '/vehicles'
+          window.location = process.env.REACT_APP_BASE_URL + 'vehicles'
         });
     } catch (error) {
       console.error(error);

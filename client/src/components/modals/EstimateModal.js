@@ -101,11 +101,11 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
           if (rows[i].id == null) {
             console.log('value');
             console.log(value);
-            let response = await axios.post(`http://127.0.0.1:8000/api/estimate-items/`, value);
+            let response = await axios.post(`${process.env.REACT_APP_API_URL}estimate-items/`, value);
             console.log('Estimate item POST Response');
             console.log(response);
           } else {
-            let response = await axios.put(`http://127.0.0.1:8000/api/estimate-items/${rows[i].id}/`, value);
+            let response = await axios.put(`${process.env.REACT_APP_API_URL}estimate-items/${rows[i].id}/`, value);
             console.log('Estimate item PUT Response');
             console.log(response);
           }
@@ -116,7 +116,7 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
           console.log('Attempting to DELETE estimate items');
           for (const itemId of itemsToDelete) {
             console.log('Attempting to delete item #:', itemId);
-            let response = await axios.delete(`http://127.0.0.1:8000/api/estimate-items/${itemId}/`);
+            let response = await axios.delete(`${process.env.REACT_APP_API_URL}estimate-items/${itemId}/`);
           }
         } else {
           console.log('No estimate items to delete');
