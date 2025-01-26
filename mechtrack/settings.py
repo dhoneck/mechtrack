@@ -5,6 +5,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv
 
@@ -16,52 +17,74 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY') or get_random_secret_key()
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: make sure these are set correctly as it affects security
 IN_PRODUCTION = os.getenv('IN_PRODUCTION').lower()
+IS_HEROKU_APP = os.getenv('IS_HEROKU_APP').lower()
 
 if IN_PRODUCTION == 'true':
     print('In production!')
     DEBUG = False
     CORS_ORIGIN_ALLOW_ALL = False
     CORS_ORIGIN_WHITELIST = (
-        os.getenv('PROD_BASE_URL'),
+        os.getenv('BASE_URL'),
     )
-    ALLOWED_HOSTS = [os.getenv('DEV_API_BASE_URL')]
 
     # Added to force SSL based on https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
     # Activate for production and deactivate for development
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
 
-    # Production database settings
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('PRODUCTION_DB'),
-            'USER': os.getenv('PRODUCTION_USER'),
-            'PASSWORD': os.getenv('PRODUCTION_PASS'),
-            'HOST': os.getenv('PRODUCTION_HOST'),
-            'PORT': os.getenv('PRODUCTION_PORT'),
+    if IS_HEROKU_APP == 'true':
+        # Production database settings for Heroku deployment
+
+        # On Heroku, it's safe to use a wildcard for `ALLOWED_HOSTS`, since the Heroku router performs
+        # validation of the Host header in the incoming HTTP request. On other platforms you may need to
+        # list the expected hostnames explicitly in production to prevent HTTP Host header attacks. See:
+        # https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-ALLOWED_HOSTS
+        ALLOWED_HOSTS = ["*"]
+
+        DATABASES = {
+            'default': dj_database_url.config(
+                env='DATABASE_URL',
+                conn_max_age=600,
+                conn_health_checks=True,
+                ssl_require=True,
+            ),
         }
-    }
+    else:
+        # Production settings for non-Heroku deployment
+
+        ALLOWED_HOSTS = [os.getenv('BASE_URL')]
+
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.getenv('DB_NAME'),
+                'USER': os.getenv('DB_USER'),
+                'PASSWORD': os.getenv('DB_PASS'),
+                'HOST': os.getenv('DB_HOST'),
+                'PORT': os.getenv('DB_PORT'),
+            }
+        }
 
 elif IN_PRODUCTION == 'false':
+    # Development settings
     print('In development!')
     DEBUG = True
-    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+    CORS_ORIGIN_ALLOW_ALL = True
+    ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '0.0.0.0', '[::]']
 
-    # Development database settings
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DEVELOPMENT_DB'),
-            'USER': os.getenv('DEVELOPMENT_USER'),
-            'PASSWORD': os.getenv('DEVELOPMENT_PASS'),
-            'HOST': os.getenv('DEVELOPMENT_HOST'),
-            'PORT': os.getenv('DEVELOPMENT_PORT'),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASS'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
         }
     }
-    CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -140,7 +163,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Chicago'
 USE_I18N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

@@ -1,0 +1,1 @@
+web: gunicorn mechtrack.wsgi --log-file -

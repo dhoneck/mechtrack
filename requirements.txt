@@ -1,8 +1,10 @@
+asgiref==3.8.1
 certifi==2024.8.30
 chardet==5.2.0
 charset-normalizer==3.4.0
 colorama==0.4.6
 defusedxml==0.8.0rc2
+dj-database-url==2.3.0
 Django==5.1.2
 django-cors-headers==4.6.0
 django-filter==24.3
@@ -11,13 +13,16 @@ django-phonenumber-field==8.0.0
 django-phonenumbers==1.0.1
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+gunicorn==23.0.0
 httpie==3.2.3
 idna==3.10
 markdown-it-py==3.0.0
 mdurl==0.1.2
 multidict==6.1.0
+packaging==24.2
 phonenumbers==8.13.48
 pillow==11.0.0
+psycopg2==2.9.10
 Pygments==2.18.0
 PyJWT==2.9.0
 PySocks==1.7.1
@@ -27,6 +32,7 @@ reportlab==4.2.5
 requests==2.31.0
 requests-toolbelt==1.0.0
 rich==13.9.3
+setuptools==75.8.0
 sqlparse==0.5.1
 typing_extensions==4.12.2
 tzdata==2024.2

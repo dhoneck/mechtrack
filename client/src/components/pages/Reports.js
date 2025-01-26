@@ -109,7 +109,7 @@ export default function Reports() {
     // TODO: Make Axios call to get sales info
 
     // Handle export report
-    let url = 'http://localhost:8000/api/export/'
+    let url = process.env.REACT_APP_API_URL + '/export/'
     if (reportValues.report === 'Customer Export') {
       url += 'customers/';
     } else if (reportValues.report === 'Vehicle Export') {

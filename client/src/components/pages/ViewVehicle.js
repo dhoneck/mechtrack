@@ -86,7 +86,7 @@ export default function ViewVehicle() {
   /** Make GET request using ID from URL param to grab customer data  */
   const getVehicleInfo = async () => {
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/${id}/`;
 
       await axios.get(url, {
           headers: {
@@ -132,7 +132,7 @@ export default function ViewVehicle() {
     };
 
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/${id}/`;
 
       await axios.put(url, values, {
         headers: {
@@ -155,7 +155,7 @@ export default function ViewVehicle() {
   const deleteEstimate = async (id) => {
     console.log(`Attempting to delete estimate #${id}`);
     try {
-      let url = `http://127.0.0.1:8000/api/estimates/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}estimates/${id}/`;
 
       // Verify deletion of estimate
       const confirmation = window.confirm('Are you sure you want to delete this estimate?\nThis action cannot be undone.');
@@ -184,7 +184,7 @@ export default function ViewVehicle() {
   const deleteService = async (id) => {
     console.log(`Attempting to delete service #${id}`);
     try {
-      let url = `http://127.0.0.1:8000/api/services/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}services/${id}/`;
 
       // Verify deletion of service
       const confirmation = window.confirm('Are you sure you want to delete this service?\nThis action cannot be undone.');
@@ -213,7 +213,7 @@ export default function ViewVehicle() {
   const deleteVehicle = async () => {
     console.log(`Attempting to delete vehicle #${id}`);
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/${id}/`;
 
       // Verify deletion of vehicle
       const confirmation = window.confirm('Are you sure you want to delete this vehicle?\nThis action cannot be undone.');
@@ -231,7 +231,7 @@ export default function ViewVehicle() {
           console.log(response.data);
 
           // Redirect to vehicles search
-          window.location = 'http://localhost:3000/vehicles'
+          window.location = process.env.REACT_APP_BASE_URL + '/vehicles'
         });
     } catch (error) {
       console.error(error);

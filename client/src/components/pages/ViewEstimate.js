@@ -40,7 +40,7 @@ export default function ViewEstimate() {
 
   async function getEstimate() {
     try {
-      let url = `http://127.0.0.1:8000/api/estimates/${eid}/`
+      let url = `${process.env.REACT_APP_API_URL}estimates/${eid}/`
       let response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`

@@ -100,7 +100,7 @@ export default function ViewCustomer() {
   /** Make GET request using ID from URL param to grab customer data */
   const getCustomerInfo = async () => {
     try {
-      let url = `http://127.0.0.1:8000/api/customers/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}customers/${id}/`;
       await axios.get(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -155,7 +155,7 @@ export default function ViewCustomer() {
     };
 
     try {
-      let url = `http://127.0.0.1:8000/api/customers/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}customers/${id}/`;
 
       await axios.put(url, values, {
         headers: {
@@ -189,7 +189,7 @@ export default function ViewCustomer() {
 
     // Try to create a new vehicle
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/`;
 
       await axios.post(url, values, {
           headers: {
@@ -208,7 +208,7 @@ export default function ViewCustomer() {
             'customer': user_id,
             'vehicle': new_vehicle_id
           }
-          let url2 = `http://127.0.0.1:8000/api/customer-vehicle/`;
+          let url2 = `${process.env.REACT_APP_API_URL}customer-vehicle/`;
 
           // Associate vehicle with customer
           axios.post(url2, customer_vehicle_values, {
@@ -239,7 +239,7 @@ export default function ViewCustomer() {
     };
 
     try {
-      let url = `http://127.0.0.1:8000/api/customer-vehicle/`;
+      let url = `${process.env.REACT_APP_API_URL}customer-vehicle/`;
 
       await axios.post(url, values, {
         headers: {
@@ -266,7 +266,7 @@ export default function ViewCustomer() {
     let vehicleID = parseInt(vehicleLink.split(' ')[1].slice(0, -1));
 
     try {
-      let url = `http://127.0.0.1:8000/api/customer-vehicle/delete-by-filter/?customer=${customerID}&vehicle=${vehicleID}`;
+      let url = `${process.env.REACT_APP_API_URL}customer-vehicle/delete-by-filter/?customer=${customerID}&vehicle=${vehicleID}`;
 
       await axios.delete(url, {
         headers: {
@@ -289,7 +289,7 @@ export default function ViewCustomer() {
   const getVehicles = async () => {
     // Try to get all vehicles
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/`;
 
       await axios.get(url, {
         headers: {

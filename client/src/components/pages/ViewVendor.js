@@ -100,7 +100,7 @@ export default function ViewVendor() {
   /** Make GET request using ID from URL param to grab vendor data */
   const getVendorInfo = async () => {
     try {
-      let url = `http://127.0.0.1:8000/api/vendors/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}vendors/${id}/`;
 
       await axios.get(url, {
         headers: {
@@ -156,7 +156,7 @@ export default function ViewVendor() {
     };
 
     try {
-      let url = `http://127.0.0.1:8000/api/vendors/${id}/`;
+      let url = `${process.env.REACT_APP_API_URL}vendors/${id}/`;
 
       await axios.put(url, values, {
         headers: {
@@ -190,7 +190,7 @@ export default function ViewVendor() {
 
     // Try to create a new vehicle
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/`;
 
       await axios.post(url, values, {
         headers: {
@@ -209,7 +209,7 @@ export default function ViewVendor() {
             'vendor': user_id,
             'vehicle': new_vehicle_id
           }
-          let url2 = `http://127.0.0.1:8000/api/vendor-vehicle/`;
+          let url2 = `${process.env.REACT_APP_API_URL}vendor-vehicle/`;
 
           // Associate vehicle with vendor
           axios.post(url2, vendor_vehicle_values, {
@@ -240,7 +240,7 @@ export default function ViewVendor() {
     };
 
     try {
-      let url = `http://127.0.0.1:8000/api/vendor-vehicle/`;
+      let url = `${process.env.REACT_APP_API_URL}vendor-vehicle/`;
 
       await axios.post(url, values)
         .then(function () {
@@ -263,7 +263,7 @@ export default function ViewVendor() {
     let vehicleID = parseInt(vehicleLink.split(' ')[1].slice(0, -1));
 
     try {
-      let url = `http://127.0.0.1:8000/api/vendor-vehicle/delete-by-filter/?vendor=${vendorID}&vehicle=${vehicleID}`;
+      let url = `${process.env.REACT_APP_API_URL}vendor-vehicle/delete-by-filter/?vendor=${vendorID}&vehicle=${vehicleID}`;
 
       await axios.delete(url)
         .then(function () {
@@ -282,7 +282,7 @@ export default function ViewVendor() {
   const getVehicles = async () => {
     // Try to get all vehicles
     try {
-      let url = `http://127.0.0.1:8000/api/vehicles/`;
+      let url = `${process.env.REACT_APP_API_URL}vehicles/`;
 
       await axios.get(url)
         .then(function (response) {

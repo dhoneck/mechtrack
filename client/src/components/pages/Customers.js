@@ -89,8 +89,6 @@ function CustomerSearch() {
           <SearchIcon sx={{ fontSize: 41 }} />
         </IconButton>
       </form>
-      <p>ENV</p>
-      <p>{process.env.REACT_APP_BASE_URL}</p>
       <Link to='/customers/add' style={{ textDecoration: 'none' }}>
         <Button variant='contained' sx={{ my: 1}} >Add Customer</Button>
       </Link>
