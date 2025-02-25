@@ -24,10 +24,11 @@ IS_HEROKU_APP = os.getenv('IS_HEROKU_APP').lower()
 if IN_PRODUCTION == 'true':
     print('In production!')
     DEBUG = False
-    CORS_ORIGIN_ALLOW_ALL = False
-    CORS_ORIGIN_WHITELIST = (
-        os.getenv('BASE_URL'),
-    )
+    # FOR TROUBLESHOOTING PURPOSES
+    CORS_ALLOW_ALL_ORIGINS = True
+    # CORS_ORIGIN_WHITELIST = (
+    #     os.getenv('BASE_URL'),
+    # )
 
     # Added to force SSL based on https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
     # Activate for production and deactivate for development
