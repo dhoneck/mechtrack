@@ -72,7 +72,7 @@ elif IN_PRODUCTION == 'false':
     # Development settings
     print('In development!')
     DEBUG = True
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ALLOW_ALL_ORIGINS = True
     ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]', '0.0.0.0', '[::]']
 
 
