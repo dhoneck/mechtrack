@@ -6,3 +6,4 @@ venv/
 shop/management/
 db.sqlite3
 node_modules/
+build/
