@@ -20,6 +20,8 @@ SECRET_KEY = os.getenv('SECRET_KEY') or get_random_secret_key()
 # SECURITY WARNING: make sure these are set correctly as it affects security
 IN_PRODUCTION = os.getenv('IN_PRODUCTION').lower()
 IS_HEROKU_APP = os.getenv('IS_HEROKU_APP').lower()
+print(f'IN_PRODUCTION: {IN_PRODUCTION}')
+print(f'IS_HEROKU_APP: {IS_HEROKU_APP}')
 
 if IN_PRODUCTION == 'true':
     print('In production!')
@@ -43,6 +45,7 @@ if IN_PRODUCTION == 'true':
         # list the expected hostnames explicitly in production to prevent HTTP Host header attacks. See:
         # https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-ALLOWED_HOSTS
         ALLOWED_HOSTS = ["*"]
+        print(f'ALLOWED_HOSTS in IS_HEROKU_APP: {ALLOWED_HOSTS}')
 
         DATABASES = {
             'default': dj_database_url.config(
@@ -56,6 +59,7 @@ if IN_PRODUCTION == 'true':
         # Production settings for non-Heroku deployment
 
         ALLOWED_HOSTS = [os.getenv('BASE_URL')]
+        print(f'ALLOWED_HOSTS in NOT IS_HEROKU_APP: {ALLOWED_HOSTS}')
 
         DATABASES = {
             'default': {
@@ -170,6 +174,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'client/build/static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -188,5 +193,3 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
-
-STATICFILES_DIRS = [BASE_DIR / 'client/build/static']
