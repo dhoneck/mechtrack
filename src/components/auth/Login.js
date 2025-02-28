@@ -49,8 +49,7 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {/* TODO: Fix alert width - too large */}
-        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {error && <Alert severity="error" fullWidth sx={{ boxSizing: 'border-box', mt: 2, maxWidth: '100%' }}>{error}</Alert>}
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
           Login
         </Button>
