@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import CustomUser
+from .models import CustomUser, Business, Branch
+from .widgets import PrettyJSONWidget
 
 class CustomUserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
@@ -33,3 +34,19 @@ class CustomUserChangeForm(forms.ModelForm):
 
     def clean_password(self):
         return self.initial["password"]
+
+class BusinessAdminForm(forms.ModelForm):
+    class Meta:
+        model = Business
+        fields = '__all__'
+        widgets = {
+            'default_pricing': PrettyJSONWidget,
+        }
+
+class BranchAdminForm(forms.ModelForm):
+    class Meta:
+        model = Branch
+        fields = '__all__'
+        widgets = {
+            'default_pricing': PrettyJSONWidget,
+        }

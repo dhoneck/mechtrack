@@ -1,11 +1,19 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Business, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .models import Business, Branch, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from .forms import CustomUserCreationForm, CustomUserChangeForm, BusinessAdminForm, BranchAdminForm
 
 
 class BusinessAdmin(admin.ModelAdmin):
+    form = BusinessAdminForm
+    all_fields = ('name', 'address', 'phone', 'email', 'website')
+    list_display = all_fields
+    search_fields = all_fields
+
+
+class BranchAdmin(admin.ModelAdmin):
+    form = BranchAdminForm
     all_fields = ('name', 'address', 'phone', 'email', 'website')
     list_display = all_fields
     search_fields = all_fields
@@ -105,6 +113,7 @@ class VendorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Business, BusinessAdmin)
+admin.site.register(Branch, BranchAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Vehicle, VehicleAdmin)
 admin.site.register(Customer, CustomerAdmin)

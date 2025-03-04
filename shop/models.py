@@ -10,10 +10,11 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Business(models.Model):
     """Business model is the main business entity."""
     name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
+    address = models.CharField(blank=True, max_length=255)
+    phone = models.CharField(blank=True, max_length=20)
     email = models.EmailField(blank=True, default='')
     website = models.URLField(blank=True, default='')
+    default_pricing = models.JSONField(blank=True, default=dict)
 
     class Meta:
         verbose_name_plural = 'Businesses'
