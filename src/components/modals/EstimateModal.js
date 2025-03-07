@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 
-import { Box, Button, IconButton, InputAdornment, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, IconButton, InputAdornment, Modal, TextField, Typography } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 
 /** Modal form for creating or editing an estimate */
@@ -12,6 +12,25 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
 
   // Store an array of estimate item IDs that need to be deleted
   const [itemsToDelete, setItemsToDelete] = useState([]);
+
+  // TODO: Dynamically grab default pricing from the API
+  const [defaultPricing, setDefaultPricing] = useState([
+      {
+      "name": "Oil Change",
+      "labor_price": 19.99,
+      "part_price": 29.99
+    },
+    {
+      "name": "Brake Replacement",
+      "labor_price": 49.99,
+      "part_price": 99.99
+    },
+    {
+      "name": "Tire Rotation",
+      "labor_price": 15.00,
+      "part_price": 0.00
+    }
+  ]);
 
   // Dynamically sets the rows based on which estimate is passed as a param, if any
   useEffect(() => {
@@ -31,6 +50,9 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
 
   /** Remove row containing an estimate item */
   const handleRemoveRow = (index, id) => {
+    console.log('Removing row index:', index);
+    console.log('Removing row id:', id);
+    console.log('Rows:', rows);
     if (rows.length === 1) return;  // Ensure at least one row exists
     // Remove the row and reset rows useState
     const newRows = [...rows];
@@ -78,12 +100,20 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
         // Construct values for creating an estimate, which can take estimate item values and create in same request
         let values = {
           vehicle_id: vehicleId,
+          branch_id: 1,  // TODO: Dynamically set branch ID
           estimate_items,
         };
 
         // Estimate endpoint URL
+        console.log(`Bearer ${localStorage.getItem('token')}`);
         let estimateUrl = process.env.REACT_APP_API_URL + 'estimates/';
-        let response = await axios.post(estimateUrl, values);
+        let response = await axios.post(estimateUrl,
+            values,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+              }
+            });
         console.log('Estimate POST Response');
         console.log(response);
 
@@ -100,12 +130,25 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
           // If id is null, create new item
           if (rows[i].id == null) {
             console.log('value');
-            console.log(value);
-            let response = await axios.post(`${process.env.REACT_APP_API_URL}estimate-items/`, value);
+            let response = await axios.post(
+                `${process.env.REACT_APP_API_URL}estimate-items/`,
+                value,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                  }
+                });
             console.log('Estimate item POST Response');
             console.log(response);
           } else {
-            let response = await axios.put(`${process.env.REACT_APP_API_URL}estimate-items/${rows[i].id}/`, value);
+            let response = await axios.put(
+                `${process.env.REACT_APP_API_URL}estimate-items/${rows[i].id}/`,
+                value,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                  }
+                });
             console.log('Estimate item PUT Response');
             console.log(response);
           }
@@ -116,7 +159,13 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
           console.log('Attempting to DELETE estimate items');
           for (const itemId of itemsToDelete) {
             console.log('Attempting to delete item #:', itemId);
-            let response = await axios.delete(`${process.env.REACT_APP_API_URL}estimate-items/${itemId}/`);
+            let response = await axios.delete(
+                `${process.env.REACT_APP_API_URL}estimate-items/${itemId}/`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                  }
+                });
           }
         } else {
           console.log('No estimate items to delete');
@@ -159,7 +208,40 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
           </Box>
           {rows.map((row, index) => (
             <Box key={index} data-id={row.id} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
-              <TextField sx={{ flexGrow: 1 }} value={row.description} onChange={(e) => handleDescriptionChange(index, e.target.value)} />
+              <Autocomplete
+                disablePortal
+                freeSolo
+                sx={{ flexGrow: 1 }}
+                options={defaultPricing}
+                getOptionLabel={(option) => option.name}
+                inputValue={row.description}
+                onInputChange={(event, newInputValue) => {
+                  handleDescriptionChange(index, newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    // inputValue={row.description}
+                    // onChange={(e) => handleDescriptionChange(index, e.target.value)}
+                  />
+                )}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    console.log('newValue if:', newValue);
+                    console.log('index:', index);
+                    handleDescriptionChange(index, newValue.name);
+                    handlePartPriceChange(index, newValue.part_price);
+                    handleLaborPriceChange(index, newValue.labor_price);
+                  } else {
+                    console.log('newValue else:', newValue);
+                    console.log('index:', index);
+                    handleDescriptionChange(index, '');
+                    handlePartPriceChange(index, '');
+                    handleLaborPriceChange(index, '');
+                  }
+                }}
+              />
+
               <TextField
                 sx={{ width: '125px' }}
                 value={row.part_price}

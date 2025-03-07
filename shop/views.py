@@ -280,7 +280,8 @@ class EstimateList(generics.ListCreateAPIView):
             serializer = self.get_serializer(estimate)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return JsonResponse({'error': 'Internal Server Error'}, status=500)
+            return JsonResponse({'error': str(e)}, status=500)
+            # return JsonResponse({'error': e + 'Internal Server Error'}, status=500)
 
 
 class EstimateDetail(generics.RetrieveUpdateDestroyAPIView):
