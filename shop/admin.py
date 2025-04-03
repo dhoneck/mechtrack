@@ -23,10 +23,10 @@ class CustomUserAdmin(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ('email', 'business','first_name', 'last_name', 'is_staff', 'is_superuser')
+    list_display = ('email', 'business', 'current_branch', 'first_name', 'last_name', 'is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'business', 'password')}),
+        (None, {'fields': ('email', 'business', 'current_branch', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name')}),
         ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
     )
@@ -40,9 +40,22 @@ class CustomUserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'current_branch':
+            obj_id = request.resolver_match.kwargs.get('object_id')
+            if obj_id:
+                user = CustomUser.objects.get(pk=obj_id)
+                kwargs['queryset'] = Branch.objects.filter(business=user.business)
+            else:
+                kwargs['queryset'] = Branch.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def save_model(self, request, obj, form, change):
-        if form.cleaned_data.get('password'):
+        # Prevents password hash from being set as the password when saving a user
+        if 'password' in form.cleaned_data and form.cleaned_data['password'] != obj.password:
             obj.set_password(form.cleaned_data['password'])
+        if 'business' in form.cleaned_data and form.cleaned_data['business'] is None:
+            obj.current_branch = None
         super().save_model(request, obj, form, change)
 
 

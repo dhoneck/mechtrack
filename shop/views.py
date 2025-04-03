@@ -33,6 +33,14 @@ def get_status_choices(request):
     return Response(choices)
 
 
+# class CustomUserGet(generics.RetrieveAPIView):
+#     queryset = CustomUser.objects.select_related('branch')
+#     serializer_class = CustomUserSerializer
+#
+#     def get_object(self):
+#         return self.request.user
+
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 

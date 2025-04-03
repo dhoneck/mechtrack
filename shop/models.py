@@ -4,6 +4,7 @@ import random
 import string
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -61,6 +62,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser):
     """CustomUser model is a staff member of the auto shop."""
     business = models.ForeignKey(Business, on_delete=models.CASCADE, blank=True, null=True, related_name='users')
+    current_branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, blank=True, null=True)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -73,8 +75,18 @@ class CustomUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    def save(self, *args, **kwargs):
+        """Override save method to ensure the current branch belongs to the user's business."""
+        if self.current_branch and self.current_branch.business != self.business:
+            raise ValidationError("The selected branch does not belong to the user's business.")
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.email
+
+    def all_branches(self):
+        return Branch.objects.filter(business=self.business)
+
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

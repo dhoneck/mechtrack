@@ -3,19 +3,16 @@ import { Link } from 'react-router-dom';
 import { Box, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import axios from 'axios';
 
-import useBranches from '../../hooks/useBranches';
-
 import './UserInfo.css';
 
 export default function UserInfo() {
   const [user, setUser] = useState(null);
-  const branches = useBranches();
-  const [defaultBranch, setDefaultBranch] = useState('');
+  const [currentBranch, setCurrentBranch] = useState('');
 
   const handleBranchChange = (event) => {
-    setDefaultBranch(event.target.value);
+    setCurrentBranch(event.target.value);
     // Optionally, save the selected branch to local storage or make an API call to save the preference
-    localStorage.setItem('defaultBranch', event.target.value);
+    localStorage.setItem('currentBranch', event.target.value);
   };
 
   useEffect(() => {
@@ -46,17 +43,17 @@ export default function UserInfo() {
       <Typography className="user-info__name" fontSize={'12px'}>{user.full_name}</Typography>
       <Typography className="user-info__email" fontSize={'12px'}>{user.email}</Typography>
       <FormControl fullWidth sx={{ mt: 2 }}>
-        <InputLabel id='branch-select-label'>Default Branch</InputLabel>
+        <InputLabel id='branch-select-label'>Current Branch</InputLabel>
         <Select
           labelId='branch-select-label'
-          value={defaultBranch}
+          value={currentBranch}
           onChange={handleBranchChange}
-          label='Default Branch'
+          label='Current Branch'
           size={'small'}
         >
-          {branches.map((branch) => (
+          {user.all_branches.map((branch) => (
             <MenuItem key={branch.id} value={branch.id} >
-              {branch.name}
+              {branch.address}
             </MenuItem>
           ))}
         </Select>

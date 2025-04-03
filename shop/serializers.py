@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from shop.models import CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from shop.models import Branch, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -12,14 +12,25 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id', 'name', 'address']
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
+    # branch = BranchSerializer(read_only=True)
     business_name = serializers.ReadOnlyField()
     full_name = serializers.ReadOnlyField()
+    all_branches = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'business_id', 'business_id', 'business_name',]
+        fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'business_id', 'business_id', 'business_name', 'current_branch', 'all_branches']
 
+    def get_all_branches(self, obj):
+        branches = obj.all_branches()
+        return BranchSerializer(branches, many=True).data
 
 class EstimateItemSerializer(serializers.ModelSerializer):
     estimate_item_total = serializers.ReadOnlyField()
