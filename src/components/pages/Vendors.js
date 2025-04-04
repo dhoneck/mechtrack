@@ -17,7 +17,6 @@ import {
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
 
-import UserInfo from '../layout/UserInfo';
 import NavBar from '../layout/NavBar';
 
 function VendorSearch() {
@@ -149,7 +148,6 @@ function VendorSearch() {
 export default function Vendors() {
   return (
     <Box>
-      <UserInfo />
       <Typography variant='h2' align='center'>Vendors</Typography>
       <NavBar active='Vendors' />
       <VendorSearch />

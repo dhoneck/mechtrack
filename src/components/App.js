@@ -1,6 +1,8 @@
+import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 
+import UserInfo from './layout/UserInfo';
 import PrivateRoute from './auth/PrivateRoute';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
@@ -18,9 +20,13 @@ import ViewEstimate from './pages/ViewEstimate';
 import ViewService from './pages/ViewService';
 import PageNotFound from './pages/PageNotFound';
 
-export default function App() {
+function Layout() {
+  const location = useLocation();
+  const hideUserInfoPaths = ['/login', '/logout'];
+
   return (
-    <BrowserRouter>
+    <>
+      {!hideUserInfoPaths.includes(location.pathname) && <UserInfo />}
       <Routes>
         <Route path='login' element={<Login />} />
         <Route path='logout' element={<Logout />} />
@@ -39,8 +45,15 @@ export default function App() {
           <Route path='services/:sid' element={<ViewService />} />
           <Route path='*' element={<PageNotFound />} />
         </Route>
-
       </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
     </BrowserRouter>
   );
 }

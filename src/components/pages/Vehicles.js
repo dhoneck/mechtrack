@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import UserInfo from '../layout/UserInfo';
 import NavBar from '../layout/NavBar';
 
 function VehicleSearch() {
@@ -150,7 +149,6 @@ function VehicleSearch() {
 export default function Customers() {
   return (
     <Box>
-      <UserInfo />
       <Typography variant='h2' align='center'>Vehicles</Typography>
       <NavBar active='Vehicles' />
       <VehicleSearch />

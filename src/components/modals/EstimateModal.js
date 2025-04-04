@@ -100,7 +100,7 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
         // Construct values for creating an estimate, which can take estimate item values and create in same request
         let values = {
           vehicle_id: vehicleId,
-          branch_id: 1,  // TODO: Dynamically set branch ID
+          branch_id: 5,  // TODO: Dynamically set branch ID
           estimate_items,
         };
 

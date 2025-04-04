@@ -18,7 +18,6 @@ import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
 
-import UserInfo from '../layout/UserInfo';
 import NavBar from '../layout/NavBar';
 import './Reports.css';
 import {Link} from "react-router-dom";
@@ -243,7 +242,6 @@ export default function Reports() {
 
   return (
     <Box>
-      <UserInfo />
       <Typography variant='h2' align='center'>Reports</Typography>
       <NavBar active='Reports'/>
       <Box sx={{display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap'}}>
