@@ -6,6 +6,8 @@ from shop import views
 
 urlpatterns = [
     path('users/', views.CustomUserGet.as_view()),
+    path('users/get-current-branch/', views.GetCurrentBranchView.as_view(), name='get-current-branch'),
+    path('users/update-current-branch/', views.UpdateCurrentBranchView.as_view(), name='update-current-branch'),
     path('customers/', views.CustomerList.as_view()),
     path('customers/<int:pk>/', views.CustomerDetail.as_view()),
     path('vehicles/', views.VehicleList.as_view()),

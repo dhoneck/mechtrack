@@ -32,6 +32,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
         branches = obj.all_branches()
         return BranchSerializer(branches, many=True).data
 
+
+class CurrentBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['current_branch']
+
+
 class EstimateItemSerializer(serializers.ModelSerializer):
     estimate_item_total = serializers.ReadOnlyField()
 

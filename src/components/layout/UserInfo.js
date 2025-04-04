@@ -7,15 +7,30 @@ import './UserInfo.css';
 
 export default function UserInfo() {
   const [user, setUser] = useState(null);
-  const [currentBranch, setCurrentBranch] = useState('');
+  const [currentBranch, setCurrentBranch] = useState();
 
-  const handleBranchChange = (event) => {
-    setCurrentBranch(event.target.value);
-    // Optionally, save the selected branch to local storage or make an API call to save the preference
-    localStorage.setItem('currentBranch', event.target.value);
+  const handleBranchChange = async (event) => {
+    // Update the current branch in the DB and set the state
+    let branchId = event.target.value;
+    try {
+      let url = process.env.REACT_APP_API_URL + 'users/update-current-branch/'
+      const response = await axios.patch(
+        url,
+        { 'current_branch': branchId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      setCurrentBranch(branchId);
+    } catch (error) {
+      console.error('Error updating current branch:', error);
+    }
   };
 
   useEffect(() => {
+    console.log('useEffect called in UserInfo');
     async function fetchUser() {
       try {
         const response = await axios.get(process.env.REACT_APP_API_URL + 'users/', {
@@ -24,7 +39,7 @@ export default function UserInfo() {
           }
         });
         setUser(response.data);
-        console.log('User data:', response.data);
+        setCurrentBranch(response.data.current_branch);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -46,7 +61,7 @@ export default function UserInfo() {
         <InputLabel id='branch-select-label'>Current Branch</InputLabel>
         <Select
           labelId='branch-select-label'
-          value={currentBranch}
+          value={currentBranch || ''}
           onChange={handleBranchChange}
           label='Current Branch'
           size={'small'}
@@ -58,7 +73,7 @@ export default function UserInfo() {
           ))}
         </Select>
       </FormControl>
-      <Link to='/logout'><Typography className="user-info__logout" fontSize={'12px'}>Logout</Typography></Link>
+      <Link to='/logout'><Typography className="user-info__logout" fontSize={'14px'}>Logout</Typography></Link>
     </Box>
   );
 }

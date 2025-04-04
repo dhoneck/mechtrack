@@ -1,7 +1,7 @@
 import csv
 from django.http import HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status
+from rest_framework import filters, generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
@@ -13,7 +13,7 @@ from reportlab.pdfgen import canvas
 from shop.models import CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
     EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer, \
-    CustomTokenObtainPairSerializer, CustomUserSerializer
+    CustomTokenObtainPairSerializer, CustomUserSerializer, CurrentBranchSerializer
 from .filters import ServiceFilter
 
 def generate_timestamp():
@@ -33,14 +33,6 @@ def get_status_choices(request):
     return Response(choices)
 
 
-# class CustomUserGet(generics.RetrieveAPIView):
-#     queryset = CustomUser.objects.select_related('branch')
-#     serializer_class = CustomUserSerializer
-#
-#     def get_object(self):
-#         return self.request.user
-
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -54,6 +46,29 @@ class CustomUserGet(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class GetCurrentBranchView(generics.RetrieveAPIView):
+    """
+    Get the current branch of the custom user.
+    """
+    serializer_class = CurrentBranchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class UpdateCurrentBranchView(generics.UpdateAPIView):
+    """
+    Update the current branch of the custom user.
+    """
+    serializer_class = CurrentBranchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 
 class CustomerList(generics.ListCreateAPIView):
     """

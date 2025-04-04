@@ -25,7 +25,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import UserInfo from "../layout/UserInfo";
 import NavBar from '../layout/NavBar';
 import EstimateModal from '../modals/EstimateModal';
 import ServiceModal from '../modals/ServiceModal';
@@ -266,7 +265,6 @@ export default function ViewVehicle() {
       maxWidth: '75%',
       margin: 'auto' }}
     >
-      <UserInfo />
       <Typography variant='h2'>Vehicle Detail</Typography>
       <NavBar active="Vehicles" />
       <br />
