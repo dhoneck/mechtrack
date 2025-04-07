@@ -15,7 +15,7 @@ class Business(models.Model):
     phone = models.CharField(blank=True, max_length=20)
     email = models.EmailField(blank=True, default='')
     website = models.URLField(blank=True, default='')
-    default_pricing = models.JSONField(blank=True, default=dict)
+    default_pricing = models.JSONField(blank=True, null=True, default=dict)
 
     class Meta:
         verbose_name_plural = 'Businesses'
@@ -27,11 +27,20 @@ class Business(models.Model):
 class Branch(models.Model):
     """Branch model is a location of the auto shop."""
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='branches')
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, default='')
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True, default='')
     website = models.URLField(blank=True, default='')
+    default_pricing = models.JSONField(blank=True, null=True, default=dict)
+
+    def get_default_pricing(self):
+        """Returns the default pricing for the branch or the business if branch pricing is not available."""
+        if self.default_pricing:
+            return self.default_pricing
+        if self.business and self.business.default_pricing:
+            return self.business.default_pricing
+        return None
 
     class Meta:
         verbose_name_plural = 'Branches'
@@ -86,7 +95,6 @@ class CustomUser(AbstractBaseUser):
 
     def all_branches(self):
         return Branch.objects.filter(business=self.business)
-
 
     def has_perm(self, perm, obj=None):
         return self.is_superuser

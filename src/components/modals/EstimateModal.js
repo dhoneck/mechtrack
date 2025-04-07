@@ -14,26 +14,11 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
   const [itemsToDelete, setItemsToDelete] = useState([]);
 
   // TODO: Dynamically grab default pricing from the API
-  const [defaultPricing, setDefaultPricing] = useState([
-      {
-      "name": "Oil Change",
-      "labor_price": 19.99,
-      "part_price": 29.99
-    },
-    {
-      "name": "Brake Replacement",
-      "labor_price": 49.99,
-      "part_price": 99.99
-    },
-    {
-      "name": "Tire Rotation",
-      "labor_price": 15.00,
-      "part_price": 0.00
-    }
-  ]);
+  const [defaultPricing, setDefaultPricing] = useState([]);
 
   // Dynamically sets the rows based on which estimate is passed as a param, if any
   useEffect(() => {
+    console.log('In useEffect for EstimateModal');
     if (open) {
       if (estimate) {  // If estimate exists, use its estimate items for the rows
         setRows(estimate.estimate_items);
@@ -42,7 +27,36 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
       }
       // When modal updates, reset the array that tracks estimate items that are pending deletion
       setItemsToDelete([]);
+
+      async function fetchDefaultPricing() {
+      try {
+        const response1 = await axios.get(`${process.env.REACT_APP_API_URL}users/get-current-branch/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        let currentBranch = response1.data.current_branch;
+        if (!currentBranch) {
+          console.warn('No current branch for user selected, will not look for service pricing');
+          return;
+        }
+
+        const response2 = await axios.get(`${process.env.REACT_APP_API_URL}branches/${currentBranch}/pricing/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setDefaultPricing(response2.data.default_pricing);
+      } catch (error) {
+         console.error('Error fetching default pricing:', error);
+      }
     }
+
+    fetchDefaultPricing();
+    }
+
+    // Fetch default pricing from the API
+
   }, [open, estimate]);
 
   /** Add new blank row for estimate */

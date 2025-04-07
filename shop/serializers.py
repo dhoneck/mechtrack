@@ -38,6 +38,16 @@ class CurrentBranchSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['current_branch']
 
+class PricingSerializer(serializers.ModelSerializer):
+    default_pricing = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Branch
+        fields = ['id', 'default_pricing']
+
+    def get_default_pricing(self, obj):
+        return obj.get_default_pricing()
+
 
 class EstimateItemSerializer(serializers.ModelSerializer):
     estimate_item_total = serializers.ReadOnlyField()

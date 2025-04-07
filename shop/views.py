@@ -5,15 +5,16 @@ from rest_framework import filters, generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from datetime import datetime
 from reportlab.pdfgen import canvas
 
-from shop.models import CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
+from shop.models import Business, Branch, CustomUser, Vehicle, Customer, CustomerVehicle, Service, ServiceItem, Estimate, EstimateItem, Vendor
 from shop.serializers import VehicleSerializer, CustomerSerializer, CustomerVehicleSerializer, ServiceSerializer, \
     EstimateSerializer, EstimateItemSerializer, ServiceItemSerializer, VendorSerializer, \
-    CustomTokenObtainPairSerializer, CustomUserSerializer, CurrentBranchSerializer
+    CustomTokenObtainPairSerializer, CustomUserSerializer, CurrentBranchSerializer, PricingSerializer
 from .filters import ServiceFilter
 
 def generate_timestamp():
@@ -68,6 +69,18 @@ class UpdateCurrentBranchView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class GetBranchPricingView(APIView):
+    def get(self, request, branch_id):
+        try:
+            branch = Branch.objects.get(id=branch_id)
+            serializer = PricingSerializer(branch)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Branch.DoesNotExist:
+            return Response({'error': 'Branch not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CustomerList(generics.ListCreateAPIView):
