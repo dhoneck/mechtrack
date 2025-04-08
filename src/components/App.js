@@ -21,11 +21,19 @@ import PageNotFound from './pages/PageNotFound';
 
 function Layout() {
   const location = useLocation();
-  const hideUserInfoPaths = ['/login', '/logout'];
+  const hideUserInfoPaths = ['/login', '/logout', '/estimates', '/services'];
+
+    // Check if the current path matches any of the paths in hideUserInfoPaths
+  const isMatch = hideUserInfoPaths.some(path => {
+    if (path === '/services' || path === '/estimates') {
+      return new RegExp(`^${path}(\/[0-9]+)?$`).test(location.pathname);
+    }
+    return path === location.pathname;
+  });
 
   return (
     <>
-      {!hideUserInfoPaths.includes(location.pathname) && <UserInfo />}
+      {!isMatch && <UserInfo />}
       <Routes>
         <Route path='login' element={<Login />} />
         <Route path='logout' element={<Logout />} />

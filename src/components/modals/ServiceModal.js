@@ -6,11 +6,10 @@ import dayjs from 'dayjs';
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormGroup,
-  Grid, IconButton, InputAdornment,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Modal,
@@ -38,6 +37,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
   // Store status choices for status dropdown
   const [statusChoices, setStatusChoices] = useState([]);
+
+  // Store the default pricing for the current branch or use business pricing if not available
+  const [defaultPricing, setDefaultPricing] = useState([]);
+
+  const [currentBranch, setCurrentBranch] = useState(null);
+  const [currentBranchName, setCurrentBranchName] = useState(null);
 
   // Default service form values
   const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
@@ -108,7 +113,7 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   };
 
   const handleCustomerNotesChange = (event) => {
-    setInternalNotes(event.target.value);
+    setCustomerNotes(event.target.value);
   };
 
   const handleMileageChange = (event) => {
@@ -134,7 +139,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
     // Make a GET request to the API to get scheduled services for a particular date
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(url,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
       setScheduledServices(response.data)
     } catch (error) {
       console.error(error);
@@ -145,20 +155,10 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   const handleSubmit = async () => {
     console.log('Attempting to schedule service');
 
-    // const serviceData = {
-    //   dateTime,
-    //   estimatedTime,
-    //   services,
-    //   customerNotes,
-    //   status,
-    //   internalNotes,
-    //   mileage,
-    //   items: serviceItems,
-    // };
-
 
     // Combine 'Schedule Service' form values to use in POST request
     let values = {
+      'branch_id': currentBranch,
       'vehicle_id': vehicleId,
       'datetime': dateTime,
       'estimated_time': estimatedTime,
@@ -174,7 +174,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     try {
       let url = `${process.env.REACT_APP_API_URL}services/`;
 
-      await axios.post(url, values)
+      await axios.post(url, values,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
         .then(function (response) {
           console.log('Service Scheduled:');
           console.log(response.data);
@@ -206,7 +211,12 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     try {
       let url = `${process.env.REACT_APP_API_URL}services/${serviceId}/`;
 
-      await axios.get(url)
+      await axios.get(url,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
         .then(function (response) {
           console.log('Service grabbed:');
           console.log(response.data);
@@ -232,6 +242,8 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     }
 
     // If serviceId was passed then get the service
+    console.log('Service ID:');
+    console.log(serviceId);
     if (serviceId) {
       console.log('Service ID was passed');
       getService();
@@ -239,15 +251,54 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
 
     async function fetchStatusChoices() {
       try {
-        const response = await axios.get(process.env.REACT_APP_API_URL + 'status-choices/');
+        const response = await axios.get(process.env.REACT_APP_API_URL + 'services/status-choices/',
+            {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+        console.log('Status choices:');
+        console.log(response.data);
         setStatusChoices(response.data);
       } catch (error) {
         console.error('Error fetching status choices:', error);
       }
     }
 
+    async function fetchDefaultPricing() {
+      try {
+        const response1 = await axios.get(`${process.env.REACT_APP_API_URL}users/get-current-branch/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        let currentBranch = response1.data.current_branch;
+        console.log('Current branch:');
+        console.log(currentBranch);
+        console.log(response1.data);
+
+        if (!currentBranch) {
+          console.warn('No current branch for user selected, will not look for service pricing');
+          return;
+        }
+
+        setCurrentBranch(response1.data.current_branch);
+        setCurrentBranchName(response1.data.current_branch_name);
+
+        const response2 = await axios.get(`${process.env.REACT_APP_API_URL}branches/${currentBranch}/pricing/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        setDefaultPricing(response2.data.default_pricing);
+      } catch (error) {
+         console.error('Error fetching default pricing:', error);
+      }
+    }
+
+    fetchDefaultPricing();
     fetchStatusChoices();
-  }, []);
+  }, [open]);
 
   // Define modal style
   const style = {
@@ -272,9 +323,10 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
         aria-describedby='service-modal-description'
       >
         <Box sx={style}>
-          <Typography id='service-modal-title' sx={{ mb: 2 }} variant='h5' component='h2'>
+          <Typography id='service-modal-title' variant='h5' component='h2'>
             {estimate ? 'Schedule Service From Estimate' : 'Schedule Service'}
           </Typography>
+          {currentBranch && <Typography sx={{mb: 1}}>{currentBranchName ? `(${currentBranchName})` : ''}</Typography>}
           <FormGroup sx={{display: 'flex', flexDirection: 'row', gap: '20px' }}>
 
             {/* Service Details Section */}

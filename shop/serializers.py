@@ -34,9 +34,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class CurrentBranchSerializer(serializers.ModelSerializer):
+    current_branch_name = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        fields = ['current_branch']
+        fields = ['current_branch', 'current_branch_name']
+
+    def get_current_branch_name(self, obj):
+        if obj.current_branch:
+            branch = Branch.objects.get(id=obj.current_branch.id)
+            return branch.name
+        return None
 
 class PricingSerializer(serializers.ModelSerializer):
     default_pricing = serializers.SerializerMethodField()

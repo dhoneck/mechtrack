@@ -75,6 +75,7 @@ export default function ViewVehicle() {
   const [vin, setVin] = useState(null);
   const [notes, setNotes] = useState('');
 
+  // Stores whether If true it will show estimates but if false it will show services
   const [showEstimates, setShowEstimates] = useState(false)
 
   /** Formats a datetime string using dayjs */
@@ -418,6 +419,7 @@ export default function ViewVehicle() {
           </Table>
         </TableContainer>
       </Box>}
+      {/* End of estimate modal and table display */}
 
       {/* Service modal and table display */}
       <ServiceModal
@@ -434,44 +436,45 @@ export default function ViewVehicle() {
         <br/>
         <br/>
         <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
-            <Table size={'small'}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Service Date & Time</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Estimated Time</TableCell>
-                  <TableCell>Mileage</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {vehicle.services && vehicle.services.map(service => (
-                  <TableRow key={service.id}>
-                    <TableCell>{formatDateTime(service.datetime)}</TableCell>
-                    <TableCell>{service.service_items_str}</TableCell>
-                    <TableCell>{service.estimated_time}</TableCell>
-                    <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
-                    <TableCell>{service.service_subtotal ? '$' + service.service_subtotal + ' Tax' : 'n/a'}</TableCell>
-                    <TableCell>{service.status ? service.status : 'n/a'}</TableCell>
-                    <TableCell>
-                      <Link to={'/services/' + service.id} target='_blank'>
-                        <IconButton sx={{ }}>
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Link>
-                      <IconButton onClick={() => handleOpenService(null, service)} sx={{ }}><EditIcon /></IconButton>
+          <Table size={'small'}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Service Date & Time</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Estimated Time</TableCell>
+                <TableCell>Mileage</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {vehicle.services && vehicle.services.map(service => (
+                <TableRow key={service.id}>
+                  <TableCell>{formatDateTime(service.datetime)}</TableCell>
+                  <TableCell>{service.service_items_str}</TableCell>
+                  <TableCell>{service.estimated_time}</TableCell>
+                  <TableCell>{service.mileage ? service.mileage : 'n/a'}</TableCell>
+                  <TableCell>{service.service_subtotal ? '$' + service.service_subtotal + ' Tax' : 'n/a'}</TableCell>
+                  <TableCell>{service.status ? service.status : 'n/a'}</TableCell>
+                  <TableCell>
+                    <Link to={'/services/' + service.id} target='_blank'>
                       <IconButton sx={{ }}>
-                        <DeleteIcon onClick={() => deleteService(service.id)} />
+                        <VisibilityIcon />
                       </IconButton>
+                    </Link>
+                    <IconButton onClick={() => handleOpenService(null, service)} sx={{ }}><EditIcon /></IconButton>
+                    <IconButton sx={{ }}>
+                      <DeleteIcon onClick={() => deleteService(service.id)} />
+                    </IconButton>
                   </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>}
+      {/* End of service modal and table display */}
     </Box>
   );
 }

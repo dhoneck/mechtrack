@@ -13,7 +13,7 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
   // Store an array of estimate item IDs that need to be deleted
   const [itemsToDelete, setItemsToDelete] = useState([]);
 
-  // TODO: Dynamically grab default pricing from the API
+    // Store the default pricing for the current branch or use business pricing if not available
   const [defaultPricing, setDefaultPricing] = useState([]);
 
   // Dynamically sets the rows based on which estimate is passed as a param, if any
@@ -235,8 +235,6 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    // inputValue={row.description}
-                    // onChange={(e) => handleDescriptionChange(index, e.target.value)}
                   />
                 )}
                 onChange={(event, newValue) => {
