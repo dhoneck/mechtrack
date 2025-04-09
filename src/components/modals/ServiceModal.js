@@ -30,7 +30,7 @@ import {StaticDatePicker} from '@mui/x-date-pickers/StaticDatePicker';
 import {AddCircleOutline, RemoveCircleOutline} from "@mui/icons-material";
 
 /** A modal form for scheduling auto service work */
-function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null, serviceId=null }) {
+function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null, serviceId=null }) {
 
   // Store existing service, if exists
   const [serviceToEdit, setServiceToEdit] = useState(null);
@@ -313,7 +313,6 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
     p: 4,
   };
 
-
   return (
     <>
       <Modal
@@ -376,15 +375,19 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
                     sx={{ width: '125px' }}
                     value={row.part_price}
                     onChange={(e) => handlePartPriceChange(index, e.target.value)}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    slotProps={{
+                      input: {
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      },
                     }}
                   /><TextField
                     sx={{ width: '125px' }}
                     value={row.labor_price}
                     onChange={(e) => handleLaborPriceChange(index, e.target.value)}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    slotProps={{
+                      input: {
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      },
                     }}
                   />
                   <IconButton onClick={() => handleRemoveService(index, row.id)} disabled={services.length === 1}>
@@ -501,4 +504,4 @@ function ServiceFormModal({ open, handleClose, vehicleId, getVehicleInfo=null, e
   );
 }
 
-export default ServiceFormModal;
+export default ServiceModal;

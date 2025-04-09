@@ -1,24 +1,28 @@
 import { useEffect, useState } from 'react';
 
-import axios from 'axios';
-
 import { Autocomplete, Box, Button, IconButton, InputAdornment, Modal, TextField, Typography } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 
+import { getPricing } from '../../api/branchesAPI';
+import { createEstimate, createEstimateItem, updateEstimateItem, deleteEstimateItem } from '../../api/estimatesAPI';
+import { getCurrentBranch } from '../../api/usersAPI';
+
 /** Modal form for creating or editing an estimate */
-function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
-  // Store an array of estimate item values (i.e. description, part price, and labor price)
+function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
+  // Store an array of estimate item values (i.e. id, description, part price, labor price)
   const [rows, setRows] = useState([]);
 
-  // Store an array of estimate item IDs that need to be deleted
+  // Array of estimate item IDs that need to be deleted
   const [itemsToDelete, setItemsToDelete] = useState([]);
 
-    // Store the default pricing for the current branch or use business pricing if not available
+  // Default pricing for the current branch or use business pricing if not available
   const [defaultPricing, setDefaultPricing] = useState([]);
 
   // Dynamically sets the rows based on which estimate is passed as a param, if any
   useEffect(() => {
     console.log('In useEffect for EstimateModal');
+    console.log('Estimate:');
+    console.log(estimate);
     if (open) {
       if (estimate) {  // If estimate exists, use its estimate items for the rows
         setRows(estimate.estimate_items);
@@ -28,35 +32,17 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
       // When modal updates, reset the array that tracks estimate items that are pending deletion
       setItemsToDelete([]);
 
-      async function fetchDefaultPricing() {
+      async function handlePricingGet() {
       try {
-        const response1 = await axios.get(`${process.env.REACT_APP_API_URL}users/get-current-branch/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        let currentBranch = response1.data.current_branch;
-        if (!currentBranch) {
-          console.warn('No current branch for user selected, will not look for service pricing');
-          return;
-        }
-
-        const response2 = await axios.get(`${process.env.REACT_APP_API_URL}branches/${currentBranch}/pricing/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        setDefaultPricing(response2.data.default_pricing);
+        const response = await getPricing();
+        const pricing = response.data.default_pricing;
+        setDefaultPricing(pricing);
       } catch (error) {
          console.error('Error fetching default pricing:', error);
       }
     }
-
-    fetchDefaultPricing();
+    handlePricingGet();
     }
-
-    // Fetch default pricing from the API
-
   }, [open, estimate]);
 
   /** Add new blank row for estimate */
@@ -109,29 +95,19 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
     const estimate_items = rows.filter(row => row.description);
 
     try {
-      if (!estimate) {  // Estimate wasn't provided - create new estimate and estimate items
+      if (!estimate) {  // Existing estimate wasn't provided - create new estimate and estimate items
+        const currentBranchResponse = await getCurrentBranch();
+        const branchId = currentBranchResponse.data.current_branch;
 
         // Construct values for creating an estimate, which can take estimate item values and create in same request
         let values = {
           vehicle_id: vehicleId,
-          branch_id: localStorage.getItem('currentBranch'),
+          branch_id: branchId,
           estimate_items,
         };
 
-        // Estimate endpoint URL
-        console.log(`Bearer ${localStorage.getItem('token')}`);
-        let estimateUrl = process.env.REACT_APP_API_URL + 'estimates/';
-        let response = await axios.post(estimateUrl,
-            values,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-              }
-            });
-        console.log('Estimate POST Response');
-        console.log(response);
-
-      } else if (estimate) {  // Estimate was provided - add, edit or remote estimate items to existing estimate
+        await createEstimate(values);
+      } else if (estimate) {  // Existing estimate was provided - add, edit or remove estimate items to estimate
         // Edit existing or create new estimate item
         for (let i =0; i < rows.length; i++) {
           let value = {
@@ -141,48 +117,19 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
             labor_price: rows[i].labor_price,
           };
 
-          // If id is null, create new item
-          if (rows[i].id == null) {
-            console.log('value');
-            let response = await axios.post(
-                `${process.env.REACT_APP_API_URL}estimate-items/`,
-                value,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                  }
-                });
-            console.log('Estimate item POST Response');
-            console.log(response);
-          } else {
-            let response = await axios.put(
-                `${process.env.REACT_APP_API_URL}estimate-items/${rows[i].id}/`,
-                value,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                  }
-                });
-            console.log('Estimate item PUT Response');
-            console.log(response);
+          // Create new or update existing estimate item depending on if there was an id
+          if (rows[i].id == null) {  // id is null, create new item
+            await createEstimateItem(value);
+          } else {  // id exists, update existing item
+            await updateEstimateItem(rows[i].id);
           }
         }
 
-        // Remove items from estimate
+        // Delete existing estimate items from database that were removed from estimate form
         if (itemsToDelete) {
-          console.log('Attempting to DELETE estimate items');
           for (const itemId of itemsToDelete) {
-            console.log('Attempting to delete item #:', itemId);
-            let response = await axios.delete(
-                `${process.env.REACT_APP_API_URL}estimate-items/${itemId}/`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                  }
-                });
+            await deleteEstimateItem(itemId);
           }
-        } else {
-          console.log('No estimate items to delete');
         }
       }
 
@@ -258,15 +205,19 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
                 sx={{ width: '125px' }}
                 value={row.part_price}
                 onChange={(e) => handlePartPriceChange(index, e.target.value)}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                slotProps={{
+                  input: {
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  },
                 }}
               /><TextField
                 sx={{ width: '125px' }}
                 value={row.labor_price}
                 onChange={(e) => handleLaborPriceChange(index, e.target.value)}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                slotProps={{
+                  input: {
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  },
                 }}
               />
               <IconButton onClick={() => handleRemoveRow(index, row.id)} disabled={rows.length === 1}>
@@ -282,4 +233,4 @@ function EstimateFormModal({ open, handleClose, vehicleId, estimate=null }) {
   );
 }
 
-export default EstimateFormModal;
+export default EstimateModal;
