@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import axios from 'axios';
 import dayjs from 'dayjs';
 
 import {
@@ -29,11 +28,27 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {StaticDatePicker} from '@mui/x-date-pickers/StaticDatePicker';
 import {AddCircleOutline, RemoveCircleOutline} from "@mui/icons-material";
 
-/** A modal form for scheduling auto service work */
-function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estimate=null, serviceId=null }) {
+import { getPricing } from '../../api/branchesAPI';
+import { getCurrentBranch } from '../../api/usersAPI';
+import {
+  createService,
+  getService,
+  getServicesByDate,
+  createServiceItem,
+  updateServiceItem,
+  deleteServiceItem,
+  getStatusChoices,
+} from '../../api/servicesAPI';
 
-  // Store existing service, if exists
-  const [serviceToEdit, setServiceToEdit] = useState(null);
+/** A modal form for scheduling auto service work
+ * @param {boolean} open - Whether the modal is open or closed
+ * @param {function} handleClose - Function to close the modal
+ * @param {number} vehicleId - ID of the vehicle associated with the service
+ * @param {object} estimate - Existing estimate object to edit (optional)
+ * @param {number} serviceId - ID of the service to edit (optional)
+ * @param {function} refreshFunction - Function to refresh the parent component (optional)
+ * */
+function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=null, refreshFunction=null, }) {
 
   // Store status choices for status dropdown
   const [statusChoices, setStatusChoices] = useState([]);
@@ -45,14 +60,25 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
   const [currentBranchName, setCurrentBranchName] = useState(null);
 
   // Default service form values
-  const [dateTime, setDateTime] = useState(dayjs().hour(11).minute(0).second(0));
-  const [estimatedTime, setEstimatedTime] = useState('1 hr');
-  const [services, setServices] = useState([{ id: null, description: '', part_price: '', labor_price: '' }]);
-  const [customerNotes, setCustomerNotes] = useState('');
-  const [internalNotes, setInternalNotes] = useState('');
-  const [mileage, setMileage] = useState(null);
-  const [status, setStatus] = useState('Scheduled');
+  const [serviceForm, setServiceForm] = useState({
+    vehicle_id: vehicleId,
+    datetime: dayjs().hour(11).minute(0).second(0),
+    estimated_time: '1 hr',
+    service_items: [{ id: null, description: '', part_price: '', labor_price: '' }],
+    customer_notes: '',
+    internal_notes: '',
+    mileage: null,
+    status: 'Scheduled',
+  });
 
+  /** Update a specific field in the vehicle form. */
+  const handleFieldChange = (field, value) => {
+    console.log('Value in handleFieldChange:', value);
+    setServiceForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   // Store date being used in schedule preview widget
   const [previewDate, setPreviewDate] = useState(new Date());
@@ -60,24 +86,28 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
   // Store services scheduled happening on preview date
   const [scheduledServices, setScheduledServices] = useState([]);
 
+  // Store an array of service item IDs that need to be deleted
+  const [itemsToDelete, setItemsToDelete] = useState([]);
+
   // Define functions to handle form changes
   const handleDateTimeChange = (e) => {
-      setDateTime(e);
+      handleFieldChange('datetime', e);
       setPreviewDate(new Date(e));
     };
-
-  const handleEstimatedTimeChange = (event) => {
-    setEstimatedTime(event.target.value);
-  };
   
-  const handleAddService = () => setServices([...services, { id: null, description: '', part_price: '', labor_price: '' }]);
+  const handleAddRow = () => {
+    setServiceForm((prev) => ({
+      ...prev,
+      service_items: [...prev.service_items, { id: null, description: '', part_price: '', labor_price: '' }],
+    }));
+  };
 
-  const handleRemoveService = (index, id) => {
-    if (services.length === 1) return;  // Ensure at least one service exists
+  const handleRemoveRow = (index, id) => {
+    if (serviceForm.service_items.length === 1) return;  // Ensure at least one service exists
     // Remove the service and reset services useState
-    const newServices = [...services];
+    const newServices = [...serviceForm.service_items];
     newServices.splice(index, 1);
-    setServices(newServices);
+    handleFieldChange('service_items', newServices);
 
     // Add service item id to array that will be deleted upon form submission
     // An id means that it's an existing service item and will need to be deleted with a DELETE request, hence tracking
@@ -87,50 +117,33 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
     }
   };
 
-  // Store an array of service item IDs that need to be deleted
-  const [itemsToDelete, setItemsToDelete] = useState([]);
-
   const handleDescriptionChange = (index, value) => {
-    const newServices = [...services];
+    const newServices = [...serviceForm.service_items];
     newServices[index].description = value;
-    setServices(newServices);
+    handleFieldChange('service_items', newServices);
   };
 
   const handlePartPriceChange = (index, value) => {
-    const newServices = [...services];
+    const newServices = [...serviceForm.service_items];
     newServices[index].part_price = value;
-    setServices(newServices);
+    handleFieldChange('service_items', newServices);
   };
 
   const handleLaborPriceChange = (index, value) => {
-    const newServices = [...services];
+    const newServices = [...serviceForm.service_items];
     newServices[index].labor_price = value;
-    setServices(newServices);
-  };
-
-  const handleInternalNotesChange = (event) => {
-    setInternalNotes(event.target.value);
-  };
-
-  const handleCustomerNotesChange = (event) => {
-    setCustomerNotes(event.target.value);
-  };
-
-  const handleMileageChange = (event) => {
-    setMileage(event.target.value);
-  };
-
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
+    handleFieldChange('service_items', newServices);
   };
 
   /** Searches for services on a particular date */
-  const handlePreview = async (e) => {
+  const handleSchedulePreview = async (e) => {
+    console.log('Preview date:', e);
     // Set date for schedule preview widget
     setPreviewDate(new Date(e));
 
     // Update dateTime with the new date while preserving the time
-    setDateTime((prevDateTime) => dayjs(e).hour(prevDateTime.hour()).minute(prevDateTime.minute()));
+    const lastDateTime = serviceForm.datetime;
+    handleFieldChange('datetime', dayjs(e).hour(lastDateTime.hour()).minute(lastDateTime.minute()));
 
     // Format date and endpoint URL
     let date = new Date(e);
@@ -139,13 +152,9 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
 
     // Make a GET request to the API to get scheduled services for a particular date
     try {
-      const response = await axios.get(url,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-      setScheduledServices(response.data)
+      const response = await getServicesByDate(dateStr);
+      const services = response.data;
+      setScheduledServices(services)
     } catch (error) {
       console.error(error);
     }
@@ -153,113 +162,60 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
 
    /** Make POST request to add new service for a vehicle */
   const handleSubmit = async () => {
-    console.log('Attempting to schedule service');
-
-
-    // Combine 'Schedule Service' form values to use in POST request
-    let values = {
-      'branch_id': currentBranch,
-      'vehicle_id': vehicleId,
-      'datetime': dateTime,
-      'estimated_time': estimatedTime,
-      'service_items': services,
-      'customer_notes': customerNotes,
-      'estimate_id': estimate ? estimate.id: null,
-    };
-
-    console.log('Service values');
-    console.log(values);
-
-    // Try to create a new vehicle
+    // Try to create a new service
     try {
-      let url = `${process.env.REACT_APP_API_URL}services/`;
+      console.log('serviceForm to submit');
+      console.log(serviceForm);
+      await createService(serviceForm);
 
-      await axios.post(url, values,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-        .then(function (response) {
-          console.log('Service Scheduled:');
-          console.log(response.data);
+      // Refresh the parent component if a refresh function was provided
+      if (refreshFunction) { refreshFunction(); }
 
-          // Close modal
-          handleClose();
-
-          // Refresh vehicle info
-          getVehicleInfo();
-        });
+      // Close modal
+      handleClose();
     } catch (error) {
       console.error(error);
-      console.error(values);
     }
   }
 
-  function setFormValues() {
-      setDateTime(dayjs(serviceToEdit.datetime));
-      setEstimatedTime(serviceToEdit.estimated_time);
-      setServices(serviceToEdit.service_items);
-      setCustomerNotes(serviceToEdit.customer_notes);
-      setInternalNotes(serviceToEdit.internal_notes);
-      setMileage(serviceToEdit.mileage);
-      setStatus(serviceToEdit.status);
-  }
-
-  async function getService() {
-    console.log('Getting service');
+  async function handleServiceGet() {
     try {
-      let url = `${process.env.REACT_APP_API_URL}services/${serviceId}/`;
+      const response = await getService(serviceId);
+      const service = response.data;
+      console.log('handleServiceGet service:');
+      console.log(service);
+      if (!service.service_items) {
+        console.log('Adding default service item');
+        handleFieldChange('service_items', [{ id: null, description: '', part_price: '', labor_price: '' }]);
+      }
 
-      await axios.get(url,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-        .then(function (response) {
-          console.log('Service grabbed:');
-          console.log(response.data);
-
-          // Refresh vehicle info
-          setServiceToEdit(response.data);
-
-          setFormValues();
-        });
+      setServiceForm(service);
     } catch (error) {
       console.error(error);
     }
   }
 
   useEffect(() => {
-    console.log('In useEffect');
+    console.log('vehicleId:', vehicleId);
+
+    console.log('serviceForm from useEffect');
+    console.log(serviceForm)
     // Assign estimate items to service items if an estimate was passed
     if (estimate) {
-      console.log('An estimate was passed to service form as a template:');
-      console.log(estimate);
-
-      setServices(estimate.estimate_items);
+      handleFieldChange('service_items', estimate.estimate_items);
     }
 
-    // If serviceId was passed then get the service
-    console.log('Service ID:');
-    console.log(serviceId);
+    // If serviceId was passed then get the service because
     if (serviceId) {
       console.log('Service ID was passed');
-      getService();
+      handleServiceGet();
     }
 
     async function fetchStatusChoices() {
       try {
-        const response = await axios.get(process.env.REACT_APP_API_URL + 'services/status-choices/',
-            {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-        console.log('Status choices:');
-        console.log(response.data);
-        setStatusChoices(response.data);
+        const response = await getStatusChoices();
+        const statusChoices = response.data;
+        setStatusChoices(statusChoices);
       } catch (error) {
         console.error('Error fetching status choices:', error);
       }
@@ -267,30 +223,21 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
 
     async function fetchDefaultPricing() {
       try {
-        const response1 = await axios.get(`${process.env.REACT_APP_API_URL}users/get-current-branch/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        let currentBranch = response1.data.current_branch;
-        console.log('Current branch:');
-        console.log(currentBranch);
-        console.log(response1.data);
+        const branchResponse = await getCurrentBranch();
+        let currentBranch = branchResponse.data.current_branch;
+        let currentBranchName = branchResponse.data.current_branch_name;
 
         if (!currentBranch) {
           console.warn('No current branch for user selected, will not look for service pricing');
           return;
         }
 
-        setCurrentBranch(response1.data.current_branch);
-        setCurrentBranchName(response1.data.current_branch_name);
+        setCurrentBranch(currentBranch);
+        setCurrentBranchName(currentBranchName);
 
-        const response2 = await axios.get(`${process.env.REACT_APP_API_URL}branches/${currentBranch}/pricing/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        setDefaultPricing(response2.data.default_pricing);
+        const pricingResponse = await getPricing(currentBranch);
+        const pricing = pricingResponse.data.default_pricing;
+        setDefaultPricing(pricing);
       } catch (error) {
          console.error('Error fetching default pricing:', error);
       }
@@ -298,7 +245,7 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
 
     fetchDefaultPricing();
     fetchStatusChoices();
-  }, [open]);
+  }, [vehicleId, open]);
 
   // Define modal style
   const style = {
@@ -336,8 +283,8 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                     timeSteps={{ minutes: 15 }}
                     label='Service Date & Time'
                     sx={{ mb: 1, width: '100%' }}
-                    value={dateTime}
-                    onChange={handleDateTimeChange}
+                    value={serviceForm.datetime}
+                    onChange={(e) => handleDateTimeChange(e.target.value)}
                   />
               </LocalizationProvider>
               <FormControl sx={{ mb: 1, width: '100%' }}>
@@ -346,9 +293,9 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                   sx={{display: 'block'}}
                   labelId='demo-simple-select-label'
                   id='demo-simple-select'
-                  value={estimatedTime}
+                  value={serviceForm.estimated_time}
                   label='Estimated Time'
-                  onChange={handleEstimatedTimeChange}
+                  onChange={(e) => handleFieldChange('estimated_time', e.target.value)}
                 >
                   <MenuItem value={'1 hr'}>1 hr</MenuItem>
                   <MenuItem value={'2 hrs'}>2 hrs</MenuItem>
@@ -368,7 +315,7 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 <Typography display="inline" sx={{ width: '125px' }}>Labor Price</Typography>
                 <Typography display="inline" sx={{ width: '40px' }}></Typography>
               </Box>
-              {services.map((row, index) => (
+              {serviceForm.service_items && serviceForm.service_items.map((row, index) => (
                 <Box key={index} data-id={row.id} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
                   <TextField sx={{ flexGrow: 1 }} value={row.description} onChange={(e) => handleDescriptionChange(index, e.target.value)} />
                   <TextField
@@ -390,12 +337,12 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                       },
                     }}
                   />
-                  <IconButton onClick={() => handleRemoveService(index, row.id)} disabled={services.length === 1}>
+                  <IconButton onClick={() => handleRemoveRow(index, row.id)} disabled={serviceForm.service_items.length === 1}>
                     <RemoveCircleOutline />
                   </IconButton>
                 </Box>
                 ))}
-                <Button onClick={handleAddService} startIcon={<AddCircleOutline />}>Add Item</Button>
+                <Button onClick={handleAddRow} startIcon={<AddCircleOutline />}>Add Item</Button>
 
               <TextField
                 id='customer-notes'
@@ -404,8 +351,8 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 multiline
                 rows={3}
                 fullWidth
-                value={customerNotes}
-                onChange={handleCustomerNotesChange}
+                value={serviceForm.customerNotes}
+                onChange={(e) => handleFieldChange('customer_notes', e.target.value)}
                 sx={{ mb: 1 }}
               />
 
@@ -417,8 +364,8 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 multiline
                 rows={3}
                 fullWidth
-                value={internalNotes}
-                onChange={handleInternalNotesChange}
+                value={serviceForm.internalNotes}
+                onChange={(e) => handleFieldChange('internal_notes', e.target.value)}
                 sx={{ mb: 1 }}
               />
 
@@ -427,8 +374,8 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 label='Mileage'
                 variant='outlined'
                 fullWidth
-                value={mileage}
-                onChange={handleMileageChange}
+                value={serviceForm.mileage}
+                onChange={(e) => handleFieldChange('mileage', e.target.value)}
                 sx={{ mb: 1 }}
               />
 
@@ -437,9 +384,9 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 <Select
                   labelId='status-select-label'
                   id='status-select'
-                  value={status}
+                  value={serviceForm.status}
                   label='Status'
-                  onChange={handleStatusChange}
+                  onChange={(e) => handleFieldChange('status', e.target.value)}
                 >
                   {statusChoices.map((statusOption) => (
                     <MenuItem key={statusOption[0]} value={statusOption[0]}>
@@ -460,7 +407,7 @@ function ServiceModal({ open, handleClose, vehicleId, getVehicleInfo=null, estim
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
                   value={dayjs(previewDate)}
-                  onChange={handlePreview}
+                  onChange={handleSchedulePreview}
                   sx={{
                     '& .MuiPickersCalendarHeader-root': {
                       marginTop: 0,

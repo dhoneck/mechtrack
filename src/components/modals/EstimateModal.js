@@ -4,25 +4,28 @@ import { Autocomplete, Box, Button, IconButton, InputAdornment, Modal, TextField
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 
 import { getPricing } from '../../api/branchesAPI';
-import { createEstimate, createEstimateItem, updateEstimateItem, deleteEstimateItem } from '../../api/estimatesAPI';
 import { getCurrentBranch } from '../../api/usersAPI';
+import { createEstimate, createEstimateItem, updateEstimateItem, deleteEstimateItem } from '../../api/estimatesAPI';
 
-/** Modal form for creating or editing an estimate */
-function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
-  // Store an array of estimate item values (i.e. id, description, part price, labor price)
+/** Modal form for creating or editing an estimate
+ * @param {boolean} open - Whether the modal is open or closed
+ * @param {function} handleClose - Function to close the modal
+ * @param {number} vehicleId - ID of the vehicle associated with the estimate
+ * @param {object} estimate - Existing estimate object to edit (optional)
+ * @param {function} refreshFunction - Function to refresh the parent component (optional)
+ */
+function EstimateModal({ open, handleClose, vehicleId, estimate=null, refreshFunction=null }) {
+  // Array of estimate item values (i.e. id, description, part price, labor price)
   const [rows, setRows] = useState([]);
 
-  // Array of estimate item IDs that need to be deleted
+  // Array of estimate item IDs that need to be deleted from DB
   const [itemsToDelete, setItemsToDelete] = useState([]);
 
-  // Default pricing for the current branch or use business pricing if not available
+  // Fetched pricing options for the current branch or use business pricing if not available
   const [defaultPricing, setDefaultPricing] = useState([]);
 
   // Dynamically sets the rows based on which estimate is passed as a param, if any
   useEffect(() => {
-    console.log('In useEffect for EstimateModal');
-    console.log('Estimate:');
-    console.log(estimate);
     if (open) {
       if (estimate) {  // If estimate exists, use its estimate items for the rows
         setRows(estimate.estimate_items);
@@ -33,26 +36,23 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
       setItemsToDelete([]);
 
       async function handlePricingGet() {
-      try {
-        const response = await getPricing();
-        const pricing = response.data.default_pricing;
-        setDefaultPricing(pricing);
-      } catch (error) {
-         console.error('Error fetching default pricing:', error);
+        try {
+          const response = await getPricing();
+          const pricing = response.data.default_pricing;
+          setDefaultPricing(pricing);
+        } catch (error) {
+           console.error('Error fetching default pricing:', error);
+        }
       }
-    }
-    handlePricingGet();
+      handlePricingGet();
     }
   }, [open, estimate]);
 
-  /** Add new blank row for estimate */
+  /** Add new blank row for estimate. */
   const handleAddRow = () => setRows([...rows, { id: null, description: '', part_price: '', labor_price: '' }]);
 
-  /** Remove row containing an estimate item */
+  /** Remove row containing an estimate item. */
   const handleRemoveRow = (index, id) => {
-    console.log('Removing row index:', index);
-    console.log('Removing row id:', id);
-    console.log('Rows:', rows);
     if (rows.length === 1) return;  // Ensure at least one row exists
     // Remove the row and reset rows useState
     const newRows = [...rows];
@@ -67,28 +67,14 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
     }
   };
 
-  /** Update description for specified row */
-  const handleDescriptionChange = (index, value) => {
-    const newRows = [...rows];
-    newRows[index].description = value;
-    setRows(newRows);
-  };
+ /** Update specified row's field with a new value. */
+const updateRowField = (index, field, value) => {
+  const updatedRows = [...rows];
+  updatedRows[index][field] = value;
+  setRows(updatedRows);
+};
 
-  /** Update part price for specified row */
-  const handlePartPriceChange = (index, value) => {
-    const newRows = [...rows];
-    newRows[index].part_price = value;
-    setRows(newRows);
-  };
-
-  /** Update labor price for specified row */
-  const handleLaborPriceChange = (index, value) => {
-    const newRows = [...rows];
-    newRows[index].labor_price = value;
-    setRows(newRows);
-  };
-
-  /** Handle estimate form submission */
+  /** Handle estimate form submission. */
   const handleSubmit = async () => {
     // Remove rows that do not have a description
     // NOTE: If you edit an existing estimate item to have no description, submitting the form shouldn't affect it
@@ -121,7 +107,7 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
           if (rows[i].id == null) {  // id is null, create new item
             await createEstimateItem(value);
           } else {  // id exists, update existing item
-            await updateEstimateItem(rows[i].id);
+            await updateEstimateItem(rows[i].id, value);
           }
         }
 
@@ -136,6 +122,9 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
       // Reset useState values
       setRows([{ id: null, description: '', labor_price: '', part_price: '' }]);
       setItemsToDelete([]);
+
+      // Refresh the parent component if a refresh function was provided
+      if (refreshFunction) { refreshFunction(); }
 
       // Close modal
       handleClose();
@@ -177,7 +166,7 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
                 getOptionLabel={(option) => option.name}
                 inputValue={row.description}
                 onInputChange={(event, newInputValue) => {
-                  handleDescriptionChange(index, newInputValue);
+                  updateRowField(index, 'description', newInputValue);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -185,26 +174,16 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
                   />
                 )}
                 onChange={(event, newValue) => {
-                  if (newValue) {
-                    console.log('newValue if:', newValue);
-                    console.log('index:', index);
-                    handleDescriptionChange(index, newValue.name);
-                    handlePartPriceChange(index, newValue.part_price);
-                    handleLaborPriceChange(index, newValue.labor_price);
-                  } else {
-                    console.log('newValue else:', newValue);
-                    console.log('index:', index);
-                    handleDescriptionChange(index, '');
-                    handlePartPriceChange(index, '');
-                    handleLaborPriceChange(index, '');
-                  }
+                  updateRowField(index, 'description', newValue?.description || '');
+                  updateRowField(index, 'part_price', newValue?.part_price || '');
+                  updateRowField(index, 'labor_price', newValue?.labor_price || '');
                 }}
               />
 
               <TextField
                 sx={{ width: '125px' }}
                 value={row.part_price}
-                onChange={(e) => handlePartPriceChange(index, e.target.value)}
+                onChange={(e) => updateRowField(index, 'part_price', e.target.value)}
                 slotProps={{
                   input: {
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -213,7 +192,7 @@ function EstimateModal({ open, handleClose, vehicleId, estimate=null }) {
               /><TextField
                 sx={{ width: '125px' }}
                 value={row.labor_price}
-                onChange={(e) => handleLaborPriceChange(index, e.target.value)}
+                onChange={(e) => updateRowField(index, 'labor_price', e.target.value)}
                 slotProps={{
                   input: {
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,

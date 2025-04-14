@@ -1,4 +1,4 @@
-import apiClient from './axiosInstance';
+import apiClient from './axiosClient';
 import { getCurrentBranch } from './usersAPI';
 
 export const getPricing = async () => {

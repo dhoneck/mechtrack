@@ -1,4 +1,4 @@
-import apiClient from './axiosInstance';
+import apiClient from './axiosClient';
 
 export const getVehicle = (id) => apiClient.get(`/vehicles/${id}/`);
 export const updateVehicle = (id, data) => apiClient.put(`/vehicles/${id}/`, data);

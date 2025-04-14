@@ -29,49 +29,64 @@ import { getVehicle, updateVehicle, deleteVehicle } from '../../api/vehiclesAPI'
 import { deleteEstimate } from '../../api/estimatesAPI';
 import { deleteService } from '../../api/servicesAPI';
 import { formatDateTime } from '../../utils/dateUtils';
+import {getCurrentBranch} from "../../api/usersAPI";
 
 export default function ViewVehicle() {
-  // Grab and rename id URL param to vehicleId
+  // Grab vehicle ID from URL param
   let { id: vehicleId } = useParams();
 
   // Vehicle info from fetch call
   const [vehicle, setVehicle] = useState([]);
 
-  // Track modal state for the edit vehicle modal
+  // Vehicle modal states
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
   const handleVehicleModalOpen = () => setIsVehicleModalOpen(true);
   const handleVehicleModalClose = () => setIsVehicleModalOpen(false);
 
-  // Tracks modal state for add estimate modal
+  // Estimate modal states
   const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
   const handleEstimateModalOpen = (estimate = null ) => {
-    setEditEstimate(estimate);
+    setEstimate(estimate);
     setIsEstimateModalOpen(true);
   }
   const handleEstimateModalClose = () => setIsEstimateModalOpen(false);
 
-  // Track modal state for the add service modal
+  // Service modal states
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const handleServiceModalOpen = (estimate = null, service = null) => {
-    setEditEstimate(estimate);
+    setEstimate(estimate);
+    setServiceId(service);
     setIsServiceModalOpen(true);
   }
-  const handleServiceModalClose = () => setIsServiceModalOpen(false);
+  const handleServiceModalClose = () => {
+    setIsServiceModalOpen(false);
+  }
 
-  // Stores whether estimate modal is in create or edit mode
-  const [editEstimate, setEditEstimate] = useState(null)
+  // Estimate and service data to pass to modals
+  const [estimate, setEstimate] = useState(null);
+  const [serviceId, setServiceId] = useState(null);
 
-  // Set empty vehicle form values
-  const [make, setMake] = useState('');
-  const [model, setModel] = useState('');
-  const [year, setYear] = useState('');
-  const [color, setColor] = useState('');
-  const [license, setLicense] = useState(null);
-  const [vin, setVin] = useState(null);
-  const [notes, setNotes] = useState('');
+  // If true it will show services table but if false it will show estimates table
+  const [isShowingServices, setIsShowingServices] = useState(true);
 
-  // If true it will show estimates table but if false it will show services table
-  const [isShowingEstimates, setIsShowingEstimates] = useState(true);
+  // State variables for vehicle form
+  const [vehicleForm, setVehicleForm] = useState({
+    make: '',
+    model: '',
+    year: null,
+    color: '',
+    license: null,
+    vin: null,
+    notes: '',
+  });
+
+  /** Update a specific field in the vehicle form. */
+  const handleFieldChange = (field, value) => {
+    setVehicleForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   /** GET vehicle and set states. */
   const handleVehicleGet = async () => {
@@ -80,15 +95,15 @@ export default function ViewVehicle() {
       const vehicleData = response.data;
 
       setVehicle(vehicleData);
-
-      // Set initial values for 'Edit Vehicle' form
-      setMake(vehicleData.make);
-      setModel(vehicleData.model);
-      setYear(vehicleData.year);
-      setColor(vehicleData.color);
-      setLicense(vehicleData.license);
-      setVin(vehicleData.vin);
-      setNotes(vehicleData.notes);
+      setVehicleForm({
+        make: vehicleData.make,
+        model: vehicleData.model,
+        year: vehicleData.year,
+        color: vehicleData.color,
+        license: vehicleData.license,
+        vin: vehicleData.vin,
+        notes: vehicleData.notes,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -96,19 +111,8 @@ export default function ViewVehicle() {
 
   /** PUT vehicle, refresh vehicle data, and close edit vehicle modal. */
   const handleVehicleUpdate = async () => {
-    // Combine 'Edit Vehicle' form values to use in PUT request
-    let values = {
-      'make': make,
-      'model': model,
-      'year': year,
-      'color': color,
-      'license': license,
-      'vin': vin,
-      'notes': notes,
-    };
-
     try {
-      await updateVehicle(vehicleId, values);
+      await updateVehicle(vehicleId, vehicleForm);
       await handleVehicleGet();
       handleVehicleModalClose();
     } catch (error) {
@@ -161,13 +165,14 @@ export default function ViewVehicle() {
     }
   };
 
-  // Update vehicle data when a modal state changes
+  // Update vehicle data on component mount
   useEffect(() => {
+    console.log('ViewVehicle useEffect');
     const fetchData = async () => {
       await handleVehicleGet();
     };
     fetchData();
-  }, [isVehicleModalOpen, isEstimateModalOpen, isServiceModalOpen]);
+  }, []);
 
   const style = {
     position: 'absolute',
@@ -185,23 +190,15 @@ export default function ViewVehicle() {
     <Box sx={{ textAlign: 'center', minWidth: '519px', maxWidth: '75%', margin: 'auto' }}>
       <Typography variant='h2'>Vehicle Detail</Typography>
       <NavBar active="Vehicles" />
-      <br />
-      <Typography><strong>{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.color ? `(${vehicle.color})` : ''}</strong></Typography>
-      <Typography><strong>Owners: {vehicle.list_owners}</strong></Typography>
-      <Typography></Typography>
-      <br/>
-      <Box sx={{ display:'Flex', justifyContent:'center', gap: '5px' }}>
+      <Typography sx={{ mt:3, mb: 1 }}><strong>{vehicle.year} {vehicle.make} {vehicle.model} {vehicle.color ? `(${vehicle.color})` : ''}</strong></Typography>
+      <Typography sx={{ my:1 }}><strong>Owners: {vehicle.list_owners}</strong></Typography>
+      <Box sx={{ display:'Flex', justifyContent:'center', gap: '5px', my: 1 }}>
         <Button variant='outlined' onClick={handleVehicleModalOpen}>Edit</Button>
         <Button variant='outlined' color='error' onClick={handleVehicleDelete}>Delete</Button>
       </Box>
-      <br/>
-      <br/>
-      <Typography><strong>VIN: {vehicle.vin ? vehicle.vin : 'n/a'}</strong></Typography>
-      <br/>
-      <Typography><strong>License: {vehicle.license ? vehicle.license : 'n/a'}</strong></Typography>
-      <br/>
-      <Typography><strong>Notes: {vehicle.notes ? vehicle.notes : 'n/a'}</strong></Typography>
-      <br/>
+      <Typography sx={{ my:1 }}><strong>VIN: {vehicle.vin ? vehicle.vin : 'n/a'}</strong></Typography>
+      <Typography sx={{ my:1 }}><strong>License: {vehicle.license ? vehicle.license : 'n/a'}</strong></Typography>
+      <Typography sx={{ my:1 }}><strong>Notes: {vehicle.notes ? vehicle.notes : 'n/a'}</strong></Typography>
 
       {/* Edit Vehicle Modal */}
       <Modal
@@ -219,48 +216,48 @@ export default function ViewVehicle() {
               required id='make'
               label='Make'
               variant='outlined'
-              value={make}
-              onChange={(e) => setMake(e.target.value)}
+              value={vehicleForm.make}
+              onChange={(e) => handleFieldChange('make', e.target.value)}
               sx={{ my: 1 }}
             />
             <TextField
               required id='model'
               label='Model'
               variant='outlined'
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
+              value={vehicleForm.model}
+              onChange={(e) => handleFieldChange('model', e.target.value)}
               sx={{ mb: 1 }}
             />
             <TextField
               required id='year'
               label='Year'
               variant='outlined'
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
+              value={vehicleForm.year}
+              onChange={(e) => handleFieldChange('year', e.target.value)}
               sx={{ mb: 1 }}
             />
             <TextField
               id='color'
               label='Color'
               variant='outlined'
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={vehicleForm.color}
+              onChange={(e) => handleFieldChange('color', e.target.value)}
               sx={{ mb: 1 }}
             />
             <TextField
               id='license'
               label='License'
               variant='outlined'
-              value={license}
-              onChange={(e) => setLicense(e.target.value)}
+              value={vehicleForm.license}
+              onChange={(e) => handleFieldChange('license', e.target.value)}
               sx={{ mb: 1 }}
             />
             <TextField
               id='vin'
               label='VIN'
               variant='outlined'
-              value={vin}
-              onChange={(e) => setVin(e.target.value)}
+              value={vehicleForm.vin}
+              onChange={(e) => handleFieldChange('vin', e.target.value)}
               sx={{ mb: 1 }}
             />
             <TextField
@@ -269,8 +266,8 @@ export default function ViewVehicle() {
               variant='outlined'
               multiline
               rows={4}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              value={vehicleForm.notes}
+              onChange={(e) => handleFieldChange('notes', e.target.value)}
               sx={{ mb: 1 }}
             />
             <Button variant='contained' onClick={handleVehicleUpdate}>Submit</Button>
@@ -283,32 +280,37 @@ export default function ViewVehicle() {
       <EstimateModal
           open={isEstimateModalOpen}
           handleClose={handleEstimateModalClose}
-          vehicleId={parseInt(vehicleId)}
-          estimate={editEstimate}
+          vehicleId={vehicle.id}
+          estimate={estimate}
+          refreshFunction={handleVehicleGet}
       />
 
       <ServiceModal
           open={isServiceModalOpen}
           handleClose={handleServiceModalClose}
           vehicleId={vehicle.id}
-          handleVehicleGet={handleVehicleGet}
-          estimate={editEstimate}
+          refreshFunction={handleVehicleGet}
+          estimate={estimate}
+          serviceId={serviceId}
       />
       {/* End of Estimate and Service Modals*/}
 
       {/* Vehicle Estimates and Services Table Heading */}
-      <Box onClick={()=> setIsShowingEstimates(!isShowingEstimates)} sx={{cursor:'pointer'}}>
-        {isShowingEstimates && <Typography variant='h4'><strong>Estimates</strong> | <span style={{color:'gray'}}>Services</span></Typography>}
-        {!isShowingEstimates && <Typography variant='h4'><span style={{color:'gray'}}>Estimates</span> | <strong>Services</strong></Typography>}
-        <br/>
+      <Box onClick={()=> setIsShowingServices(!isShowingServices)} sx={{ cursor:'pointer', mt: 1, mb: 1 }}>
+        {!isShowingServices && <Typography variant='h4'>
+          <strong>Estimates</strong>
+          <span style={{color:'gray'}}> | Services</span>
+        </Typography>}
+        {isShowingServices && <Typography variant='h4'>
+          <span style={{color:'gray'}}>Estimates | </span>
+          <strong>Services</strong></Typography>}
+
       </Box>
       {/* End of estimates and services table heading */}
 
       {/* Estimates Table */}
-      {isShowingEstimates && <Box>
-        <Button variant='outlined' onClick={() => handleEstimateModalOpen()}>Create Estimate</Button>
-        <br/>
-        <br/>
+      {!isShowingServices && <Box>
+        <Button variant='outlined' sx={{ mb: 1 }} onClick={() => handleEstimateModalOpen()}>Create Estimate</Button>
         <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table size='small'>
             <TableHead>
@@ -343,12 +345,19 @@ export default function ViewVehicle() {
                     <IconButton onClick={() => handleEstimateModalOpen(estimate)}>
                       <EditIcon />
                     </IconButton>
-                    <IconButton>
-                      <DeleteIcon onClick={() => handleEstimateDelete(estimate.id)} />
+                    <IconButton onClick={() => handleEstimateDelete(estimate.id)} >
+                      <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
+              {vehicle.estimates && vehicle.estimates.length == 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
+                      No estimates found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -356,10 +365,8 @@ export default function ViewVehicle() {
       {/* End of estimates table */}
 
       {/* Services Table */}
-      {!isShowingEstimates && <Box>
-        <Button variant='outlined' onClick={() => handleServiceModalOpen(null)} sx={{ mx: 1 }}>Schedule Services</Button>
-        <br/>
-        <br/>
+      {isShowingServices && <Box>
+        <Button variant='outlined' sx={{ mb: 1 }} onClick={() => handleServiceModalOpen()}>Schedule Services</Button>
         <TableContainer container={Paper} sx={{ textAlign: 'center' }}>
           <Table size='small'>
             <TableHead>
@@ -389,7 +396,7 @@ export default function ViewVehicle() {
                       </IconButton>
                     </Link>
                     <IconButton>
-                      <EditIcon onClick={() => handleServiceModalOpen(null, service)} />
+                      <EditIcon onClick={() => handleServiceModalOpen(null, service.id)} />
                     </IconButton>
                     <IconButton>
                       <DeleteIcon onClick={() => handleServiceDelete(service.id)} />
@@ -397,6 +404,13 @@ export default function ViewVehicle() {
                   </TableCell>
                 </TableRow>
               ))}
+              {vehicle.services && vehicle.services.length == 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
+                      No services found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
