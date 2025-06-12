@@ -30,7 +30,6 @@ export default function UserInfo() {
   };
 
   useEffect(() => {
-    console.log('useEffect called in UserInfo');
     async function fetchUser() {
       try {
         const response = await axios.get(process.env.REACT_APP_API_URL + 'users/', {

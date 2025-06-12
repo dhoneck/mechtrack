@@ -29,7 +29,6 @@ import { getVehicle, updateVehicle, deleteVehicle } from '../../api/vehiclesAPI'
 import { deleteEstimate } from '../../api/estimatesAPI';
 import { deleteService } from '../../api/servicesAPI';
 import { formatDateTime } from '../../utils/dateUtils';
-import {getCurrentBranch} from "../../api/usersAPI";
 
 export default function ViewVehicle() {
   // Grab vehicle ID from URL param
@@ -167,7 +166,6 @@ export default function ViewVehicle() {
 
   // Update vehicle data on component mount
   useEffect(() => {
-    console.log('ViewVehicle useEffect');
     const fetchData = async () => {
       await handleVehicleGet();
     };

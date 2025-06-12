@@ -19,6 +19,8 @@ urlpatterns = [
     path('export/customers/csv/', views.export_customers_csv, name='export_customers_csv'),
     path('export/customers/pdf/', views.export_customers_pdf, name='export_customers_pdf'),
     path('services/', views.ServiceList.as_view()),
+    path('service-items/', views.ServiceItemList.as_view()),
+    path('service-items/<int:pk>/', views.ServiceItemDetail.as_view()),
     path('services/<int:pk>/', views.ServiceDetail.as_view()),
     path('services/status-choices/', views.get_status_choices, name='status-choices'),
     path('estimates/', views.EstimateList.as_view()),

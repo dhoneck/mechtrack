@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 import {
+  Autocomplete,
   Box,
   Button,
   FormControl,
@@ -49,19 +50,13 @@ import {
  * @param {function} refreshFunction - Function to refresh the parent component (optional)
  * */
 function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=null, refreshFunction=null, }) {
-
-  // Store status choices for status dropdown
-  const [statusChoices, setStatusChoices] = useState([]);
-
-  // Store the default pricing for the current branch or use business pricing if not available
-  const [defaultPricing, setDefaultPricing] = useState([]);
-
   const [currentBranch, setCurrentBranch] = useState(null);
   const [currentBranchName, setCurrentBranchName] = useState(null);
-
-  // Default service form values
+  const [defaultPricing, setDefaultPricing] = useState([]);
+  const [statusChoices, setStatusChoices] = useState([]);
   const [serviceForm, setServiceForm] = useState({
-    vehicle_id: vehicleId,
+    vehicle_id: null,
+    branch_id: null,
     datetime: dayjs().hour(11).minute(0).second(0),
     estimated_time: '1 hr',
     service_items: [{ id: null, description: '', part_price: '', labor_price: '' }],
@@ -69,32 +64,24 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
     internal_notes: '',
     mileage: null,
     status: 'Scheduled',
+    estimate: null,
   });
+  const [itemsToDelete, setItemsToDelete] = useState([]);
+  const [previewDate, setPreviewDate] = useState(new Date());
+  const [scheduledServices, setScheduledServices] = useState([]);
 
   /** Update a specific field in the vehicle form. */
   const handleFieldChange = (field, value) => {
-    console.log('Value in handleFieldChange:', value);
     setServiceForm((prev) => ({
       ...prev,
       [field]: value,
     }));
+    if (field == 'datetime') {
+      setPreviewDate(new Date(value));
+    }
   };
 
-  // Store date being used in schedule preview widget
-  const [previewDate, setPreviewDate] = useState(new Date());
-
-  // Store services scheduled happening on preview date
-  const [scheduledServices, setScheduledServices] = useState([]);
-
-  // Store an array of service item IDs that need to be deleted
-  const [itemsToDelete, setItemsToDelete] = useState([]);
-
-  // Define functions to handle form changes
-  const handleDateTimeChange = (e) => {
-      handleFieldChange('datetime', e);
-      setPreviewDate(new Date(e));
-    };
-  
+  /** Adds a blank row to the service_items. */
   const handleAddRow = () => {
     setServiceForm((prev) => ({
       ...prev,
@@ -102,6 +89,14 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
     }));
   };
 
+  /** Updates specific field within the service_items Service Form. */
+  const updateRowField = (index, field, value) => {
+    const updatedRows = [...serviceForm.service_items];
+    updatedRows[index][field] = value;
+    handleFieldChange('service_items', updatedRows);
+  };
+
+  /** Removes a service_items row. */
   const handleRemoveRow = (index, id) => {
     if (serviceForm.service_items.length === 1) return;  // Ensure at least one service exists
     // Remove the service and reset services useState
@@ -117,33 +112,14 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
     }
   };
 
-  const handleDescriptionChange = (index, value) => {
-    const newServices = [...serviceForm.service_items];
-    newServices[index].description = value;
-    handleFieldChange('service_items', newServices);
-  };
-
-  const handlePartPriceChange = (index, value) => {
-    const newServices = [...serviceForm.service_items];
-    newServices[index].part_price = value;
-    handleFieldChange('service_items', newServices);
-  };
-
-  const handleLaborPriceChange = (index, value) => {
-    const newServices = [...serviceForm.service_items];
-    newServices[index].labor_price = value;
-    handleFieldChange('service_items', newServices);
-  };
-
-  /** Searches for services on a particular date */
+  /** Searches for services on a particular date. */
   const handleSchedulePreview = async (e) => {
-    console.log('Preview date:', e);
     // Set date for schedule preview widget
     setPreviewDate(new Date(e));
 
     // Update dateTime with the new date while preserving the time
-    const lastDateTime = serviceForm.datetime;
-    handleFieldChange('datetime', dayjs(e).hour(lastDateTime.hour()).minute(lastDateTime.minute()));
+    handleFieldChange('datetime', e);
+
 
     // Format date and endpoint URL
     let date = new Date(e);
@@ -160,13 +136,47 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
     }
   }
 
-   /** Make POST request to add new service for a vehicle */
+  function filterObject(data, allowedKeys, nestedKey = null, nestedAllowedKeys = null) {
+    // Filter top-level keys
+    const filteredData = Object.keys(data).reduce((acc, key) => {
+      if (allowedKeys.includes(key)) {
+        acc[key] = data[key];
+      }
+      return acc;
+    }, {});
+
+    // If there's a nested key to filter
+    if (nestedKey && nestedKey in data && nestedAllowedKeys) {
+      filteredData[nestedKey] = data[nestedKey].map(item =>
+        Object.keys(item).reduce((acc, key) => {
+          if (nestedAllowedKeys.includes(key)) {
+            acc[key] = item[key];
+          }
+          return acc;
+        }, {})
+      );
+    }
+
+    return filteredData;
+  }
+
+  const allowedKeys = ['vehicle_id', 'branch_id', 'datetime', 'estimated_time', 'service_items', 'customer_notes', 'internal_notes', 'mileage', 'status', 'estimate'];
+  const nestedAllowedKeys = ['id', 'description', 'part_price', 'labor_price'];
+
+  /** Submit form for either creating or editting a service */
   const handleSubmit = async () => {
     // Try to create a new service
     try {
-      console.log('serviceForm to submit');
+      handleFieldChange('vehicle_id', vehicleId);
+      handleFieldChange('branch_id', currentBranch);
+
+      console.log('service form to be submitted:');
       console.log(serviceForm);
-      await createService(serviceForm);
+      if (!serviceId) {
+        await createService(serviceForm);
+      } else {
+        const filteredServiceData = filterObject(serviceForm, allowedKeys, "service_items", nestedAllowedKeys);
+      }
 
       // Refresh the parent component if a refresh function was provided
       if (refreshFunction) { refreshFunction(); }
@@ -182,10 +192,8 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
     try {
       const response = await getService(serviceId);
       const service = response.data;
-      console.log('handleServiceGet service:');
-      console.log(service);
+
       if (!service.service_items) {
-        console.log('Adding default service item');
         handleFieldChange('service_items', [{ id: null, description: '', part_price: '', labor_price: '' }]);
       }
 
@@ -196,55 +204,23 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
   }
 
   useEffect(() => {
-    console.log('vehicleId:', vehicleId);
+    if (estimate) handleFieldChange('service_items', estimate.estimate_items);
+    if (serviceId) handleServiceGet();
 
-    console.log('serviceForm from useEffect');
-    console.log(serviceForm)
-    // Assign estimate items to service items if an estimate was passed
-    if (estimate) {
-      handleFieldChange('service_items', estimate.estimate_items);
-    }
-
-    // If serviceId was passed then get the service because
-    if (serviceId) {
-      console.log('Service ID was passed');
-      handleServiceGet();
-    }
-
-    async function fetchStatusChoices() {
-      try {
-        const response = await getStatusChoices();
-        const statusChoices = response.data;
-        setStatusChoices(statusChoices);
-      } catch (error) {
-        console.error('Error fetching status choices:', error);
-      }
-    }
-
-    async function fetchDefaultPricing() {
+    const fetchData = async () => {
       try {
         const branchResponse = await getCurrentBranch();
-        let currentBranch = branchResponse.data.current_branch;
-        let currentBranchName = branchResponse.data.current_branch_name;
-
-        if (!currentBranch) {
-          console.warn('No current branch for user selected, will not look for service pricing');
-          return;
-        }
-
-        setCurrentBranch(currentBranch);
-        setCurrentBranchName(currentBranchName);
-
-        const pricingResponse = await getPricing(currentBranch);
-        const pricing = pricingResponse.data.default_pricing;
-        setDefaultPricing(pricing);
+        setCurrentBranch(branchResponse.data.current_branch);
+        setCurrentBranchName(branchResponse.data.current_branch_name);
+        const pricingResponse = await getPricing(branchResponse.data.current_branch);
+        setDefaultPricing(pricingResponse.data.default_pricing);
+        const statusResponse = await getStatusChoices();
+        setStatusChoices(statusResponse.data);
       } catch (error) {
-         console.error('Error fetching default pricing:', error);
+        console.error(error);
       }
-    }
-
-    fetchDefaultPricing();
-    fetchStatusChoices();
+    };
+    fetchData();
   }, [vehicleId, open]);
 
   // Define modal style
@@ -283,8 +259,8 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
                     timeSteps={{ minutes: 15 }}
                     label='Service Date & Time'
                     sx={{ mb: 1, width: '100%' }}
-                    value={serviceForm.datetime}
-                    onChange={(e) => handleDateTimeChange(e.target.value)}
+                    value={ serviceForm.datetime ? dayjs(serviceForm.datetime) : dayjs() }
+                    onChange={(e) => handleFieldChange('datetime', e)}
                   />
               </LocalizationProvider>
               <FormControl sx={{ mb: 1, width: '100%' }}>
@@ -317,11 +293,31 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
               </Box>
               {serviceForm.service_items && serviceForm.service_items.map((row, index) => (
                 <Box key={index} data-id={row.id} sx={{ display: 'flex', flexDirection: 'row', gap: '10px', marginY: '10px' }}>
-                  <TextField sx={{ flexGrow: 1 }} value={row.description} onChange={(e) => handleDescriptionChange(index, e.target.value)} />
+                  <Autocomplete
+                    disablePortal
+                    freeSolo
+                    sx={{ flexGrow: 1 }}
+                    options={defaultPricing}
+                    getOptionLabel={(option) => option.name}
+                    inputValue={row.description}
+                    onInputChange={(event, newInputValue) => {
+                      updateRowField(index, 'description', newInputValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                      />
+                    )}
+                    onChange={(event, newValue) => {
+                      updateRowField(index, 'description', newValue?.description || '');
+                      updateRowField(index, 'part_price', newValue?.part_price || '');
+                      updateRowField(index, 'labor_price', newValue?.labor_price || '');
+                    }}
+                  />
                   <TextField
                     sx={{ width: '125px' }}
                     value={row.part_price}
-                    onChange={(e) => handlePartPriceChange(index, e.target.value)}
+                    onChange={(e) => updateRowField(index, 'part_price', e.target.value)}
                     slotProps={{
                       input: {
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -330,7 +326,7 @@ function ServiceModal({ open, handleClose, vehicleId, estimate=null, serviceId=n
                   /><TextField
                     sx={{ width: '125px' }}
                     value={row.labor_price}
-                    onChange={(e) => handleLaborPriceChange(index, e.target.value)}
+                    onChange={(e) => updateRowField(index, 'labor_price', e.target.value)}
                     slotProps={{
                       input: {
                         startAdornment: <InputAdornment position="start">$</InputAdornment>,
